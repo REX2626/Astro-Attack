@@ -1,7 +1,6 @@
 import pygame
 import os
 import sys
-import decimal
 
 
 
@@ -19,8 +18,8 @@ def get_path(relative_path):
 
 class Object():
     def __init__(self, x, y, width, height, image) -> None:
-        self.x = decimal.Decimal(x)
-        self.y = decimal.Decimal(y)
+        self.x = x
+        self.y = y
         self.width = width
         self.height = height
         self.image = image
