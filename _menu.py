@@ -35,14 +35,10 @@ class Menu():
         self.credit_title =   Widget(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 8    , "CREDITS"     , main.WHITE, "comicsans", 40)
         self.credit_text =      Text(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 8 * 2, """
                                                                                           Rex Attwood
-                                                                                          Freddie Weir
+                                                                                          Gabriel Correia
                                                                                           """ , main.WHITE, "comicsans", 20)
         self.controls_title = Widget(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 8 * 3, "CONTROLS"     , main.WHITE, "comicsans", 40)
         self.controls_text =    Text(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 8 * 4.7, """
-                                                                                          RED PADDLE UP: W
-                                                                                          RED PADDLE DOWN:S
-                                                                                          YELLOW PADDLE UP: UP ARROW
-                                                                                          YELLOW PADDLE DOWN: DOWN ARROW
                                                                                           CHANGE SETTINGS: UP AND DOWN ARROWS
                                                                                           PAUSE: ESC
                                                                                           """ , main.WHITE, "comicsans", 20)

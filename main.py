@@ -7,7 +7,7 @@ import _menu
 pygame.init()
 
 WIN = pygame.display.set_mode((1600, 1000), flags=pygame.RESIZABLE)
-pygame.display.set_caption("GamingX Framework")
+pygame.display.set_caption("Astro Attack")
 WIDTH, HEIGHT = pygame.display.get_window_size()
 FULLSCREEN = True
 FULLSCREEN_SIZE = WIDTH, HEIGHT
