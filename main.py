@@ -1,7 +1,7 @@
 from time import perf_counter
 import pygame
 import sys
-from objects import Object, MoveableObject
+from objects import Object, MoveableObject, Player_Ship
 import _menu
 
 pygame.init()
@@ -60,16 +60,54 @@ def draw_window(objects: list[Object], delta_time):
 
 
 def handle_player_movement(keys_pressed, objects):
+
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
     if keys_pressed[pygame.K_UP]:
-        "move_up()"
+        move_up()
+
+    if keys_pressed[pygame.K_DOWN]:
+        move_down()
+
+    if keys_pressed[pygame.K_LEFT]:
+        move_left()
+
+    if keys_pressed[pygame.K_RIGHT]:
+        move_right()
+    
+
+
+def move_up():
+    red_ship.change_vel(0, -1)
+
+def move_down():
+    red_ship.change_vel(0, 1)
+
+def move_left():
+    red_ship.change_vel(-1, 0)
+
+def move_right():
+    red_ship.change_vel(1, 0)
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
     """Handles movement for all objects, adjusts positions based on velocity"""
     
     # Loop until every object has moved for the given time
+    for object in objects:
+        object.update_pos(delta_time)
+
+
+def add_objects():
+
+    objects = []
+
+    # Red Player Ship
+    global red_ship
+    red_ship = Player_Ship(x=300, y=300, vx=0, vy=0, width=200, height=200, max_speed=100, image="assets/red_ship.png")
+    objects.append(red_ship)
+
+    return objects
 
 
 def quit():
@@ -82,8 +120,9 @@ def main(menu: "_menu.Menu"):
     """Main game loop"""
     delta_time = 0
 
-    objects = []
     static_objects = []
+
+    objects = add_objects()
     
     running = True
     paused = False
