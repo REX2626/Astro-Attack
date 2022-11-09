@@ -22,6 +22,16 @@ class Vector():
         self.x = x
         self.y = y
 
+    def __add__(self, arg):
+
+        # Adding Vectors
+        if type(arg) == Vector:
+            return Vector(self.x + arg.x, self.y + arg.y)
+
+        # Adding Vector to Scalar
+        else:
+            return Vector(self.x + arg, self.y + arg)
+
     def __repr__(self):
         return str((self.x, self.y))
 
@@ -50,20 +60,21 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, vx, vy, width, height, image) -> None:
+    def __init__(self, position, velocity, width, height, image) -> None:
         super().__init__(position, width, height, image)
         self.vx = vx
         self.vy = vy
 
     def update_posx(self, delta_time):
-        self.x += self.vx * delta_time
+        self.position.x += self.vx * delta_time
     
     def update_posy(self, delta_time):
-        self.y += self.vy * delta_time
+        self.position.y += self.vy * delta_time
 
     def update_pos(self, delta_time):
         self.update_posx(delta_time)
         self.update_posy(delta_time)
+        self.position += self.velocity * delta_time
 
     def change_vel(self, ax, ay):
         self.vx += ax
