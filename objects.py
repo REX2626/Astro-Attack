@@ -31,6 +31,16 @@ class Vector():
         # Adding Vector to Scalar
         else:
             return Vector(self.x + arg, self.y + arg)
+    
+    def __sub__(self, arg):
+
+        # Subtracting Vectors
+        if type(arg) == Vector:
+            return Vector(self.x - arg.x, self.y - arg.y)
+        
+        # Subtracting Scalar from Vector
+        else:
+            return Vector(self.x - arg, self.y - arg)
 
     def __mul__(self, arg):
 
@@ -67,8 +77,8 @@ class Object():
         self.height = height
         self.image = pygame.transform.scale(pygame.image.load(image), (width, height)).convert()
 
-    def draw(self, win: pygame.Surface):
-        win.blit(self.image, (round(self.position)))
+    def draw(self, win: pygame.Surface, focus_point):
+        win.blit(self.image, (round(self.position - focus_point)))
 
 
 
