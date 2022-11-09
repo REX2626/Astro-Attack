@@ -16,23 +16,42 @@ def get_path(relative_path):
 
 
 
-class Object():
-    def __init__(self, x, y, width, height, image) -> None:
+
+class Vector():
+    def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
+
+    def __repr__(self):
+        return str((self.x, self.y))
+
+    def __round__(self):
+        self.x = round(self.x)
+        self.y = round(self.y)
+
+
+
+class Object():
+    def __init__(self, position, width, height, image) -> None:
+        
+        # Make position a vector
+        if type(self.position) != Vector:
+            self.position = Vector(position[0], position[1])
+        else:
+            self.position = position
+
         self.width = width
         self.height = height
         self.image = pygame.transform.scale(pygame.image.load(image), (width, height)).convert()
 
     def draw(self, win: pygame.Surface):
-        print(self.x, self.y)
-        win.blit(self.image, (round(self.x), round(self.y)))
+        win.blit(self.image, (round(self.position)))
 
 
 
 class MoveableObject(Object):
-    def __init__(self, x, y, vx, vy, width, height, image) -> None:
-        super().__init__(x, y, width, height, image)
+    def __init__(self, position, vx, vy, width, height, image) -> None:
+        super().__init__(position, width, height, image)
         self.vx = vx
         self.vy = vy
 
