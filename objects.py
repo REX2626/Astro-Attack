@@ -56,11 +56,13 @@ class Vector():
         return str((self.x, self.y))
 
     def __round__(self):
-        self.x = round(self.x)
-        self.y = round(self.y)
+        return Vector(round(self.x), round(self.y))
 
     def magnitude(self):
         return (self.x**2 + self.y**2) ** 0.5
+    
+    def to_tuple(self):
+        return (self.x, self.y)
 
 
 
@@ -77,8 +79,8 @@ class Object():
         self.height = height
         self.image = pygame.transform.scale(pygame.image.load(image), (width, height)).convert()
 
-    def draw(self, win: pygame.Surface, focus_point):
-        win.blit(self.image, (round(self.position - focus_point)))
+    def draw(self, win: pygame.Surface, focus_point, centre_point):
+        win.blit(self.image, (round(self.position - focus_point + centre_point)).to_tuple())
 
 
 

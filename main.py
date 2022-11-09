@@ -1,7 +1,7 @@
 from time import perf_counter
 import pygame
 import sys
-from objects import Object, MoveableObject, Player_Ship
+from objects import Vector, Object, MoveableObject, Player_Ship
 import _menu
 
 pygame.init()
@@ -49,8 +49,10 @@ def draw_window(objects: list[Object], delta_time):
     """Draw window"""
     WIN.fill(BLACK)
 
+    # centre_point is the position of red_ship on screen
+    centre_point = Vector(WIDTH/2, HEIGHT/2)
     for object in objects:
-        object.draw(WIN, red_ship)
+        object.draw(WIN, red_ship.position, centre_point)
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
@@ -78,16 +80,16 @@ def handle_player_movement(keys_pressed, objects):
 
 
 def move_up():
-    red_ship.change_vel(0, -1)
+    red_ship.change_vel(Vector(0, -1))
 
 def move_down():
-    red_ship.change_vel(0, 1)
+    red_ship.change_vel(Vector(0, 1))
 
 def move_left():
-    red_ship.change_vel(-1, 0)
+    red_ship.change_vel(Vector(-1, 0))
 
 def move_right():
-    red_ship.change_vel(1, 0)
+    red_ship.change_vel(Vector(1, 0))
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
@@ -104,7 +106,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(x=300, y=300, vx=0, vy=0, width=200, height=200, max_speed=100, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), width=200, height=200, max_speed=100, image="./assets/red_ship.png")
     objects.append(red_ship)
 
     return objects
