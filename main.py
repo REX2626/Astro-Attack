@@ -50,7 +50,7 @@ def draw_window(objects: list[Object], delta_time):
     WIN.fill(BLACK)
 
     for object in objects:
-        object.draw(WIN)
+        object.draw(WIN, red_ship)
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
@@ -104,7 +104,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(x=300, y=300, vx=0, vy=0, width=200, height=200, max_speed=100, image="assets/red_ship.png")
+    red_ship = Player_Ship(x=300, y=300, vx=0, vy=0, width=200, height=200, max_speed=100, image="./assets/red_ship.png")
     objects.append(red_ship)
 
     return objects
