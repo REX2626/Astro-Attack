@@ -7,7 +7,7 @@ import random
 
 pygame.init()
 
-WIN = pygame.display.set_mode((1600, 1000), flags=pygame.RESIZABLE)
+WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 pygame.display.set_caption("Astro Attack")
 WIDTH, HEIGHT = pygame.display.get_window_size()
 FULLSCREEN = True
@@ -62,35 +62,35 @@ def draw_window(objects: list[Object], delta_time):
     pygame.display.update()
 
 
-def handle_player_movement(keys_pressed, objects):
+def handle_player_movement(keys_pressed, objects, delta_time):
 
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
     if keys_pressed[pygame.K_UP]:
-        move_up()
+        move_up(delta_time)
 
     if keys_pressed[pygame.K_DOWN]:
-        move_down()
+        move_down(delta_time)
 
     if keys_pressed[pygame.K_LEFT]:
-        move_left()
+        move_left(delta_time)
 
     if keys_pressed[pygame.K_RIGHT]:
-        move_right()
+        move_right(delta_time)
     
 
 
-def move_up():
-    red_ship.change_vel(Vector(0, -10))
+def move_up(delta_time):
+    red_ship.change_vel(delta_time * Vector(0, -2000))
 
-def move_down():
-    red_ship.change_vel(Vector(0, 10))
+def move_down(delta_time):
+    red_ship.change_vel(delta_time * Vector(0, 2000))
 
-def move_left():
-    red_ship.change_vel(Vector(-10, 0))
+def move_left(delta_time):
+    red_ship.change_vel(delta_time * Vector(-2000, 0))
 
-def move_right():
-    red_ship.change_vel(Vector(10, 0))
+def move_right(delta_time):
+    red_ship.change_vel(delta_time * Vector(2000, 0))
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
@@ -135,7 +135,7 @@ def main(menu: "_menu.Menu"):
 
             keys_pressed = pygame.key.get_pressed()
 
-            handle_player_movement(keys_pressed, objects)
+            handle_player_movement(keys_pressed, objects, delta_time)
             handle_movement(objects, static_objects, delta_time)
             objects.append(MoveableObject(
                 position=(random.randint(round(red_ship.position.x)-500, round(red_ship.position.x)+500), random.randint(round(red_ship.position.y)-500, round(red_ship.position.y)+500)),

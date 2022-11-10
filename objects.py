@@ -52,6 +52,16 @@ class Vector():
         else:
             return Vector(self.x * arg, self.y * arg)
 
+    def __rmul__(self, arg):
+
+        # Multiplying Vectors
+        if type(arg) == Vector:
+            return Vector(self.x * arg.x, self.y * arg.y)
+
+        # Multiplying Vector with Scalar
+        else:
+            return Vector(self.x * arg, self.y * arg)
+
     def __repr__(self):
         return str((self.x, self.y))
 
