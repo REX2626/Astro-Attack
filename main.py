@@ -3,6 +3,7 @@ import pygame
 import sys
 from objects import Vector, Object, MoveableObject, Player_Ship
 import _menu
+import random
 
 pygame.init()
 
@@ -80,16 +81,16 @@ def handle_player_movement(keys_pressed, objects):
 
 
 def move_up():
-    red_ship.change_vel(Vector(0, -1))
+    red_ship.change_vel(Vector(0, -10))
 
 def move_down():
-    red_ship.change_vel(Vector(0, 1))
+    red_ship.change_vel(Vector(0, 10))
 
 def move_left():
-    red_ship.change_vel(Vector(-1, 0))
+    red_ship.change_vel(Vector(-10, 0))
 
 def move_right():
-    red_ship.change_vel(Vector(1, 0))
+    red_ship.change_vel(Vector(10, 0))
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
@@ -106,7 +107,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), width=200, height=200, max_speed=100, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), width=200, height=200, max_speed=500, image="./assets/red_ship.png")
     objects.append(red_ship)
 
     return objects
@@ -136,6 +137,12 @@ def main(menu: "_menu.Menu"):
 
             handle_player_movement(keys_pressed, objects)
             handle_movement(objects, static_objects, delta_time)
+            objects.append(MoveableObject(
+                position=(random.randint(round(red_ship.position.x)-500, round(red_ship.position.x)+500), random.randint(round(red_ship.position.y)-500, round(red_ship.position.y)+500)),
+                velocity=(0, 0),
+                width=50,
+                height=50,
+                image="assets/GABE.png"))
 
             draw_window(objects, delta_time)
 

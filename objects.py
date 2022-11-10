@@ -119,5 +119,5 @@ class Player_Ship(Ship):
         self.max_speed = max_speed
 
     def change_vel(self, acceleration):
-        self.velocity + acceleration
+        self.velocity += acceleration
         self.clamp_vel(self.max_speed)
