@@ -122,3 +122,17 @@ class Player_Ship(Ship):
     def change_vel(self, acceleration):
         self.velocity += acceleration
         self.clamp_vel(self.max_speed)
+    
+    def update_pos(self, delta_time):
+        super().update_pos(delta_time)
+
+        # Inertial Dampening
+        if self.velocity.x > 0:
+            self.velocity.x -= 200 * delta_time
+        elif self.velocity.x < 0:
+            self.velocity.x += 200 * delta_time
+        if self.velocity.y > 0:
+            self.velocity.y -= 200 * delta_time
+        elif self.velocity.y < 0:
+            self.velocity.y += 200 * delta_time
+        #self.velocity -= self.velocity * delta_time
