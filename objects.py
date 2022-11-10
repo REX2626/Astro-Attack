@@ -77,10 +77,11 @@ class Object():
 
         self.width = width
         self.height = height
+        self.size = Vector(width, height)
         self.image = pygame.transform.scale(pygame.image.load(image), (width, height)).convert()
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
-        win.blit(self.image, (round(self.position - focus_point + centre_point)).to_tuple())
+        win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
 
 
 
