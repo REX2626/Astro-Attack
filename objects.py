@@ -104,7 +104,7 @@ class Vector():
 
 
 class Object():
-    def __init__(self, position, width, height, image) -> None:
+    def __init__(self, position, width, height, image="assets/default_image.png") -> None:
         
         # Make position a vector
         if type(position) != Vector:
@@ -123,7 +123,7 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, width, height, image) -> None:
+    def __init__(self, position, velocity, width, height, image="assets/default_image.png") -> None:
         super().__init__(position, width, height, image)
 
         # Make velocity a vector
@@ -138,14 +138,19 @@ class MoveableObject(Object):
 
 
 class Ship(MoveableObject):
-    def __init__(self, position: Vector, velocity: Vector, width, height, image) -> None:
+    def __init__(self, position: Vector, velocity: Vector, width, height, rotation=0, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, width, height, image)
+        self.rotation = rotation
+
+    def set_rotation(self, rotation):
+        self.rotation = rotation
+        self.image = pygame.transform.rotate(self.image, rotation)
 
 
 
 class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, width, height, max_speed, image) -> None:
-        super().__init__(position, velocity, width, height, image)
+    def __init__(self, position: Vector, velocity: Vector, width, height, max_speed, rotation=0, image="assets/default_image.png") -> None:
+        super().__init__(position, velocity, width, height, rotation, image)
         self.max_speed = max_speed
 
     def change_vel(self, acceleration: Vector):

@@ -66,17 +66,23 @@ def handle_player_movement(keys_pressed, objects, delta_time):
 
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
-    if keys_pressed[pygame.K_UP]:
+    if keys_pressed[pygame.K_w]:
         move_up(delta_time)
 
-    if keys_pressed[pygame.K_DOWN]:
+    if keys_pressed[pygame.K_s]:
         move_down(delta_time)
 
-    if keys_pressed[pygame.K_LEFT]:
+    if keys_pressed[pygame.K_a]:
         move_left(delta_time)
 
-    if keys_pressed[pygame.K_RIGHT]:
+    if keys_pressed[pygame.K_d]:
         move_right(delta_time)
+
+    if keys_pressed[pygame.K_LEFT]:
+        turn_left(delta_time)
+
+    if keys_pressed[pygame.K_RIGHT]:
+        turn_right(delta_time)
     
 
 
@@ -91,6 +97,12 @@ def move_left(delta_time):
 
 def move_right(delta_time):
     red_ship.change_vel(delta_time * Vector(2000, 0))
+
+def turn_left(delta_time):
+    red_ship.set_rotation(red_ship.rotation - 1 * delta_time)
+
+def turn_right(delta_time):
+    red_ship.set_rotation(red_ship.rotation + 1 * delta_time)
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
