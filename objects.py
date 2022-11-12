@@ -103,7 +103,7 @@ class Vector():
         x1, y1 = self.x, self.y
         # The positive and negative signs are different
         # Because y increases downwards (for our coord system)
-        self.x = y1*math.sin(angle) - x1*math.cos(angle)
+        self.x = y1*math.sin(angle) + x1*math.cos(angle)
         self.y = y1*math.cos(angle) - x1*math.sin(angle)
     
     def to_tuple(self):
@@ -112,7 +112,7 @@ class Vector():
 
 
 class Object():
-    def __init__(self, position, width, height, image="assets/default_image.png") -> None:
+    def __init__(self, position, size, image="assets/default_image.png") -> None:
         
         # Make position a vector
         if type(position) != Vector:
@@ -120,10 +120,13 @@ class Object():
         else:
             self.position = position
 
-        self.width = width
-        self.height = height
-        self.size = Vector(width, height)
-        self.image = pygame.transform.scale(pygame.image.load(image), (width, height)).convert()
+        # Make size a vector
+        if type(size) != Vector:
+            self.size = Vector(size[0], size[1])
+        else:
+            self.size = size
+
+        self.image = pygame.transform.scale(pygame.image.load(image), (size)).convert()
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
@@ -132,8 +135,8 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, width, height, image="assets/default_image.png") -> None:
-        super().__init__(position, width, height, image)
+    def __init__(self, position, velocity, size, image="assets/default_image.png") -> None:
+        super().__init__(position, size, image)
 
         # Make velocity a vector
         if type(velocity) != Vector:
@@ -147,8 +150,8 @@ class MoveableObject(Object):
 
 
 class Ship(MoveableObject):
-    def __init__(self, position: Vector, velocity: Vector, width, height, rotation=0, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, width, height, image)
+    def __init__(self, position: Vector, velocity: Vector, size, rotation=0, image="assets/default_image.png") -> None:
+        super().__init__(position, velocity, size, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
@@ -160,14 +163,13 @@ class Ship(MoveableObject):
         # pygame.transform.rotate uses degrees NOT radians
         # so rotation needs to be converted to degrees
         self.image = pygame.transform.rotate(self.original_image, rotation / math.pi * 180)
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
+        self.size = Vector(self.image.get_width(), self.image.get_height())
 
 
 
 class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, width, height, max_speed, rotation=0, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, width, height, rotation, image)
+    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, image="assets/default_image.png") -> None:
+        super().__init__(position, velocity, size, rotation, image)
         self.max_speed = max_speed
 
     def accelerate(self, acceleration: Vector):

@@ -123,7 +123,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), width=200, height=200, max_speed=500, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), size=(200, 200), max_speed=500, image="./assets/red_ship.png")
     objects.append(red_ship)
 
     return objects
@@ -156,8 +156,7 @@ def main(menu: "_menu.Menu"):
             objects.append(MoveableObject(
                 position=(random.randint(round(red_ship.position.x)-500, round(red_ship.position.x)+500), random.randint(round(red_ship.position.y)-500, round(red_ship.position.y)+500)),
                 velocity=(0, 0),
-                width=50,
-                height=50,
+                size=(50, 50),
                 image="assets/GABE.png"))
 
             draw_window(objects, delta_time)
