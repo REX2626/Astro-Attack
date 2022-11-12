@@ -126,7 +126,7 @@ class Object():
         else:
             self.size = size
 
-        self.image = pygame.transform.scale(pygame.image.load(image), (size)).convert()
+        self.image = pygame.transform.scale(pygame.image.load(image), (size)).convert_alpha()
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())

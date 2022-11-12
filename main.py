@@ -53,7 +53,7 @@ def draw_window(objects: list[Object], delta_time):
 
     # centre_point is the position of red_ship on screen
     centre_point = Vector(WIDTH/2, HEIGHT/2)
-    for object in objects:
+    for object in objects[::-1]:
         object.draw(WIN, red_ship.position, centre_point)
 
     if delta_time:
@@ -91,22 +91,22 @@ def handle_player_movement(keys_pressed, objects, delta_time):
 
 
 def move_up(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(0, -2000))
+    red_ship.accelerate_relative(delta_time * Vector(0, -1000))
 
 def move_down(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(0, 2000))
+    red_ship.accelerate_relative(delta_time * Vector(0, 1000))
 
 def move_left(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(-2000, 0))
+    red_ship.accelerate_relative(delta_time * Vector(-1000, 0))
 
 def move_right(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(2000, 0))
+    red_ship.accelerate_relative(delta_time * Vector(1000, 0))
 
 def turn_left(delta_time):
-    red_ship.set_rotation(red_ship.rotation + 1 * delta_time)
+    red_ship.set_rotation(red_ship.rotation + 2 * delta_time)
 
 def turn_right(delta_time):
-    red_ship.set_rotation(red_ship.rotation - 1 * delta_time)
+    red_ship.set_rotation(red_ship.rotation - 2 * delta_time)
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
@@ -123,7 +123,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), size=(200, 200), max_speed=500, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), size=(150, 150), max_speed=1000, image="./assets/red_ship.png")
     objects.append(red_ship)
 
     return objects
