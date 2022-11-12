@@ -1,6 +1,7 @@
 import pygame
 import os
 import sys
+import math
 
 
 
@@ -97,6 +98,13 @@ class Vector():
         new_vector = self * magnitude / self.magnitude()
         self.x = new_vector.x
         self.y = new_vector.y
+
+    def rotate(self, angle):
+        x1, y1 = self.x, self.y
+        # The positive and negative signs are different
+        # Because y increases downwards (for our coord system)
+        self.x = y1*math.sin(angle) - x1*math.cos(angle)
+        self.y = y1*math.cos(angle) - x1*math.sin(angle)
     
     def to_tuple(self):
         return (self.x, self.y)
@@ -119,6 +127,7 @@ class Object():
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
+        pygame.draw.rect(win, (255, 0, 0), (self.image.get_rect()))
 
 
 
@@ -140,11 +149,19 @@ class MoveableObject(Object):
 class Ship(MoveableObject):
     def __init__(self, position: Vector, velocity: Vector, width, height, rotation=0, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, width, height, image)
+
+        # self.rotation is stored as radians
         self.rotation = rotation
+        self.original_image = self.image
 
     def set_rotation(self, rotation):
         self.rotation = rotation
-        self.image = pygame.transform.rotate(self.image, rotation)
+
+        # pygame.transform.rotate uses degrees NOT radians
+        # so rotation needs to be converted to degrees
+        self.image = pygame.transform.rotate(self.original_image, rotation / math.pi * 180)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
 
 
@@ -153,7 +170,12 @@ class Player_Ship(Ship):
         super().__init__(position, velocity, width, height, rotation, image)
         self.max_speed = max_speed
 
-    def change_vel(self, acceleration: Vector):
+    def accelerate(self, acceleration: Vector):
+        self.velocity += acceleration
+        self.velocity.clamp(self.max_speed)
+
+    def accelerate_relative(self, acceleration: Vector):
+        acceleration.rotate(self.rotation)
         self.velocity += acceleration
         self.velocity.clamp(self.max_speed)
     

@@ -4,6 +4,7 @@ import sys
 from objects import Vector, Object, MoveableObject, Player_Ship
 import _menu
 import random
+import math
 
 pygame.init()
 
@@ -59,6 +60,9 @@ def draw_window(objects: list[Object], delta_time):
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 0))
 
+        label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180)}", True, (255, 255, 255))
+        WIN.blit(label, (300, 0))
+
     pygame.display.update()
 
 
@@ -87,22 +91,22 @@ def handle_player_movement(keys_pressed, objects, delta_time):
 
 
 def move_up(delta_time):
-    red_ship.change_vel(delta_time * Vector(0, -2000))
+    red_ship.accelerate_relative(delta_time * Vector(0, -2000))
 
 def move_down(delta_time):
-    red_ship.change_vel(delta_time * Vector(0, 2000))
+    red_ship.accelerate_relative(delta_time * Vector(0, 2000))
 
 def move_left(delta_time):
-    red_ship.change_vel(delta_time * Vector(-2000, 0))
+    red_ship.accelerate_relative(delta_time * Vector(-2000, 0))
 
 def move_right(delta_time):
-    red_ship.change_vel(delta_time * Vector(2000, 0))
+    red_ship.accelerate_relative(delta_time * Vector(2000, 0))
 
 def turn_left(delta_time):
-    red_ship.set_rotation(red_ship.rotation - 1 * delta_time)
+    red_ship.set_rotation(red_ship.rotation + 1 * delta_time)
 
 def turn_right(delta_time):
-    red_ship.set_rotation(red_ship.rotation + 1 * delta_time)
+    red_ship.set_rotation(red_ship.rotation - 1 * delta_time)
 
 
 def handle_movement(objects: list[MoveableObject], static_objects: list[Object], delta_time):
