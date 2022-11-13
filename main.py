@@ -2,6 +2,7 @@ from time import perf_counter
 import pygame
 import sys
 from objects import Vector, Object, MoveableObject, Player_Ship
+import _chunks
 import _menu
 import random
 import math
@@ -21,6 +22,9 @@ LIGHT_GREY = (120, 120, 120)
 MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
+
+CHUNK_DISTANCE = 1
+CHUNK_SIZE = 100
 
 
 def update_screen_size():
@@ -53,7 +57,7 @@ def draw_window(objects: list[Object], delta_time):
 
     # centre_point is the position of red_ship on screen
     centre_point = Vector(WIDTH/2, HEIGHT/2)
-    for object in objects[::-1]:
+    for object in objects:
         object.draw(WIN, red_ship.position, centre_point)
 
     if delta_time:
@@ -66,7 +70,7 @@ def draw_window(objects: list[Object], delta_time):
     pygame.display.update()
 
 
-def handle_player_movement(keys_pressed, objects, delta_time):
+def handle_player_movement(keys_pressed, chunks: _chunks.Chunks, delta_time):
 
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
@@ -87,6 +91,8 @@ def handle_player_movement(keys_pressed, objects, delta_time):
 
     if keys_pressed[pygame.K_RIGHT]:
         turn_right(delta_time)
+
+    chunks.update(red_ship)
     
 
 
@@ -119,14 +125,26 @@ def handle_movement(objects: list[MoveableObject], static_objects: list[Object],
 
 def add_objects():
 
-    objects = []
+    objects = set()
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(300, 300), velocity=(0, 0), size=(150, 150), max_speed=1000, image="./assets/red_ship.png")
-    objects.append(red_ship)
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(150, 150), max_speed=1000, image="./assets/red_ship.png")
+    objects.add(red_ship)
 
     return objects
+
+def update_objects(objects: set[MoveableObject], static_objects: set[Object], chunks: _chunks.Chunks):
+
+    for entity in chunks.entities:
+
+        if type(entity) == Object:
+            static_objects.add(entity)
+
+        else:
+            objects.add(entity)
+
+    return objects, static_objects
 
 
 def quit():
@@ -139,10 +157,11 @@ def main(menu: "_menu.Menu"):
     """Main game loop"""
     delta_time = 0
 
-    static_objects = []
+    static_objects = set()
 
     objects = add_objects()
-    
+    chunks = _chunks.Chunks()
+
     running = True
     paused = False
     while running:
@@ -151,15 +170,16 @@ def main(menu: "_menu.Menu"):
 
             keys_pressed = pygame.key.get_pressed()
 
-            handle_player_movement(keys_pressed, objects, delta_time)
+            handle_player_movement(keys_pressed, chunks, delta_time)
             handle_movement(objects, static_objects, delta_time)
-            objects.append(MoveableObject(
+            objects, static_objects = update_objects(objects, static_objects, chunks)
+            """objects.append(MoveableObject(
                 position=(random.randint(round(red_ship.position.x)-500, round(red_ship.position.x)+500), random.randint(round(red_ship.position.y)-500, round(red_ship.position.y)+500)),
                 velocity=(0, 0),
                 size=(50, 50),
-                image="assets/GABE.png"))
+                image="assets/GABE.png"))"""
 
-            draw_window(objects, delta_time)
+            draw_window(objects.union(static_objects), delta_time)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

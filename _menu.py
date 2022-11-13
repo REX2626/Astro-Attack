@@ -10,7 +10,7 @@ class Menu():
         self.box_colour = main.MEDIUM_GREY
         self.setting_chosen = None
 
-        self.title_text =                  Widget(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 7    , "Gaming X Framework", main.WHITE, "comicsans", 40)
+        self.title_text =                  Widget(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 7    , "Astro Attack", main.WHITE, "comicsans", 40)
         self.singleplayer_button =         Button(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 7 * 2, lambda: main.main(self)                               , "SINGLE PLAYER", main.WHITE, self.box_colour, "comicsans", 40)
         self.multiplayer_button =          Button(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 7 * 3, lambda: main.main(self)                               , "MULTIPLAYER"  , main.WHITE, self.box_colour, "comicsans", 40)
         self.settings_button =             Button(lambda: main.WIDTH / 2, lambda: main.HEIGHT / 7 * 4, self.settings                                         , "SETTINGS"     , main.WHITE, self.box_colour, "comicsans", 40)

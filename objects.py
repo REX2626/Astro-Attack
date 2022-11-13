@@ -73,6 +73,9 @@ class Vector():
         else:
             return Vector(self.x * arg, self.y * arg)
 
+    def __mod__(self, arg):
+        return Vector(int(self.x) % arg, int(self.y) % arg)
+
     def __repr__(self):
         return str((self.x, self.y))
 
@@ -126,9 +129,11 @@ class Object():
         else:
             self.size = size
 
-        self.image = pygame.transform.scale(pygame.image.load(image), (size)).convert_alpha()
+        self.image = pygame.transform.scale(pygame.image.load(image), (self.size.to_tuple())).convert_alpha()
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
+        print(focus_point)
+        print(self.position, round(self.position - focus_point + centre_point), round(self.position - focus_point + centre_point - self.size * 0.5))
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
         pygame.draw.rect(win, (255, 0, 0), (self.image.get_rect()))
 
