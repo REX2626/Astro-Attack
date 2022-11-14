@@ -141,6 +141,9 @@ class Object():
 
         self.image = pygame.transform.scale(pygame.image.load(image), (self.size.to_tuple())).convert_alpha()
 
+    def update(self, delta_time):
+        pass
+
     def draw(self, win: pygame.Surface, focus_point, centre_point):
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
 
@@ -156,7 +159,7 @@ class MoveableObject(Object):
         else:
             self.velocity: Vector = velocity
 
-    def update_pos(self, delta_time):
+    def update(self, delta_time):
         self.position += self.velocity * delta_time
 
 
