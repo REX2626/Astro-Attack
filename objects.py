@@ -42,6 +42,16 @@ class Vector():
         # Dividing Vector by Scalar
         else:
             return Vector(self.x / arg, self.y / arg)
+
+    def __floordiv__(self, arg):
+
+        # Dividing Vectors
+        if type(arg) == Vector:
+            return Vector(self.x // arg.x, self.y // arg.y)
+        
+        # Dividing Vector by Scalar
+        else:
+            return Vector(self.x // arg, self.y // arg)
     
     def __sub__(self, arg):
 
@@ -132,10 +142,7 @@ class Object():
         self.image = pygame.transform.scale(pygame.image.load(image), (self.size.to_tuple())).convert_alpha()
 
     def draw(self, win: pygame.Surface, focus_point, centre_point):
-        print(focus_point)
-        print(self.position, round(self.position - focus_point + centre_point), round(self.position - focus_point + centre_point - self.size * 0.5))
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
-        pygame.draw.rect(win, (255, 0, 0), (self.image.get_rect()))
 
 
 

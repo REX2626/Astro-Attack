@@ -13,7 +13,7 @@ class Chunks():
     def update(self, player):
         
         # Turn coordinates into chunk coordinates
-        chunk_coords = player.position % CHUNK_SIZE
+        chunk_coords = round(player.position // CHUNK_SIZE)
 
         # Loop through chunks in square around player's position
         for y in range(chunk_coords.y - CHUNK_DISTANCE, chunk_coords.y + CHUNK_DISTANCE + 1):
@@ -22,8 +22,6 @@ class Chunks():
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
                 if position not in self.list:
-                    print(len(self.list.keys()))
-                    print(position)
                     self.list[position] = self.create_chunk(Vector(position[0], position[1]))
 
     def create_chunk(self, position):
@@ -44,7 +42,6 @@ class Chunk():
         for _ in range(3):
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE))
-            print(random_position)
             size = Vector(36, 40)
             self.entities.append(
 
