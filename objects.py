@@ -164,13 +164,14 @@ class MoveableObject(Object):
 
 
 
-class Ship(MoveableObject):
-    def __init__(self, position: Vector, velocity: Vector, size, rotation=0, image="assets/default_image.png") -> None:
+class Entity(MoveableObject):
+    def __init__(self, position, velocity, size, rotation=0, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, size, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
         self.original_image = self.image
+        self.set_rotation(rotation) 
 
     def set_rotation(self, rotation):
         self.rotation = rotation
@@ -182,9 +183,22 @@ class Ship(MoveableObject):
 
 
 
-class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, image="assets/default_image.png") -> None:
+class Ship(Entity):
+    def __init__(self, position: Vector, velocity: Vector, size, rotation=0, fire_rate=1, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, size, rotation, image)
+
+        # self.rotation is stored as radians
+        self.rotation = rotation
+        self.reload_time = 1 / fire_rate
+        self.original_image = self.image
+        
+        self.time_reloading = 0
+
+
+
+class Player_Ship(Ship):
+    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, fire_rate=1, image="assets/default_image.png") -> None:
+        super().__init__(position, velocity, size, rotation, fire_rate, image)
         self.max_speed = max_speed
 
     def accelerate(self, acceleration: Vector):
@@ -207,3 +221,27 @@ class Player_Ship(Ship):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Increase reload time
+        self.time_reloading += delta_time
+
+
+
+class Bullet(Entity):
+    def __init__(self, position, velocity, size, chunks, rotation=0, image="assets/default_image.png") -> None:
+        super().__init__(position, velocity, size, rotation, image)
+        global CHUNKS
+        CHUNKS = chunks
+        
+    def update(self, delta_time):
+        
+        # Check if bullet is near to any aliens in it's chunk
+        # If it is, then destroy alien and bullet
+        for entity in CHUNKS.get_chunk(self).entities:
+            if type(entity) == Object and (entity.position - self.position).magnitude() < 20:
+                CHUNKS.remove_entity(entity)
+                CHUNKS.remove_entity(self)
+                break
+        
+        # Position has to be updated afterwards to ensure that the bullet is still in it's chunk
+        super().update(delta_time)

@@ -25,12 +25,19 @@ class Chunks():
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
                 if position not in self.list:
-                    self.list[position] = Chunk(Vector(position[0], position[1]))
+                    self.list[position] = Chunk(Vector(x, y))
 
                 # Load entities in loaded chunks
                 self.entities.update(self.get_chunk(position).entities)
 
-    def get_chunk(self, position: tuple[float, float]) -> "Chunk":
+    def get_chunk(self, arg: tuple[int, int] | Object) -> "Chunk":
+        """Returns the chunk, arg can be a chunk_coord or an object"""
+
+        # Check if arg is chunk_coord or an entity
+        if type(arg) == tuple:
+            position = arg
+        else:
+            position = (arg.position // CHUNK_SIZE).to_tuple()
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
@@ -40,9 +47,14 @@ class Chunks():
 
     def add_entity(self, entity: Object):
 
-        chunk_coords = entity.position // CHUNK_SIZE
+        self.get_chunk(entity).entities.add(entity)
 
-        self.get_chunk(chunk_coords.to_tuple()).entities.add(entity)
+    def remove_entity(self, entity: Object):
+
+        self.get_chunk(entity).entities.remove(entity)
+        
+        if entity in self.entities:
+            self.entities.remove(entity)
 
 
 

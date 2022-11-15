@@ -1,7 +1,7 @@
 from time import perf_counter
 import pygame
 import sys
-from objects import Vector, Object, MoveableObject, Player_Ship
+from objects import Vector, Object, MoveableObject, Entity, Player_Ship, Bullet
 import _chunks
 import _menu
 import random
@@ -23,7 +23,7 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 3 # Similar to RENDER DISTANCE, how many chunks are generated
+CHUNK_DISTANCE = 10 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
 
@@ -92,6 +92,9 @@ def handle_player_movement(keys_pressed, delta_time):
     if keys_pressed[pygame.K_RIGHT]:
         turn_right(delta_time)
 
+    if keys_pressed[pygame.K_SPACE]:
+        shoot()
+
     CHUNKS.update(red_ship)
     
 
@@ -114,30 +117,60 @@ def turn_left(delta_time):
 def turn_right(delta_time):
     red_ship.set_rotation(red_ship.rotation - 2 * delta_time)
 
+def shoot():
 
-def handle_movement(delta_time):
-    """Handles movement for all objects, adjusts positions based on velocity"""
+    # Check if reloaded
+    if red_ship.time_reloading >= red_ship.reload_time:
+
+        bullet_velocity = Vector(0, -300)
+        bullet_velocity.rotate(red_ship.rotation)
+        bullet = Bullet(
+
+            position=red_ship.position,
+            velocity=bullet_velocity + red_ship.velocity,
+            size=(9, 21),
+            chunks=CHUNKS,
+            rotation=red_ship.rotation,
+            image="assets/bullet.png"
+            )
+
+        CHUNKS.add_entity(bullet)
+        red_ship.time_reloading = 0
+
+
+def update_objects(delta_time):
+    """Updates all objects, e.g. adjusts positions based on velocity"""
     
     # Loop until every object has moved for the given time
-    for object in CHUNKS.entities:
+    for object in CHUNKS.entities.copy():
         
-        # Remove object from current chunk
-        chunk = CHUNKS.get_chunk((object.position // CHUNK_SIZE).to_tuple())
-        chunk.entities.remove(object)
+        # If an object is deleted, then it can be skipped
+        if object not in CHUNKS.entities:
+            continue
+        
+        # Get orignal chunk
+        original_chunk = CHUNKS.get_chunk(object)
+        
 
         # Update object e.g. move it
         object.update(delta_time)
 
-        # Add object to the chunk it should now be in
-        chunk = CHUNKS.get_chunk((object.position // CHUNK_SIZE).to_tuple())
-        chunk.entities.add(object)
+        # Ensure object hasn't deleted itself
+        if object in original_chunk.entities:
+
+            # Remove entity from original chunk
+            original_chunk.entities.remove(object)
+
+            # Add object to the chunk it should now be in
+            chunk = CHUNKS.get_chunk(object)
+            chunk.entities.add(object)
 
 
 def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(121, 121), max_speed=1000, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(121, 121), max_speed=1000, fire_rate=10, image="assets/red_ship.png")
     CHUNKS.add_entity(red_ship)
 
 
@@ -164,7 +197,7 @@ def main(menu: "_menu.Menu"):
             keys_pressed = pygame.key.get_pressed()
 
             handle_player_movement(keys_pressed, delta_time)
-            handle_movement(delta_time)
+            update_objects(delta_time)
 
             draw_window(delta_time)
 
