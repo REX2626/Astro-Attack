@@ -24,7 +24,7 @@ DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
 CHUNK_DISTANCE = 3 # Similar to RENDER DISTANCE, how many chunks are generated
-CHUNK_SIZE = 100 # How big each chunk is
+CHUNK_SIZE = 200 # How big each chunk is
 
 
 def update_screen_size():
@@ -137,7 +137,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(150, 150), max_speed=1000, image="./assets/red_ship.png")
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(121, 121), max_speed=1000, image="./assets/red_ship.png")
     CHUNKS.add_entity(red_ship)
 
 
