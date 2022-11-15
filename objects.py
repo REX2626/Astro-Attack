@@ -47,11 +47,11 @@ class Vector():
 
         # Dividing Vectors
         if type(arg) == Vector:
-            return Vector(self.x // arg.x, self.y // arg.y)
+            return Vector(int(self.x // arg.x), int(self.y // arg.y))
         
         # Dividing Vector by Scalar
         else:
-            return Vector(self.x // arg, self.y // arg)
+            return Vector(int(self.x // arg), int(self.y // arg))
     
     def __sub__(self, arg):
 
@@ -196,8 +196,8 @@ class Player_Ship(Ship):
         self.velocity += acceleration
         self.velocity.clamp(self.max_speed)
     
-    def update_pos(self, delta_time):
-        super().update_pos(delta_time)
+    def update(self, delta_time):
+        super().update(delta_time)
 
         # Inertial Dampening
         """

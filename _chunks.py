@@ -13,7 +13,7 @@ class Chunks():
     def update(self, player):
         
         # Turn coordinates into chunk coordinates
-        chunk_coords = round(player.position // CHUNK_SIZE)
+        chunk_coords = player.position // CHUNK_SIZE
 
         # Unload all entities
         self.entities = set()
@@ -27,15 +27,10 @@ class Chunks():
                 if position not in self.list:
                     self.list[position] = Chunk(Vector(position[0], position[1]))
 
-                # Put entities into the right chunks
-                for entity in self.get_chunk(position).entities:
-                    self.get_chunk(position).entities.remove(entity)
-                    self.get_chunk(round(entity.position // CHUNK_SIZE).to_tuple()).entities.add(entity)
-
                 # Load entities in loaded chunks
                 self.entities.update(self.get_chunk(position).entities)
 
-    def get_chunk(self, position: tuple) -> "Chunk":
+    def get_chunk(self, position: tuple[float, float]) -> "Chunk":
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
@@ -45,7 +40,7 @@ class Chunks():
 
     def add_entity(self, entity: Object):
 
-        chunk_coords = round(entity.position // CHUNK_SIZE)
+        chunk_coords = entity.position // CHUNK_SIZE
 
         self.get_chunk(chunk_coords.to_tuple()).entities.add(entity)
 
@@ -61,7 +56,7 @@ class Chunk():
         
         for _ in range(3):
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE))
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
             size = Vector(36, 40)
             self.entities.add(
 

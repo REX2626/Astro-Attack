@@ -23,8 +23,8 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 1
-CHUNK_SIZE = 100
+CHUNK_DISTANCE = 3 # Similar to RENDER DISTANCE, how many chunks are generated
+CHUNK_SIZE = 100 # How big each chunk is
 
 
 def update_screen_size():
@@ -120,7 +120,17 @@ def handle_movement(delta_time):
     
     # Loop until every object has moved for the given time
     for object in CHUNKS.entities:
+        
+        # Remove object from current chunk
+        chunk = CHUNKS.get_chunk((object.position // CHUNK_SIZE).to_tuple())
+        chunk.entities.remove(object)
+
+        # Update object e.g. move it
         object.update(delta_time)
+
+        # Add object to the chunk it should now be in
+        chunk = CHUNKS.get_chunk((object.position // CHUNK_SIZE).to_tuple())
+        chunk.entities.add(object)
 
 
 def add_objects():
