@@ -241,6 +241,43 @@ class Player_Ship(Ship):
         # Increase reload time
         self.time_reloading += delta_time
 
+    def move_up(self, delta_time):
+        self.accelerate_relative(delta_time * Vector(0, -1000))
+
+    def move_down(self, delta_time):
+        self.accelerate_relative(delta_time * Vector(0, 1000))
+
+    def move_left(self, delta_time):
+        self.accelerate_relative(delta_time * Vector(-1000, 0))
+
+    def move_right(self, delta_time):
+        self.accelerate_relative(delta_time * Vector(1000, 0))
+
+    def turn_left(self, delta_time):
+        self.set_rotation(self.rotation + 2 * delta_time)
+
+    def turn_right(self, delta_time):
+        self.set_rotation(self.rotation - 2 * delta_time)
+
+    def shoot(self):
+
+        # Check if reloaded
+        if self.time_reloading >= self.reload_time:
+
+            bullet_velocity = Vector(0, -500)
+            bullet_velocity.rotate(self.rotation)
+            bullet = Bullet(
+
+                position=self.position,
+                velocity=bullet_velocity + self.velocity,
+                size=(9, 21),
+                rotation=self.rotation,
+                image="assets/bullet.png"
+                )
+
+            CHUNKS.add_entity(bullet)
+            self.time_reloading = 0
+
 
 
 class Bullet(Entity):

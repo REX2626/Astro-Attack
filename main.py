@@ -75,66 +75,27 @@ def handle_player_movement(keys_pressed, delta_time):
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
     if keys_pressed[pygame.K_w]:
-        move_up(delta_time)
+        red_ship.move_up(delta_time)
 
     if keys_pressed[pygame.K_s]:
-        move_down(delta_time)
+        red_ship.move_down(delta_time)
 
     if keys_pressed[pygame.K_a]:
-        move_left(delta_time)
+        red_ship.move_left(delta_time)
 
     if keys_pressed[pygame.K_d]:
-        move_right(delta_time)
+        red_ship.move_right(delta_time)
 
     if keys_pressed[pygame.K_LEFT]:
-        turn_left(delta_time)
+        red_ship.turn_left(delta_time)
 
     if keys_pressed[pygame.K_RIGHT]:
-        turn_right(delta_time)
+        red_ship.turn_right(delta_time)
 
     if keys_pressed[pygame.K_SPACE]:
-        shoot()
+        red_ship.shoot()
 
     CHUNKS.update(red_ship)
-    
-
-
-def move_up(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(0, -1000))
-
-def move_down(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(0, 1000))
-
-def move_left(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(-1000, 0))
-
-def move_right(delta_time):
-    red_ship.accelerate_relative(delta_time * Vector(1000, 0))
-
-def turn_left(delta_time):
-    red_ship.set_rotation(red_ship.rotation + 2 * delta_time)
-
-def turn_right(delta_time):
-    red_ship.set_rotation(red_ship.rotation - 2 * delta_time)
-
-def shoot():
-
-    # Check if reloaded
-    if red_ship.time_reloading >= red_ship.reload_time:
-
-        bullet_velocity = Vector(0, -300)
-        bullet_velocity.rotate(red_ship.rotation)
-        bullet = Bullet(
-
-            position=red_ship.position,
-            velocity=bullet_velocity + red_ship.velocity,
-            size=(9, 21),
-            rotation=red_ship.rotation,
-            image="assets/bullet.png"
-            )
-
-        CHUNKS.add_entity(bullet)
-        red_ship.time_reloading = 0
 
 
 def update_objects(delta_time):
