@@ -24,6 +24,65 @@ def init_chunks(chunks: "_chunks.Chunks"):
 
 
 
+class Vector_1D():
+    def __init__(self, x) -> None:
+        self.x = x
+
+    def __add__(self, arg):
+
+        # Adding Vectors
+        if type(arg) == Vector_1D:
+            return Vector_1D(self.x + arg.x)
+
+        # Adding Vector and number
+        else:
+            return Vector_1D(self.x + arg)
+
+    def __radd__(self, arg):
+        return self.x + arg
+
+    def __sub__(self, arg):
+        return Vector_1D(self.x - arg.x)
+
+    def __mul__(self, arg):
+
+        # Multiplying Vectors
+        if type(arg) == Vector_1D:
+            return Vector_1D(self.x * arg.x)
+
+        # Multiplying Vector by int
+        else:
+            return Vector_1D(self.x * arg)
+
+    def __truediv__(self, arg):
+
+        # Vector divided by Vector
+        if type(arg) == Vector_1D:
+            return Vector_1D(self.x / arg.x)
+
+        # Vector divided by number
+        else:
+            return Vector_1D(self.x / arg)
+
+    def magnitude(self):
+        return abs(self.x)
+
+    def set_magnitude(self, magnitude):
+        new_vector = self * magnitude / self.magnitude()
+        self.x = new_vector.x
+
+    def clamp(self, maximum):
+        if self.magnitude() > maximum:
+            self.set_magnitude(maximum)
+
+    def get_clamp(self, maximum):
+        if self.magnitude() > maximum:
+            # Set magnitude to maximum
+            return self * maximum / self.magnitude()
+        return self
+
+
+
 class Vector():
     def __init__(self, x, y) -> None:
         self.x = x
@@ -213,9 +272,11 @@ class Ship(Entity):
 
 
 class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, fire_rate=1, image="assets/default_image.png") -> None:
+    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, max_rotation_speed=3, fire_rate=1, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, size, rotation, fire_rate, image)
         self.max_speed = max_speed
+        self.max_rotation_speed = max_rotation_speed
+        self.rotation_speed = Vector_1D(0)
 
     def accelerate(self, acceleration: Vector):
         self.velocity += acceleration
@@ -225,6 +286,10 @@ class Player_Ship(Ship):
         acceleration.rotate(self.rotation)
         self.velocity += acceleration
         self.velocity.clamp(self.max_speed)
+
+    def accelerate_rotation(self, acceleration):
+        self.rotation_speed += acceleration
+        self.rotation_speed.clamp(self.max_rotation_speed)
     
     def update(self, delta_time):
         super().update(delta_time)
@@ -237,6 +302,16 @@ class Player_Ship(Ship):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Change rotation by rotation speed
+        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
+
+        # Rotation Dampening
+        """
+        -> See above definition of dampening
+        -> 10 is the size of the dampening
+        """
+        self.rotation_speed -= self.rotation_speed.get_clamp(2 * delta_time)
 
         # Increase reload time
         self.time_reloading += delta_time
@@ -254,10 +329,10 @@ class Player_Ship(Ship):
         self.accelerate_relative(delta_time * Vector(1000, 0))
 
     def turn_left(self, delta_time):
-        self.set_rotation(self.rotation + 2 * delta_time)
+        self.accelerate_rotation(delta_time * 5)
 
     def turn_right(self, delta_time):
-        self.set_rotation(self.rotation - 2 * delta_time)
+        self.accelerate_rotation(delta_time * -5)
 
     def shoot(self):
 

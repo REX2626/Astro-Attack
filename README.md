@@ -2,7 +2,7 @@
 
 
 TODO:
-Add rotation acceleration, so red_ship doesn't immediately stop rotating
+Adjust ship accleration (so faster if forward, slower if side to side)
 
 Add ship colliding with asteroids
 
@@ -20,3 +20,5 @@ When updating entities, don't update every entity's chunk
 In entity.update(), if the entity moved, put entity into it's new chunk
 
 Add asteroid class
+
+Add rotation acceleration, so red_ship doesn't immediately stop rotating
