@@ -129,7 +129,6 @@ def shoot():
             position=red_ship.position,
             velocity=bullet_velocity + red_ship.velocity,
             size=(9, 21),
-            chunks=CHUNKS,
             rotation=red_ship.rotation,
             image="assets/bullet.png"
             )
@@ -141,29 +140,12 @@ def shoot():
 def update_objects(delta_time):
     """Updates all objects, e.g. adjusts positions based on velocity"""
     
-    # Loop until every object has moved for the given time
+    # Loop until every object has been updated e.g. moved
+    # Entity set has to be copied as entity might be deleted from the actual set
     for object in CHUNKS.entities.copy():
         
-        # If an object is deleted, then it can be skipped
-        if object not in CHUNKS.entities:
-            continue
-        
-        # Get orignal chunk
-        original_chunk = CHUNKS.get_chunk(object)
-        
-
         # Update object e.g. move it
         object.update(delta_time)
-
-        # Ensure object hasn't deleted itself
-        if object in original_chunk.entities:
-
-            # Remove entity from original chunk
-            original_chunk.entities.remove(object)
-
-            # Add object to the chunk it should now be in
-            chunk = CHUNKS.get_chunk(object)
-            chunk.entities.add(object)
 
 
 def add_objects():

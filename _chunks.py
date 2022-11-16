@@ -1,4 +1,4 @@
-from objects import Vector, Object
+from objects import init_chunks, Vector, Object
 import random
 
 
@@ -9,6 +9,7 @@ class Chunks():
         from main import CHUNK_DISTANCE, CHUNK_SIZE
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
+        init_chunks(self) # Gives CHUNKS object to other files
 
     def update(self, player):
         
@@ -83,6 +84,6 @@ class Chunk():
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
             size = Vector(74, 74)
             self.entities.add(
-                
+
                 Object(random_position, size, image="assets/asteroid.png")
             )

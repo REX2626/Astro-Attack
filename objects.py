@@ -17,6 +17,12 @@ def get_path(relative_path):
 
 
 
+def init_chunks(chunks: "_chunks.Chunks"):
+    global CHUNKS
+    CHUNKS = chunks
+
+
+
 
 class Vector():
     def __init__(self, x, y) -> None:
@@ -160,7 +166,17 @@ class MoveableObject(Object):
             self.velocity: Vector = velocity
 
     def update(self, delta_time):
+
+        # Remove self from current chunk
+        original_chunk = CHUNKS.get_chunk(self)
+        original_chunk.entities.remove(self)
+
+        # Move self
         self.position += self.velocity * delta_time
+
+        # Add self to the chunk it should now be in
+        new_chunk = CHUNKS.get_chunk(self)
+        new_chunk.entities.add(self)
 
 
 
@@ -228,13 +244,12 @@ class Player_Ship(Ship):
 
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, size, chunks, rotation=0, image="assets/default_image.png") -> None:
+    def __init__(self, position, velocity, size, rotation=0, image="assets/default_image.png") -> None:
         super().__init__(position, velocity, size, rotation, image)
-        global CHUNKS
-        CHUNKS = chunks
         
     def update(self, delta_time):
-        
+        super().update(delta_time)
+
         # Check if bullet is near to any aliens in it's chunk
         # If it is, then destroy alien and bullet
         for entity in CHUNKS.get_chunk(self).entities:
@@ -243,5 +258,7 @@ class Bullet(Entity):
                 CHUNKS.remove_entity(self)
                 break
         
-        # Position has to be updated afterwards to ensure that the bullet is still in it's chunk
-        super().update(delta_time)
+
+
+# _chunks has to be imported last, so that all objects can be initialized
+import _chunks
