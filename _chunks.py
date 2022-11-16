@@ -76,5 +76,13 @@ class Chunk():
                 Object(random_position, size, image="assets/alien.png")
             )
 
-    def in_chunk(self, entity: Object):
-        return self.position * CHUNK_DISTANCE <= entity.position and self.position * CHUNK_DISTANCE + CHUNK_DISTANCE >= entity.position
+        # Asteroid
+        # 20% chance of spawning
+        if random.random() < 0.1:
+
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+            size = Vector(74, 74)
+            self.entities.add(
+                
+                Object(random_position, size, image="assets/asteroid.png")
+            )

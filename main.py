@@ -23,7 +23,7 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 10 # Similar to RENDER DISTANCE, how many chunks are generated
+CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
 
@@ -64,7 +64,7 @@ def draw_window(delta_time):
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 0))
 
-        label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180)}", True, (255, 255, 255))
+        label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
         WIN.blit(label, (300, 0))
 
     pygame.display.update()
