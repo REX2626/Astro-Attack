@@ -1,4 +1,4 @@
-from objects import init_chunks, Vector, Object
+from objects import init_chunks, Vector, Object, Asteroid
 import random
 
 
@@ -85,5 +85,5 @@ class Chunk():
             size = Vector(74, 74)
             self.entities.add(
 
-                Object(random_position, size, image="assets/asteroid.png")
+                Asteroid(random_position, size, image="assets/asteroid.png")
             )

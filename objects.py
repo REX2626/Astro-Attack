@@ -294,6 +294,12 @@ class Bullet(Entity):
                 CHUNKS.remove_entity(entity)
                 CHUNKS.remove_entity(self)
                 break
+
+
+
+class Asteroid(Object):
+    def __init__(self, position, size, image="assets/default_image.png") -> None:
+        super().__init__(position, size, image)
         
 
 
