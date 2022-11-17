@@ -11,8 +11,6 @@ Add player health
 
 Add ship colliding with asteroids
 
-Make bullet fire from the front of the ship
-
 Add animation framework
 
 Add stars in background, layered, which move
@@ -43,3 +41,5 @@ Add rotation acceleration, so red_ship doesn't immediately stop rotating
 Make turning more snappy
 
 Adjust ship accleration (so faster if forward, slower if side to side)
+
+Make bullet fire from the front of the ship

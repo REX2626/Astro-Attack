@@ -183,6 +183,13 @@ class Vector():
         # Because y increases downwards (for our coord system)
         self.x = y1*math.sin(angle) + x1*math.cos(angle)
         self.y = y1*math.cos(angle) - x1*math.sin(angle)
+
+    def rotate_about(self, angle, position):
+        self.x -= position.x
+        self.y -= position.y
+        self.rotate(angle)
+        self.x += position.x
+        self.y += position.y
     
     def to_tuple(self):
         return (self.x, self.y)
@@ -338,12 +345,14 @@ class Player_Ship(Ship):
 
         # Check if reloaded
         if self.time_reloading >= self.reload_time:
-
+            
+            bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
+            bullet_position.rotate_about(self.rotation, self.position)
             bullet_velocity = Vector(0, -500)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
-                position=self.position,
+                position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
                 size=(9, 21),
                 rotation=self.rotation,
