@@ -316,17 +316,17 @@ class Player_Ship(Ship):
         # Increase reload time
         self.time_reloading += delta_time
 
-    def move_up(self, delta_time):
+    def move_forward(self, delta_time):
         self.accelerate_relative(delta_time * Vector(0, -1000))
 
-    def move_down(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, 1000))
+    def move_backward(self, delta_time):
+        self.accelerate_relative(delta_time * Vector(0, 800))
 
     def move_left(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(-1000, 0))
+        self.accelerate_relative(delta_time * Vector(-500, 0))
 
     def move_right(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(1000, 0))
+        self.accelerate_relative(delta_time * Vector(500, 0))
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)

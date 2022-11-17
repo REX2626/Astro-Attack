@@ -97,10 +97,10 @@ def handle_player_movement(keys_pressed, delta_time):
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
     if keys_pressed[pygame.K_w]:
-        red_ship.move_up(delta_time)
+        red_ship.move_forward(delta_time)
 
     if keys_pressed[pygame.K_s]:
-        red_ship.move_down(delta_time)
+        red_ship.move_backward(delta_time)
 
     if keys_pressed[pygame.K_a]:
         red_ship.move_left(delta_time)

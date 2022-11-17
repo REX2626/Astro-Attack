@@ -2,10 +2,6 @@
 
 
 # TODO:
-Make turning more snappy
-
-Adjust ship accleration (so faster if forward, slower if side to side)
-
 Make ship more detailed, have cross in the centre
 Make ship smaller
 
@@ -43,3 +39,7 @@ In entity.update(), if the entity moved, put entity into it's new chunk
 Add asteroid class
 
 Add rotation acceleration, so red_ship doesn't immediately stop rotating
+
+Make turning more snappy
+
+Adjust ship accleration (so faster if forward, slower if side to side)
