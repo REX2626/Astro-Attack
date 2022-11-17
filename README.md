@@ -1,17 +1,38 @@
 # Astro-Attack
 
 
-TODO:
+# TODO:
+Make turning more snappy
+
 Adjust ship accleration (so faster if forward, slower if side to side)
+
+Make ship more detailed, have cross in the centre
+Make ship smaller
+
+Add alien ship class
+
+Add player health
 
 Add ship colliding with asteroids
 
-Add alien class
+Make bullet fire from the front of the ship
 
-Add rendering order
+Add animation framework
+
+Add stars in background, layered, which move
+
+### POTENTIAL ###
+
+Add money system, different currencies, get cash from killing
+
+Add shop system
+
+Add loot system
+
+Add fuel system
 
 
-DONE:
+# DONE:
 Fix angle, so it is between +180 and -180
 
 CHUNKS is globalled in objects.py

@@ -17,6 +17,9 @@ FULLSCREEN_SIZE = WIDTH, HEIGHT
 WINDOW_SIZE = WIDTH * 0.8, HEIGHT * 0.8
 SIZE_LINK = True
 
+# CENTRE_POINT is the position of red_ship on screen
+CENTRE_POINT = Vector(WIDTH/2, HEIGHT/2)
+
 WHITE = (255, 255, 255)
 LIGHT_GREY = (120, 120, 120)
 MEDIUM_GREY = (60, 60, 60)
@@ -55,17 +58,36 @@ def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
 
-    # centre_point is the position of red_ship on screen
-    centre_point = Vector(WIDTH/2, HEIGHT/2)
     for object in CHUNKS.entities:
-        object.draw(WIN, red_ship.position, centre_point)
+        object.draw(WIN, red_ship.position, CENTRE_POINT)
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 0))
 
         label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-        WIN.blit(label, (300, 0))
+        WIN.blit(label, (200, 0))
+
+        label = font.render(f"Speed: {round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
+        WIN.blit(label, (200, 50))
+
+        # Developer Tools
+        # Chunk drawer
+        """loaded_chunks = set()
+        for chunk in CHUNKS.list:
+            c: "_chunks.Chunk" = CHUNKS.get_chunk(chunk)
+            pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
+            rect = (pos.x, pos.y, CHUNK_SIZE+1, CHUNK_SIZE+1)
+            if len(c.entities.intersection(CHUNKS.entities)):
+                loaded_chunks.add(c)
+            else:
+                pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
+        
+        for c in loaded_chunks:
+            pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
+            rect = (pos.x, pos.y, CHUNK_SIZE+1, CHUNK_SIZE+1)
+            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)"""
+
 
     pygame.display.update()
 
