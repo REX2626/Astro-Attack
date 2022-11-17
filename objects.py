@@ -311,7 +311,7 @@ class Player_Ship(Ship):
         -> See above definition of dampening
         -> 10 is the size of the dampening
         """
-        self.rotation_speed -= self.rotation_speed.get_clamp(2 * delta_time)
+        self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
 
         # Increase reload time
         self.time_reloading += delta_time
@@ -329,10 +329,10 @@ class Player_Ship(Ship):
         self.accelerate_relative(delta_time * Vector(1000, 0))
 
     def turn_left(self, delta_time):
-        self.accelerate_rotation(delta_time * 5)
+        self.accelerate_rotation(delta_time * 8)
 
     def turn_right(self, delta_time):
-        self.accelerate_rotation(delta_time * -5)
+        self.accelerate_rotation(delta_time * -8)
 
     def shoot(self):
 
