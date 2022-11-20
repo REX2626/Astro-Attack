@@ -1,15 +1,16 @@
-from time import perf_counter
 import pygame
-import sys
-from objects import Vector, Object, MoveableObject, Entity, Player_Ship, Bullet
+WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
+
+from objects import Vector, Player_Ship
 import _chunks
 import _menu
-import random
+
+import sys
 import math
+from time import perf_counter
 
 pygame.init()
 
-WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 pygame.display.set_caption("Astro Attack")
 WIDTH, HEIGHT = pygame.display.get_window_size()
 FULLSCREEN = True
@@ -135,7 +136,7 @@ def add_objects():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), size=(121, 121), max_speed=1000, fire_rate=10, image="assets/red_ship.png")
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), max_speed=1000, scale=2, fire_rate=10)
     CHUNKS.add_entity(red_ship)
 
 

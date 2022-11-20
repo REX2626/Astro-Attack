@@ -1,4 +1,5 @@
 from objects import init_chunks, Vector, Object, Asteroid
+import images
 import random
 
 
@@ -70,11 +71,11 @@ class Chunk():
         for _ in range(3):
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-            size = Vector(36, 40)
+            scale = 2
             self.entities.add(
 
                 # Alien
-                Object(random_position, size, image="assets/alien.png")
+                Object(random_position, scale, image=images.ALIEN)
             )
 
         # Asteroid
@@ -82,8 +83,8 @@ class Chunk():
         if random.random() < 0.1:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-            size = Vector(74, 74)
+            scale = 3
             self.entities.add(
 
-                Asteroid(random_position, size, image="assets/asteroid.png")
+                Asteroid(random_position, scale)
             )

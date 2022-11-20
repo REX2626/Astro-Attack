@@ -1,7 +1,7 @@
 # Astro-Attack
 
 
-# TODO:
+## TODO:
 Make ship more detailed, have cross in the centre
 Make ship smaller
 
@@ -9,13 +9,17 @@ Add alien ship class
 
 Add player health
 
+Add Images file 
+
+Add a constants file (maybe class), so that any file can use any constant (without any circular import shenanigans)
+
 Add ship colliding with asteroids
 
 Add animation framework
 
 Add stars in background, layered, which move
 
-### POTENTIAL ###
+### POTENTIAL
 
 Add money system, different currencies, get cash from killing
 
@@ -26,7 +30,7 @@ Add loot system
 Add fuel system
 
 
-# DONE:
+## DONE:
 Fix angle, so it is between +180 and -180
 
 CHUNKS is globalled in objects.py

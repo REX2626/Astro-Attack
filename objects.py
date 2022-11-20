@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import math
+import images
 
 
 
@@ -197,7 +198,7 @@ class Vector():
 
 
 class Object():
-    def __init__(self, position, size, image="assets/default_image.png") -> None:
+    def __init__(self, position, scale=1, image=images.DEFAULT) -> None:
         
         # Make position a vector
         if type(position) != Vector:
@@ -205,13 +206,10 @@ class Object():
         else:
             self.position = position
 
-        # Make size a vector
-        if type(size) != Vector:
-            self.size = Vector(size[0], size[1])
-        else:
-            self.size = size
+        # Set the size (dimensions)
+        self.size = Vector(image.get_width(), image.get_height()) * scale
 
-        self.image = pygame.transform.scale(pygame.image.load(image), (self.size.to_tuple())).convert_alpha()
+        self.image = pygame.transform.scale(image, (self.size.to_tuple())).convert_alpha()
 
     def update(self, delta_time):
         pass
@@ -222,8 +220,8 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, size, image="assets/default_image.png") -> None:
-        super().__init__(position, size, image)
+    def __init__(self, position, velocity, scale=1, image=images.DEFAULT) -> None:
+        super().__init__(position, scale, image)
 
         # Make velocity a vector
         if type(velocity) != Vector:
@@ -247,8 +245,8 @@ class MoveableObject(Object):
 
 
 class Entity(MoveableObject):
-    def __init__(self, position, velocity, size, rotation=0, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, size, image)
+    def __init__(self, position, velocity, scale=1, rotation=0, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, scale, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
@@ -266,8 +264,8 @@ class Entity(MoveableObject):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, size, rotation=0, fire_rate=1, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, size, rotation, image)
+    def __init__(self, position: Vector, velocity: Vector, scale=1, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, scale, rotation, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
@@ -279,8 +277,8 @@ class Ship(Entity):
 
 
 class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, size, max_speed, rotation=0, max_rotation_speed=3, fire_rate=1, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, size, rotation, fire_rate, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed, scale=1, rotation=0, max_rotation_speed=3, fire_rate=1, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, scale, rotation, fire_rate, image)
         self.max_speed = max_speed
         self.max_rotation_speed = max_rotation_speed
         self.rotation_speed = Vector_1D(0)
@@ -354,9 +352,8 @@ class Player_Ship(Ship):
 
                 position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
-                size=(9, 21),
-                rotation=self.rotation,
-                image="assets/bullet.png"
+                scale=3,
+                rotation=self.rotation
                 )
 
             CHUNKS.add_entity(bullet)
@@ -365,8 +362,8 @@ class Player_Ship(Ship):
 
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, size, rotation=0, image="assets/default_image.png") -> None:
-        super().__init__(position, velocity, size, rotation, image)
+    def __init__(self, position, velocity, scale=1, rotation=0, image=images.BULLET) -> None:
+        super().__init__(position, velocity, scale, rotation, image)
         
     def update(self, delta_time):
         super().update(delta_time)
@@ -382,8 +379,8 @@ class Bullet(Entity):
 
 
 class Asteroid(Object):
-    def __init__(self, position, size, image="assets/default_image.png") -> None:
-        super().__init__(position, size, image)
+    def __init__(self, position, scale=1, image=images.ASTEROID) -> None:
+        super().__init__(position, scale, image)
         
 
 
