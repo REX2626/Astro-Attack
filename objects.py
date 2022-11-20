@@ -275,7 +275,7 @@ class Ship(Entity):
             
             bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
             bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -500)
+            bullet_velocity = Vector(0, -700)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
