@@ -2,16 +2,9 @@
 
 
 ## TODO:
-Make ship more detailed, have cross in the centre
-Make ship smaller
-
 Add alien ship class
 
 Add player health
-
-Add Images file 
-
-Add a constants file (maybe class), so that any file can use any constant (without any circular import shenanigans)
 
 Add ship colliding with asteroids
 
@@ -47,3 +40,10 @@ Make turning more snappy
 Adjust ship accleration (so faster if forward, slower if side to side)
 
 Make bullet fire from the front of the ship
+
+Add Images file
+
+Make ship more detailed, have cross in the centre
+Make ship smaller
+
+Add a constants file (maybe class), so that any file can use any constant (without any circular import shenanigans)

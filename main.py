@@ -1,42 +1,17 @@
 import pygame
-WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 
-from objects import Vector, Player_Ship
+from game import *
+from objects import Player_Ship
 import _chunks
 import _menu
 
-import sys
 import math
 from time import perf_counter
 
 pygame.init()
 
 pygame.display.set_caption("Astro Attack")
-WIDTH, HEIGHT = pygame.display.get_window_size()
-FULLSCREEN = True
-FULLSCREEN_SIZE = WIDTH, HEIGHT
-WINDOW_SIZE = WIDTH * 0.8, HEIGHT * 0.8
-SIZE_LINK = True
 
-# CENTRE_POINT is the position of red_ship on screen
-CENTRE_POINT = Vector(WIDTH/2, HEIGHT/2)
-
-WHITE = (255, 255, 255)
-LIGHT_GREY = (120, 120, 120)
-MEDIUM_GREY = (60, 60, 60)
-DARK_GREY = (30, 30, 30)
-BLACK = (0, 0, 0)
-
-CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
-CHUNK_SIZE = 200 # How big each chunk is
-
-
-def update_screen_size():
-    """Updates objects size and position with new screen size"""
-    "Adjust any constants"
-
-    if SIZE_LINK:
-        "Adjust objects size"
 
 
 def update_playing_screen_size(menu: "_menu.Menu"):
@@ -140,18 +115,12 @@ def add_objects():
     CHUNKS.add_entity(red_ship)
 
 
-def quit():
-    """Stops the program"""
-    pygame.quit()
-    sys.exit(0)
-
-
 def main(menu: "_menu.Menu"):
     """Main game loop"""
     delta_time = 0
 
     global CHUNKS
-    CHUNKS = _chunks.Chunks()
+    CHUNKS = init_chunks()
     add_objects()
 
     running = True
