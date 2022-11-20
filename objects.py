@@ -172,6 +172,10 @@ class Vector():
         self.x = new_vector.x
         self.y = new_vector.y
 
+    def get_angle(self, position):
+        angle = math.atan((-position.y + self.y) / (position.x - self.x))
+        return angle - math.pi/2 if self.x < position.x else angle + math.pi/2
+
     def rotate(self, angle):
         x1, y1 = self.x, self.y
         # The positive and negative signs are different
@@ -267,6 +271,32 @@ class Ship(Entity):
         self.original_image = self.image
         
         self.time_reloading = 0
+        self.rotation_speed = Vector1D(0)
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        # Inertial Dampening
+        """
+        -> velocity is added with the inverse velocity, making velocity 0
+        -> but inverse velocity is clamped so it doesn't go to 0 velocity instantly
+        -> 200 is a constant
+        -> the bigger the constant, the faster the dampening
+        """
+        self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Change rotation by rotation speed
+        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
+
+        # Rotation Dampening
+        """
+        -> See above definition of dampening
+        -> 10 is the size of the dampening
+        """
+        self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
+
+        # Increase reload time
+        self.time_reloading += delta_time
 
     def shoot(self):
 

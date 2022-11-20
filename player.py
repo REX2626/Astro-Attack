@@ -19,7 +19,6 @@ class Player_Ship(Ship):
 
         self.max_speed = max_speed
         self.max_rotation_speed = max_rotation_speed
-        self.rotation_speed = Vector1D(0)
         self.health = health
 
     def accelerate(self, acceleration: Vector):
@@ -34,31 +33,6 @@ class Player_Ship(Ship):
     def accelerate_rotation(self, acceleration):
         self.rotation_speed += acceleration
         self.rotation_speed.clamp(self.max_rotation_speed)
-    
-    def update(self, delta_time):
-        super().update(delta_time)
-
-        # Inertial Dampening
-        """
-        -> velocity is added with the inverse velocity, making velocity 0
-        -> but inverse velocity is clamped so it doesn't go to 0 velocity instantly
-        -> 200 is a constant
-        -> the bigger the constant, the faster the dampening
-        """
-        self.velocity -= self.velocity.get_clamp(200 * delta_time)
-
-        # Change rotation by rotation speed
-        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
-
-        # Rotation Dampening
-        """
-        -> See above definition of dampening
-        -> 10 is the size of the dampening
-        """
-        self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
-
-        # Increase reload time
-        self.time_reloading += delta_time
 
     def move_forward(self, delta_time):
         self.accelerate_relative(delta_time * Vector(0, -1000))
