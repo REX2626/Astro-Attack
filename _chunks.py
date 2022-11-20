@@ -1,16 +1,16 @@
-from objects import init_chunks, Vector, Object, Asteroid
+from objects import Vector, Object, Asteroid
 import images
 import random
+import game
 
 
 
 class Chunks():
     def __init__(self) -> None:
         global CHUNK_DISTANCE, CHUNK_SIZE
-        from main import CHUNK_DISTANCE, CHUNK_SIZE
+        CHUNK_DISTANCE, CHUNK_SIZE = game.CHUNK_DISTANCE, game.CHUNK_SIZE
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
-        init_chunks(self) # Gives CHUNKS object to other files
 
     def update(self, player):
         

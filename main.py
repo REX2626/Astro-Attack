@@ -1,8 +1,7 @@
 import pygame
 
 from game import *
-from objects import Player_Ship
-import _chunks
+from player import Player_Ship
 import _menu
 
 import math
@@ -38,14 +37,17 @@ def draw_window(delta_time):
         object.draw(WIN, red_ship.position, CENTRE_POINT)
 
     if delta_time:
-        label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 0))
-
         label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
         WIN.blit(label, (200, 0))
 
         label = font.render(f"Speed: {round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
         WIN.blit(label, (200, 50))
+
+        label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
+        WIN.blit(label, (WIDTH - 300, 0))
+        
+        label = font.render(f"Health: {round(red_ship.health)}", True, (255, 255, 255))
+        WIN.blit(label, (WIDTH - 300, 50))
 
         # Developer Tools
         # Chunk drawer

@@ -3,6 +3,7 @@ import os
 import sys
 import math
 import images
+import game
 
 
 
@@ -18,52 +19,45 @@ def get_path(relative_path):
 
 
 
-def init_chunks(chunks: "_chunks.Chunks"):
-    global CHUNKS
-    CHUNKS = chunks
-
-
-
-
-class Vector_1D():
+class Vector1D():
     def __init__(self, x) -> None:
         self.x = x
 
     def __add__(self, arg):
 
         # Adding Vectors
-        if type(arg) == Vector_1D:
-            return Vector_1D(self.x + arg.x)
+        if type(arg) == Vector1D:
+            return Vector1D(self.x + arg.x)
 
         # Adding Vector and number
         else:
-            return Vector_1D(self.x + arg)
+            return Vector1D(self.x + arg)
 
     def __radd__(self, arg):
         return self.x + arg
 
     def __sub__(self, arg):
-        return Vector_1D(self.x - arg.x)
+        return Vector1D(self.x - arg.x)
 
     def __mul__(self, arg):
 
         # Multiplying Vectors
-        if type(arg) == Vector_1D:
-            return Vector_1D(self.x * arg.x)
+        if type(arg) == Vector1D:
+            return Vector1D(self.x * arg.x)
 
         # Multiplying Vector by int
         else:
-            return Vector_1D(self.x * arg)
+            return Vector1D(self.x * arg)
 
     def __truediv__(self, arg):
 
         # Vector divided by Vector
-        if type(arg) == Vector_1D:
-            return Vector_1D(self.x / arg.x)
+        if type(arg) == Vector1D:
+            return Vector1D(self.x / arg.x)
 
         # Vector divided by number
         else:
-            return Vector_1D(self.x / arg)
+            return Vector1D(self.x / arg)
 
     def magnitude(self):
         return abs(self.x)
@@ -232,14 +226,14 @@ class MoveableObject(Object):
     def update(self, delta_time):
 
         # Remove self from current chunk
-        original_chunk = CHUNKS.get_chunk(self)
+        original_chunk = game.CHUNKS.get_chunk(self)
         original_chunk.entities.remove(self)
 
         # Move self
         self.position += self.velocity * delta_time
 
         # Add self to the chunk it should now be in
-        new_chunk = CHUNKS.get_chunk(self)
+        new_chunk = game.CHUNKS.get_chunk(self)
         new_chunk.entities.add(self)
 
 
@@ -276,91 +270,6 @@ class Ship(Entity):
 
 
 
-class Player_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, scale=1, rotation=0, max_rotation_speed=3, fire_rate=1, image=images.RED_SHIP) -> None:
-        super().__init__(position, velocity, scale, rotation, fire_rate, image)
-        self.max_speed = max_speed
-        self.max_rotation_speed = max_rotation_speed
-        self.rotation_speed = Vector_1D(0)
-
-    def accelerate(self, acceleration: Vector):
-        self.velocity += acceleration
-        self.velocity.clamp(self.max_speed)
-
-    def accelerate_relative(self, acceleration: Vector):
-        acceleration.rotate(self.rotation)
-        self.velocity += acceleration
-        self.velocity.clamp(self.max_speed)
-
-    def accelerate_rotation(self, acceleration):
-        self.rotation_speed += acceleration
-        self.rotation_speed.clamp(self.max_rotation_speed)
-    
-    def update(self, delta_time):
-        super().update(delta_time)
-
-        # Inertial Dampening
-        """
-        -> velocity is added with the inverse velocity, making velocity 0
-        -> but inverse velocity is clamped so it doesn't go to 0 velocity instantly
-        -> 200 is a constant
-        -> the bigger the constant, the faster the dampening
-        """
-        self.velocity -= self.velocity.get_clamp(200 * delta_time)
-
-        # Change rotation by rotation speed
-        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
-
-        # Rotation Dampening
-        """
-        -> See above definition of dampening
-        -> 10 is the size of the dampening
-        """
-        self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
-
-        # Increase reload time
-        self.time_reloading += delta_time
-
-    def move_forward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, -1000))
-
-    def move_backward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, 800))
-
-    def move_left(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(-500, 0))
-
-    def move_right(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(500, 0))
-
-    def turn_left(self, delta_time):
-        self.accelerate_rotation(delta_time * 8)
-
-    def turn_right(self, delta_time):
-        self.accelerate_rotation(delta_time * -8)
-
-    def shoot(self):
-
-        # Check if reloaded
-        if self.time_reloading >= self.reload_time:
-            
-            bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
-            bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -500)
-            bullet_velocity.rotate(self.rotation)
-            bullet = Bullet(
-
-                position=bullet_position,
-                velocity=bullet_velocity + self.velocity,
-                scale=3,
-                rotation=self.rotation
-                )
-
-            CHUNKS.add_entity(bullet)
-            self.time_reloading = 0
-
-
-
 class Bullet(Entity):
     def __init__(self, position, velocity, scale=1, rotation=0, image=images.BULLET) -> None:
         super().__init__(position, velocity, scale, rotation, image)
@@ -370,10 +279,10 @@ class Bullet(Entity):
 
         # Check if bullet is near to any aliens in it's chunk
         # If it is, then destroy alien and bullet
-        for entity in CHUNKS.get_chunk(self).entities:
+        for entity in game.CHUNKS.get_chunk(self).entities:
             if type(entity) == Object and (entity.position - self.position).magnitude() < 20:
-                CHUNKS.remove_entity(entity)
-                CHUNKS.remove_entity(self)
+                game.CHUNKS.remove_entity(entity)
+                game.CHUNKS.remove_entity(self)
                 break
 
 
@@ -381,8 +290,3 @@ class Bullet(Entity):
 class Asteroid(Object):
     def __init__(self, position, scale=1, image=images.ASTEROID) -> None:
         super().__init__(position, scale, image)
-        
-
-
-# _chunks has to be imported last, so that all objects can be initialized
-import _chunks
