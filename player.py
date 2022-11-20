@@ -77,23 +77,3 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
-
-    def shoot(self):
-
-        # Check if reloaded
-        if self.time_reloading >= self.reload_time:
-            
-            bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
-            bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -500)
-            bullet_velocity.rotate(self.rotation)
-            bullet = Bullet(
-
-                position=bullet_position,
-                velocity=bullet_velocity + self.velocity,
-                scale=3,
-                rotation=self.rotation
-                )
-
-            game.CHUNKS.add_entity(bullet)
-            self.time_reloading = 0

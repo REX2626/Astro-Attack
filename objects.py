@@ -268,7 +268,29 @@ class Ship(Entity):
         
         self.time_reloading = 0
 
+    def shoot(self):
 
+        # Check if reloaded
+        if self.time_reloading >= self.reload_time:
+            
+            bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
+            bullet_position.rotate_about(self.rotation, self.position)
+            bullet_velocity = Vector(0, -500)
+            bullet_velocity.rotate(self.rotation)
+            bullet = Bullet(
+
+                position=bullet_position,
+                velocity=bullet_velocity + self.velocity,
+                scale=3,
+                rotation=self.rotation
+                )
+
+            game.CHUNKS.add_entity(bullet)
+            self.time_reloading = 0
+
+
+
+from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
 
 class Bullet(Entity):
     def __init__(self, position, velocity, scale=1, rotation=0, image=images.BULLET) -> None:
@@ -280,7 +302,7 @@ class Bullet(Entity):
         # Check if bullet is near to any aliens in it's chunk
         # If it is, then destroy alien and bullet
         for entity in game.CHUNKS.get_chunk(self).entities:
-            if type(entity) == Object and (entity.position - self.position).magnitude() < 20:
+            if type(entity) == Enemy_Ship and (entity.position - self.position).magnitude() < 40:
                 game.CHUNKS.remove_entity(entity)
                 game.CHUNKS.remove_entity(self)
                 break

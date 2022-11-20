@@ -1,5 +1,4 @@
-from objects import Vector, Object, Asteroid
-import images
+from objects import Vector, Object, Asteroid, Enemy_Ship
 import random
 import game
 
@@ -68,14 +67,17 @@ class Chunk():
 
     def generate(self):
         
-        for _ in range(3):
+        for _ in range(1):
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
             scale = 2
             self.entities.add(
 
                 # Alien
-                Object(random_position, scale, image=images.ALIEN)
+                #Object(random_position, scale, image=images.ALIEN)
+
+                # Enemy_Ship
+                Enemy_Ship(random_position, Vector(0, 0), scale)
             )
 
         # Asteroid

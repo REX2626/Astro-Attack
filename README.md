@@ -2,8 +2,6 @@
 
 
 ## TODO:
-Add alien ship class
-
 Add ship colliding with asteroids
 
 Add animation framework
@@ -47,3 +45,5 @@ Make ship smaller
 Add a constants file (maybe class), so that any file can use any constant (without any circular import shenanigans)
 
 Add player health
+
+Add enemy ship class

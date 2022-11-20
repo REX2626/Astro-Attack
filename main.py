@@ -2,6 +2,7 @@ import pygame
 
 from game import *
 from player import Player_Ship
+from objects import Bullet
 import _menu
 
 import math
@@ -51,11 +52,11 @@ def draw_window(delta_time):
 
         # Developer Tools
         # Chunk drawer
-        """loaded_chunks = set()
+        loaded_chunks = set()
         for chunk in CHUNKS.list:
-            c: "_chunks.Chunk" = CHUNKS.get_chunk(chunk)
+            c = CHUNKS.get_chunk(chunk)
             pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
-            rect = (pos.x, pos.y, CHUNK_SIZE+1, CHUNK_SIZE+1)
+            rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
             if len(c.entities.intersection(CHUNKS.entities)):
                 loaded_chunks.add(c)
             else:
@@ -63,8 +64,8 @@ def draw_window(delta_time):
         
         for c in loaded_chunks:
             pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
-            rect = (pos.x, pos.y, CHUNK_SIZE+1, CHUNK_SIZE+1)
-            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)"""
+            rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
+            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
 
 
     pygame.display.update()
@@ -103,9 +104,13 @@ def update_objects(delta_time):
     
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set
-    for object in CHUNKS.entities.copy():
+    for object in filter(lambda object: type(object) != Bullet, CHUNKS.entities.copy()):
         
         # Update object e.g. move it
+        object.update(delta_time)
+
+    # Bullets are updated after everything else to ensure that the ships they may hit have been updated (and moved to the right position)
+    for object in filter(lambda object: type(object) == Bullet, CHUNKS.entities.copy()):
         object.update(delta_time)
 
 
