@@ -1,5 +1,6 @@
 from objects import Vector, Ship
 import images
+import game
 
 
 
@@ -10,6 +11,6 @@ class Enemy_Ship(Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        self.set_rotation(self.position.get_angle(Vector(0, 0)))
+        self.set_rotation(self.position.get_angle(game.red_ship.position))
 
         self.shoot()

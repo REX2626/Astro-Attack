@@ -10,6 +10,7 @@ WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 
 import sys
 from objects import Vector
+from player import Player_Ship
 import _chunks
 
 
@@ -28,7 +29,7 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
+CHUNK_DISTANCE = 4 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
 
@@ -36,6 +37,15 @@ def init_chunks():
     global CHUNKS
     CHUNKS = _chunks.Chunks()
     return CHUNKS
+
+
+def add_player():
+
+    # Red Player Ship
+    global red_ship
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), max_speed=1000, scale=2, fire_rate=10)
+    CHUNKS.add_entity(red_ship)
+    return red_ship
 
 
 def quit():

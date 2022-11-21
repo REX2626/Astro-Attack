@@ -1,7 +1,6 @@
 import pygame
 
 from game import *
-from player import Player_Ship
 from objects import Bullet
 import _menu
 
@@ -114,21 +113,15 @@ def update_objects(delta_time):
         object.update(delta_time)
 
 
-def add_objects():
-
-    # Red Player Ship
-    global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), max_speed=1000, scale=2, fire_rate=10)
-    CHUNKS.add_entity(red_ship)
-
-
 def main(menu: "_menu.Menu"):
     """Main game loop"""
     delta_time = 0
 
     global CHUNKS
     CHUNKS = init_chunks()
-    add_objects()
+    
+    global red_ship
+    red_ship = add_player()
 
     running = True
     paused = False
