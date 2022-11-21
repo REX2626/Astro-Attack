@@ -212,6 +212,9 @@ class Object():
     def update(self, delta_time):
         pass
 
+    def distance_to(self, object):
+        return (self.position - object.position).magnitude()
+
     def draw(self, win: pygame.Surface, focus_point, centre_point):
         win.blit(self.image, (round(self.position - focus_point + centre_point - self.size * 0.5)).to_tuple())
 
@@ -334,12 +337,12 @@ class Bullet(Entity):
         # Check if bullet is near to any aliens in it's chunk
         # If it is, then destroy alien and bullet
         for entity in game.CHUNKS.get_chunk(self).entities:
-            if type(entity) == Enemy_Ship and (entity.position - self.position).magnitude() < 40:
+            if type(entity) == Enemy_Ship and self.distance_to(entity) < 40:
                 game.CHUNKS.remove_entity(entity)
                 game.CHUNKS.remove_entity(self)
                 break
 
-            elif type(entity) == player.Player_Ship and (entity.position - self.position).magnitude() < 40:
+            elif type(entity) == player.Player_Ship and self.distance_to(entity) < 40:
                 entity.health -= 1
                 game.CHUNKS.remove_entity(self)
                 break

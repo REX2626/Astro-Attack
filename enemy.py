@@ -13,4 +13,5 @@ class Enemy_Ship(Ship):
 
         self.set_rotation(self.position.get_angle(game.red_ship.position))
 
-        self.shoot()
+        if self.distance_to(game.red_ship) < 500:
+            self.shoot()

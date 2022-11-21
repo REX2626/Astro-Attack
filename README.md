@@ -4,8 +4,6 @@
 ## TODO:
 Make Enemy ships move around
 
-Make Enemy only shoot when close to red_ship
-
 Add ship colliding with asteroids
 
 Add animation framework
@@ -51,3 +49,5 @@ Add a constants file (maybe class), so that any file can use any constant (witho
 Add player health
 
 Add enemy ship class
+
+Make Enemy only shoot when close to red_ship
