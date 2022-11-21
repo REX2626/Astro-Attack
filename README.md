@@ -2,6 +2,12 @@
 
 
 ## TODO:
+Dampen intertia before moving, so that acceleration is dampened 1 tick later, not straight away
+
+Improve star drawing code, so stars aren't brute force placed around the side
+
+Improve bullet shooting, so that the position the bullet is spawned at is relative to the size of the ship
+
 Make Enemy ships move around
 
 Add ship colliding with asteroids
