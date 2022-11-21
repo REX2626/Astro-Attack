@@ -325,6 +325,8 @@ from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, us
 class Bullet(Entity):
     def __init__(self, position, velocity, scale=1, rotation=0, image=images.BULLET) -> None:
         super().__init__(position, velocity, scale, rotation, image)
+        global player
+        import player
         
     def update(self, delta_time):
         super().update(delta_time)
@@ -334,6 +336,11 @@ class Bullet(Entity):
         for entity in game.CHUNKS.get_chunk(self).entities:
             if type(entity) == Enemy_Ship and (entity.position - self.position).magnitude() < 40:
                 game.CHUNKS.remove_entity(entity)
+                game.CHUNKS.remove_entity(self)
+                break
+
+            elif type(entity) == player.Player_Ship and (entity.position - self.position).magnitude() < 40:
+                entity.health -= 1
                 game.CHUNKS.remove_entity(self)
                 break
 

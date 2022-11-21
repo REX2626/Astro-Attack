@@ -2,6 +2,10 @@
 
 
 ## TODO:
+Make Enemy ships move around
+
+Make Enemy only shoot when close to red_ship
+
 Add ship colliding with asteroids
 
 Add animation framework

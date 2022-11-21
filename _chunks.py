@@ -67,7 +67,7 @@ class Chunk():
 
     def generate(self):
         
-        for _ in range(1):
+        if random.random() < 0.25:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
             scale = 2

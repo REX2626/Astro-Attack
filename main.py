@@ -51,7 +51,7 @@ def draw_window(delta_time):
 
         # Developer Tools
         # Chunk drawer
-        loaded_chunks = set()
+        """loaded_chunks = set()
         for chunk in CHUNKS.list:
             c = CHUNKS.get_chunk(chunk)
             pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
@@ -64,7 +64,7 @@ def draw_window(delta_time):
         for c in loaded_chunks:
             pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
             rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
-            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
+            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)"""
 
 
     pygame.display.update()
@@ -119,7 +119,7 @@ def main(menu: "_menu.Menu"):
 
     global CHUNKS
     CHUNKS = init_chunks()
-    
+
     global red_ship
     red_ship = add_player()
 
@@ -135,6 +135,9 @@ def main(menu: "_menu.Menu"):
             update_objects(delta_time)
 
             draw_window(delta_time)
+
+            if red_ship.health <= 0:
+                main_menu()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
