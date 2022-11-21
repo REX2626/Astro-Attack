@@ -8,8 +8,6 @@ Add ship colliding with asteroids
 
 Add animation framework
 
-Add stars in background, layered, which move
-
 ### POTENTIAL
 
 Add money system, different currencies, get cash from killing
@@ -51,3 +49,5 @@ Add player health
 Add enemy ship class
 
 Make Enemy only shoot when close to red_ship
+
+Add stars in background, layered, which move

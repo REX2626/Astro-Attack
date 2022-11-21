@@ -3,7 +3,6 @@ This file has all constants for other files to use
 It also has functions that can be used in any file e.g. game.quit()
 """
 
-
 import pygame
 
 WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)

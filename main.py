@@ -3,6 +3,7 @@ import pygame
 from game import *
 from objects import Bullet
 import _menu
+import graphics
 
 import math
 from time import perf_counter
@@ -33,6 +34,8 @@ def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
 
+    graphics.draw_stars(delta_time)
+
     for object in CHUNKS.entities:
         object.draw(WIN, red_ship.position, CENTRE_POINT)
 
@@ -49,22 +52,7 @@ def draw_window(delta_time):
         label = font.render(f"Health: {round(red_ship.health)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 50))
 
-        # Developer Tools
-        # Chunk drawer
-        """loaded_chunks = set()
-        for chunk in CHUNKS.list:
-            c = CHUNKS.get_chunk(chunk)
-            pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
-            rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
-            if len(c.entities.intersection(CHUNKS.entities)):
-                loaded_chunks.add(c)
-            else:
-                pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
-        
-        for c in loaded_chunks:
-            pos = c.position * CHUNK_SIZE - red_ship.position + CENTRE_POINT
-            rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
-            pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)"""
+        graphics.draw_chunks()
 
 
     pygame.display.update()

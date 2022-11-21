@@ -189,6 +189,9 @@ class Vector():
         self.rotate(angle)
         self.x += position.x
         self.y += position.y
+
+    def in_range(self, x, y, width, height):
+        return self.x >= x and self.x <= x + width and self.y >= y and self.y <= y + height
     
     def to_tuple(self):
         return (self.x, self.y)

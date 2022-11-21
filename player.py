@@ -10,7 +10,7 @@ class Player_Ship(Ship):
         self,
         position: Vector, velocity: Vector,
         max_speed, scale=1, rotation=0, max_rotation_speed=3,
-        fire_rate=1, health=10,
+        fire_rate=1, health=20,
         image=images.RED_SHIP
 
         ) -> None:
