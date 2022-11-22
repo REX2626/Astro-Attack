@@ -36,7 +36,7 @@ layers = 6
 stars: list[set[Vector]] = list()
 for _ in range(layers):
     layer: set[Vector] = set()
-    for _ in range(200):
+    for _ in range(150):
         layer.add(Vector(random.randint(-100, WIDTH + 100), random.randint(-100, HEIGHT + 100)))
     stars.append(layer)
 
@@ -50,22 +50,34 @@ def draw_stars(delta_time):
         # This is because the smallest layer should still have
         # a speed / size > 0
 
+        radius = int((layer+2) / 2)
+
         # Move each star opposite direction to red_ship
         for star in stars[layer]:
             star.x -= game.red_ship.velocity.x * delta_time * star_speed * (layer+1)
             star.y -= game.red_ship.velocity.y * delta_time * star_speed * (layer+1)
 
             # If the star is outside of the screen, remove it
-            # The + x needs to be double the -x
-            # Because it is the -200 + 400 + WIDTH = WIDTH + 200
-            if not star.in_range(-200, -200, WIDTH + 400, HEIGHT + 400):
-                stars[layer].remove(star)
+            # 200 is the number of pixels a star can go outside the screen before being destroyed
 
-                # Keep on trying to add back star
-                # That is not in the screen but around the outside
-                star = Vector(random.randint(-100, WIDTH + 200), random.randint(-100, HEIGHT + 200))
-                while star.in_range(0, 0, WIDTH, HEIGHT):
-                    star = Vector(random.randint(-100, WIDTH + 200), random.randint(-100, HEIGHT + 200))
+            if star.x < -200:
+                stars[layer].remove(star)
+                star = Vector(WIDTH + radius, random.randint(-radius, HEIGHT+radius))
+                stars[layer].add(star)
+
+            elif star.x > WIDTH + 200:
+                stars[layer].remove(star)
+                star = Vector(-radius, random.randint(-radius, HEIGHT+radius))
+                stars[layer].add(star)
+
+            elif star.y < -200:
+                stars[layer].remove(star)
+                star = Vector(random.randint(-radius, WIDTH+radius), HEIGHT+radius)
+                stars[layer].add(star)
+
+            elif star.y > HEIGHT + 200:
+                stars[layer].remove(star)
+                star = Vector(random.randint(-radius, WIDTH+radius), -radius)
                 stars[layer].add(star)
 
         # Draw all the stars in this layer

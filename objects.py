@@ -285,7 +285,6 @@ class Ship(Entity):
         self.rotation_speed = Vector1D(0)
 
     def update(self, delta_time):
-        super().update(delta_time)
 
         # Inertial Dampening
         """
@@ -296,15 +295,18 @@ class Ship(Entity):
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
 
-        # Change rotation by rotation speed
-        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
-
         # Rotation Dampening
         """
         -> See above definition of dampening
         -> 10 is the size of the dampening
         """
         self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
+
+        # Move the ship by it's velocity
+        super().update(delta_time)
+
+        # Change rotation by rotation speed
+        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
 
         # Increase reload time
         self.time_reloading += delta_time
