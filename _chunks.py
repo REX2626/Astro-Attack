@@ -11,6 +11,15 @@ class Chunks():
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
 
+        self.create_initial_chunks()
+
+    def create_initial_chunks(self):
+        for y in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
+            for x in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
+                chunk = Chunk(Vector(x, y))
+                chunk.entities.clear()
+                self.list[(x, y)] = chunk
+
     def update(self, player):
         
         # Turn coordinates into chunk coordinates

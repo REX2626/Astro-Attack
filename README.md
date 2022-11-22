@@ -4,8 +4,6 @@
 ## TODO:
 Make Enemy ships move around
 
-Stop spawning anything in starting chunks
-
 Improve asteroid image, add several asteroid images
 
 Add ship colliding with asteroids
@@ -67,3 +65,5 @@ Improve star drawing code, so stars aren't brute force placed around the side
 Improve bullet shooting, so that the position the bullet is spawned at is relative to the size of the ship
 
 Add score counter
+
+Stop spawning anything in starting chunks
