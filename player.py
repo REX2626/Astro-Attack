@@ -15,15 +15,10 @@ class Player_Ship(Ship):
 
         ) -> None:
 
-        super().__init__(position, velocity, scale, rotation, fire_rate, image)
+        super().__init__(position, velocity, max_speed, scale, rotation, fire_rate, image)
 
-        self.max_speed = max_speed
         self.max_rotation_speed = max_rotation_speed
         self.health = health
-
-    def accelerate(self, acceleration: Vector):
-        self.velocity += acceleration
-        self.velocity.clamp(self.max_speed)
 
     def accelerate_relative(self, acceleration: Vector):
         acceleration.rotate(self.rotation)

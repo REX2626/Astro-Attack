@@ -246,7 +246,7 @@ class MoveableObject(Object):
         new_chunk = game.CHUNKS.get_chunk(self)
         new_chunk.entities.add(self)
 
-    def move_towards(self, target_position: "Vector", speed: float) -> None:
+    def move_towards(self, target_position, speed):
         v: "Vector" = target_position - self.position
         v.set_magnitude(speed)
         self.velocity = v
@@ -272,13 +272,14 @@ class Entity(MoveableObject):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, scale=1, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, scale=1, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, scale, rotation, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
         self.reload_time = 1 / fire_rate
         self.original_image = self.image
+        self.max_speed = max_speed
         
         self.time_reloading = 0
         self.rotation_speed = Vector1D(0)
@@ -329,6 +330,14 @@ class Ship(Entity):
 
             game.CHUNKS.add_entity(bullet)
             self.time_reloading = 0
+    
+    def accelerate(self, acceleration: Vector):
+        self.velocity += acceleration
+        self.velocity.clamp(self.max_speed)
+    
+    def accelerate_towards(self, target_position, acceleration):
+        pos_difference = target_position - self.position
+        self.accelerate(pos_difference * acceleration)
 
 
 
