@@ -359,6 +359,7 @@ class Bullet(Entity):
             if type(entity) == Enemy_Ship and self.distance_to(entity) < 40:
                 game.CHUNKS.remove_entity(entity)
                 game.CHUNKS.remove_entity(self)
+                game.SCORE += 1
                 break
 
             elif type(entity) == player.Player_Ship and self.distance_to(entity) < 40:

@@ -2,8 +2,6 @@
 
 
 ## TODO:
-Add score counter
-
 Make Enemy ships move around
 
 Stop spawning anything in starting chunks
@@ -67,3 +65,5 @@ Dampen intertia before moving, so that acceleration is dampened 1 tick later, no
 Improve star drawing code, so stars aren't brute force placed around the side
 
 Improve bullet shooting, so that the position the bullet is spawned at is relative to the size of the ship
+
+Add score counter

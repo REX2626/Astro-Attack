@@ -31,6 +31,8 @@ BLACK = (0, 0, 0)
 CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
+SCORE: int
+
 
 def init_chunks():
     global CHUNKS

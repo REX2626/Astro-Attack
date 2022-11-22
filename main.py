@@ -1,6 +1,7 @@
 import pygame
 
 from game import *
+import game
 from objects import Bullet
 import _menu
 import graphics
@@ -51,6 +52,10 @@ def draw_window(delta_time):
         
         label = font.render(f"Health: {round(red_ship.health)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 50))
+
+        font2 = pygame.font.SysFont("comicsans", 50)
+        label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
+        WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
         graphics.draw_chunks()
 
@@ -110,6 +115,8 @@ def main(menu: "_menu.Menu"):
 
     global red_ship
     red_ship = add_player()
+
+    game.SCORE = 0
 
     running = True
     paused = False
