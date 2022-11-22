@@ -205,7 +205,7 @@ class Object():
         if type(position) != Vector:
             self.position = Vector(position[0], position[1])
         else:
-            self.position = position
+            self.position: Vector = position
 
         # Set the size (dimensions)
         self.size = Vector(image.get_width(), image.get_height()) * scale
@@ -335,9 +335,10 @@ class Ship(Entity):
         self.velocity += acceleration
         self.velocity.clamp(self.max_speed)
     
-    def accelerate_towards(self, target_position, acceleration):
-        pos_difference = target_position - self.position
-        self.accelerate(pos_difference * acceleration)
+    def accelerate_towards(self, target_position: Vector, magnitude: float):
+        acceleration = target_position - self.position
+        acceleration.set_magnitude(magnitude)
+        self.accelerate(acceleration)
 
 
 

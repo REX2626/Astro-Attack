@@ -2,13 +2,21 @@
 
 
 ## TODO:
+Add score counter
+
 Make Enemy ships move around
+
+Stop spawning anything in starting chunks
+
+Improve asteroid image, add several asteroid images
 
 Add ship colliding with asteroids
 
 Add zoom
 
 Add animation framework
+
+Make all artwork the same scale
 
 ### POTENTIAL
 

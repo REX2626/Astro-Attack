@@ -17,10 +17,7 @@ class Enemy_Ship(Ship):
             self.shoot()
 
         if self.distance_to(game.red_ship) < 750 and self.distance_to(game.red_ship) > 300:
-            self.accelerate_towards(game.red_ship.position, 20)
+            self.accelerate_towards(game.red_ship.position, 500 * delta_time)
 
         elif self.distance_to(game.red_ship) < 200:
-            self.accelerate_towards(game.red_ship.position, -20)
-        
-            print(self.velocity)
-    
+            self.accelerate_towards(game.red_ship.position, -500 * delta_time)
