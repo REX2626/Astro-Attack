@@ -15,3 +15,6 @@ class Enemy_Ship(Ship):
 
         if self.distance_to(game.red_ship) < 500:
             self.shoot()
+
+        if self.distance_to(game.red_ship) < 1000:
+            self.move_towards(game.red_ship.position, 100)

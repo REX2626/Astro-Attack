@@ -31,7 +31,7 @@ class Chunks():
                 # Load entities in loaded chunks
                 self.entities.update(self.get_chunk(position).entities)
 
-    def get_chunk(self, arg: tuple[int, int] | Object) -> "Chunk":
+    def get_chunk(self, arg: tuple[int, int] or Object) -> "Chunk":
         """Returns the chunk, arg can be a chunk_coord or an object"""
 
         # Check if arg is chunk_coord or an entity

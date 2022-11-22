@@ -246,6 +246,10 @@ class MoveableObject(Object):
         new_chunk = game.CHUNKS.get_chunk(self)
         new_chunk.entities.add(self)
 
+    def move_towards(self, target_position: "Vector", speed: float) -> None:
+        v: "Vector" = target_position - self.position
+        v.set_magnitude(speed)
+        self.velocity = v
 
 
 class Entity(MoveableObject):
