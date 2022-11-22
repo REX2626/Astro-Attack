@@ -315,7 +315,7 @@ class Ship(Entity):
         # Check if reloaded
         if self.time_reloading >= self.reload_time:
             
-            bullet_position = self.position + Vector(0, -71) # spawns bullet at ship's gun, ship's height/2 + bullet's height/2
+            bullet_position = self.position + Vector(0, -self.original_image.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
             bullet_velocity = Vector(0, -700)
             bullet_velocity.rotate(self.rotation)
