@@ -36,7 +36,7 @@ layers = 6
 stars: list[set[Vector]] = list()
 for _ in range(layers):
     layer: set[Vector] = set()
-    for _ in range(200):
+    for _ in range(150):
         layer.add(Vector(random.randint(-100, WIDTH + 100), random.randint(-100, HEIGHT + 100)))
     stars.append(layer)
 
