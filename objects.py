@@ -273,8 +273,14 @@ class Entity(MoveableObject):
 
         # pygame.transform.rotate uses degrees NOT radians
         # so rotation needs to be converted to degrees
-        self.image = pygame.transform.rotate(self.original_image, rotation / math.pi * 180)
+        #self.image = pygame.transform.rotate(self.original_image, rotation / math.pi * 180)
         self.offset = game.CENTRE_POINT - Vector(self.image.get_width(), self.image.get_height())/2
+
+    def draw(self, win: pygame.Surface, focus_point):
+        image = pygame.transform.scale(self.image, (game.ZOOM * Vector(self.image.get_width(), self.image.get_height())).to_tuple())
+        image = pygame.transform.rotate(image, self.rotation / math.pi * 180)
+        self.offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
+        win.blit(image, (round((self.position - focus_point) * game.ZOOM + self.offset)).to_tuple())
 
 
 

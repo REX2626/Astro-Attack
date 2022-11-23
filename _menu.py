@@ -38,7 +38,10 @@ class Menu():
                                                                                           Rex Attwood
                                                                                           Gabriel Correia
                                                                                           """ , game.WHITE, "comicsans", 20)
-        self.controls_title = Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 8 * 3, "CONTROLS"     , game.WHITE, "comicsans", 40)
+        self.credit_fred =      Text(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 8 * 2.5, """
+                                                                                          Fred
+                                                                                          """ , game.WHITE, "comicsans", 5)
+        self.controls_title = Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 8 * 3.4, "CONTROLS"     , game.WHITE, "comicsans", 40)
         self.controls_text =    Text(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 8 * 4.7, """
                                                                                           CHANGE SETTINGS: UP AND DOWN ARROWS
                                                                                           PAUSE: ESC
@@ -47,6 +50,7 @@ class Menu():
         self.info_widgets = [
             self.credit_title,
             self.credit_text,
+            self.credit_fred,
             self.controls_title,
             self.controls_text
         ]
