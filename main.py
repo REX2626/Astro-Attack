@@ -37,7 +37,7 @@ def draw_window(delta_time):
 
     graphics.draw_stars(delta_time)
 
-    for object in CHUNKS.entities:
+    for object in graphics.get_entities_to_draw():
         object.draw(WIN, red_ship.position)
 
     if delta_time:
@@ -89,10 +89,10 @@ def handle_player_movement(keys_pressed, delta_time):
         red_ship.shoot()
 
     if keys_pressed[pygame.K_UP]:
-        game.ZOOM += game.ZOOM * delta_time
+        game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 10) # MAX ZOOM is 10x normal
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM -= game.ZOOM * delta_time
+        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, 0.2) # MIN ZOOM is 0.2x normal
 
     CHUNKS.update(red_ship)
 

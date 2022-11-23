@@ -7,6 +7,7 @@ Zoom final WIN instead of individual images
 Don't blit objects which will not be on the screen
 
 Limit the zooming in and out based on the chunk distance
+Make Enemy ships move around
 
 Improve asteroid image, add several asteroid images
 
@@ -78,3 +79,7 @@ Improve bullet shooting, so that the position the bullet is spawned at is relati
 Add score counter
 
 Stop spawning anything in starting chunks
+
+Add zoom
+
+Don't blit objects which will not be on the screen

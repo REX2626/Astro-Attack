@@ -11,6 +11,26 @@ import game
 
 
 
+def get_entities_to_draw():
+    """Returns the entities that are visible on the screen"""
+
+    # Get number of chunks until going off the screen
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
+
+    centre: Vector = game.CHUNKS.get_chunk(game.red_ship).position
+
+    entities: set[Object] = set()
+
+    for y in range(centre.y - radius, centre.y + radius + 1):
+        for x in range(centre.x - radius, centre.x + radius + 1):
+
+            chunk = game.CHUNKS.get_chunk((x, y))
+            entities.update(chunk.entities)
+
+    return entities
+
+
+
 def draw_chunks():
 
     # Developer Tools
