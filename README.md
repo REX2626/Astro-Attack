@@ -6,13 +6,18 @@ Zoom final WIN instead of individual images
 
 Don't blit objects which will not be on the screen
 
-Make Enemy ships move around
+Limit the zooming in and out based on the chunk distance
 
 Improve asteroid image, add several asteroid images
 
-Add ship colliding with asteroids
+Add AI states:
+    Protrol state
+    Attack state
+    Retreat state
 
-Add zoom
+Enemy Grouping
+
+Add ship colliding with asteroids
 
 Add animation framework
 
@@ -30,6 +35,8 @@ Add fuel system
 
 
 ## DONE:
+Make Enemy ships move around
+
 Fix angle, so it is between +180 and -180
 
 CHUNKS is globalled in objects.py

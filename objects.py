@@ -348,11 +348,21 @@ class Ship(Entity):
         self.velocity += acceleration
         self.velocity.clamp(self.max_speed)
     
-    def accelerate_towards(self, target_position: Vector, magnitude: float):
+    def accelerate_in_direction(self, target_position: Vector, magnitude: float):
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
-
+    
+    def accelerate_to_point(self, target_position: Vector, acceleration, max_speed):
+        distance_to_point = (target_position - self.position).magnitude()
+        if distance_to_point > 25:
+            vector_direction = target_position - self.position
+            vector_direction.set_magnitude(max_speed)
+            distance_to_decelerate = -1 * (vector_direction * vector_direction) / -2 * acceleration
+            if distance_to_decelerate == distance_to_point:
+                self.accelerate_in_direction(target_position, -acceleration)
+            else:
+                self.accelerate_in_direction(target_position, acceleration)
 
 
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
