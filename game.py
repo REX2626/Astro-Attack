@@ -35,6 +35,8 @@ SPAWN_SIZE = 2
 
 SCORE: int
 
+ZOOM = 1
+
 
 def init_chunks():
     global CHUNKS

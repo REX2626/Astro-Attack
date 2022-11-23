@@ -2,6 +2,10 @@
 
 
 ## TODO:
+Zoom final WIN instead of individual images
+
+Don't blit objects which will not be on the screen
+
 Make Enemy ships move around
 
 Improve asteroid image, add several asteroid images

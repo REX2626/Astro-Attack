@@ -222,7 +222,11 @@ class Object():
         return (self.position - object.position).magnitude()
 
     def draw(self, win: pygame.Surface, focus_point):
-        win.blit(self.image, (round(self.position - focus_point + self.offset)).to_tuple())
+        image = pygame.transform.scale(self.image, (game.ZOOM * Vector(self.image.get_width(), self.image.get_height())).to_tuple())
+        self.offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
+        win.blit(image, (round((self.position - focus_point) * game.ZOOM + self.offset)).to_tuple())
+        # old code
+        # win.blit(self.image, (round(self.position - focus_point + self.offset)).to_tuple())
 
 
 

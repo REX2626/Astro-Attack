@@ -88,6 +88,12 @@ def handle_player_movement(keys_pressed, delta_time):
     if keys_pressed[pygame.K_SPACE]:
         red_ship.shoot()
 
+    if keys_pressed[pygame.K_UP]:
+        game.ZOOM += game.ZOOM * delta_time
+
+    if keys_pressed[pygame.K_DOWN]:
+        game.ZOOM -= game.ZOOM * delta_time
+
     CHUNKS.update(red_ship)
 
 
