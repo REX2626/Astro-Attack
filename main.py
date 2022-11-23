@@ -38,7 +38,7 @@ def draw_window(delta_time):
     graphics.draw_stars(delta_time)
 
     for object in CHUNKS.entities:
-        object.draw(WIN, red_ship.position, CENTRE_POINT)
+        object.draw(WIN, red_ship.position)
 
     if delta_time:
         label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
