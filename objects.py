@@ -221,10 +221,13 @@ class Object():
     def distance_to(self, object):
         return (self.position - object.position).magnitude()
 
+    def get_zoomed_image(self):
+        return pygame.transform.scale(self.image, (game.ZOOM * self.size).to_tuple())
+
     def draw(self, win: pygame.Surface, focus_point):
-        image = pygame.transform.scale(self.image, (game.ZOOM * Vector(self.image.get_width(), self.image.get_height())).to_tuple())
-        self.offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
-        win.blit(image, (round((self.position - focus_point) * game.ZOOM + self.offset)).to_tuple())
+        image = self.get_zoomed_image()
+        offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
+        win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())
         # old code
         # win.blit(self.image, (round(self.position - focus_point + self.offset)).to_tuple())
 
@@ -277,10 +280,10 @@ class Entity(MoveableObject):
         self.offset = game.CENTRE_POINT - Vector(self.image.get_width(), self.image.get_height())/2
 
     def draw(self, win: pygame.Surface, focus_point):
-        image = pygame.transform.scale(self.image, (game.ZOOM * Vector(self.image.get_width(), self.image.get_height())).to_tuple())
+        image = self.get_zoomed_image()
         image = pygame.transform.rotate(image, self.rotation / math.pi * 180)
-        self.offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
-        win.blit(image, (round((self.position - focus_point) * game.ZOOM + self.offset)).to_tuple())
+        offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
+        win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())
 
 
 
