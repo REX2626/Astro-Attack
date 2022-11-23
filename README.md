@@ -2,17 +2,11 @@
 
 
 ## TODO:
-Zoom final WIN instead of individual images
-
-Don't blit objects which will not be on the screen
-
 Make Enemy ships move around
 
 Improve asteroid image, add several asteroid images
 
 Add ship colliding with asteroids
-
-Add zoom
 
 Add animation framework
 
@@ -71,3 +65,7 @@ Improve bullet shooting, so that the position the bullet is spawned at is relati
 Add score counter
 
 Stop spawning anything in starting chunks
+
+Add zoom
+
+Don't blit objects which will not be on the screen
