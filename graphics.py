@@ -38,16 +38,16 @@ def draw_chunks():
     loaded_chunks = set()
     for chunk in game.CHUNKS.list:
         c = game.CHUNKS.get_chunk(chunk)
-        pos = c.position * CHUNK_SIZE - game.red_ship.position + CENTRE_POINT
-        rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
+        pos = c.position * CHUNK_SIZE * game.ZOOM - game.red_ship.position * game.ZOOM + CENTRE_POINT
+        rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
         if len(c.entities.intersection(game.CHUNKS.entities)):
             loaded_chunks.add(c)
         else:
             pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
     
     for c in loaded_chunks:
-        pos = c.position * CHUNK_SIZE - game.red_ship.position + CENTRE_POINT
-        rect = (pos.x+1, pos.y-1, CHUNK_SIZE, CHUNK_SIZE)
+        pos = c.position * CHUNK_SIZE * game.ZOOM - game.red_ship.position * game.ZOOM + CENTRE_POINT
+        rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
         pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
 
 
