@@ -135,7 +135,7 @@ class Vector():
 
     def __rmul__(self, arg):
 
-        # Multiplying Vectors
+        # Multiplying Vectors with dot product
         if type(arg) == Vector:
             return Vector(self.x * arg.x, self.y * arg.y)
 
@@ -358,10 +358,17 @@ class Ship(Entity):
     
     def accelerate_to_point(self, target_position: Vector, acceleration, max_speed):
         distance_to_point = (target_position - self.position).magnitude()
-        if distance_to_point > 25:
+
+        if distance_to_point > 25:  # Check to see if the ship is not near the point
+
+            # Calculate the distance that it takes to decelerate to the target point when travelling at max speed
+
             vector_direction = target_position - self.position
             vector_direction.set_magnitude(max_speed)
             distance_to_decelerate = -1 * (vector_direction * vector_direction) / -2 * acceleration
+
+            # Alternates between accelerating and decelerating to the point
+
             if distance_to_decelerate == distance_to_point:
                 self.accelerate_in_direction(target_position, -acceleration)
             else:
