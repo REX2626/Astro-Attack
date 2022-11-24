@@ -31,7 +31,7 @@ BLACK = (0, 0, 0)
 CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
-SPAWN_SIZE = 2
+SPAWN_SIZE = 4
 
 SCORE: int
 

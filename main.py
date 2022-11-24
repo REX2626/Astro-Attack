@@ -57,7 +57,7 @@ def draw_window(delta_time):
         label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
         WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
-        #graphics.draw_chunks()
+        graphics.draw_chunks()
 
 
     pygame.display.update()
@@ -92,7 +92,8 @@ def handle_player_movement(keys_pressed, delta_time):
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 10) # MAX ZOOM is 10x normal
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, 0.2) # MIN ZOOM is 0.2x normal
+        #game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, 1 / CHUNK_DISTANCE) # MIN ZOOM is 0.2x normal
+        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(CHUNK_DISTANCE-0.5)*CHUNK_SIZE))
 
     CHUNKS.update(red_ship)
 
