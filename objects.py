@@ -334,13 +334,13 @@ class Ship(Entity):
             
             bullet_position = self.position + Vector(0, -self.original_image.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -100)
+            bullet_velocity = Vector(0, -700)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
                 position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
-                scale=50,
+                scale=3,
                 rotation=self.rotation
                 )
 
@@ -356,23 +356,18 @@ class Ship(Entity):
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
     
-    def accelerate_to_point(self, target_position: Vector, acceleration, max_speed):
+    def accelerate_to_point(self, target_position: Vector, acceleration):
         distance_to_point = (target_position - self.position).magnitude()
 
-        if distance_to_point > 25:  # Check to see if the ship is not near the point
+        # Calculate the distance that it takes to decelerate to the target point
+        distance_to_decelerate = (self.velocity * self.velocity) / (2 * acceleration)
 
-            # Calculate the distance that it takes to decelerate to the target point when travelling at max speed
+        # Alternates between accelerating and decelerating to the point
 
-            vector_direction = target_position - self.position
-            vector_direction.set_magnitude(max_speed)
-            distance_to_decelerate = -1 * (vector_direction * vector_direction) / -2 * acceleration
-
-            # Alternates between accelerating and decelerating to the point
-
-            if distance_to_decelerate == distance_to_point:
-                self.accelerate_in_direction(target_position, -acceleration)
-            else:
-                self.accelerate_in_direction(target_position, acceleration)
+        if distance_to_decelerate.magnitude() >= distance_to_point:
+            self.accelerate_in_direction(target_position, -acceleration)
+        else:
+            self.accelerate_in_direction(target_position, acceleration)
 
 
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet

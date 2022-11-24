@@ -57,7 +57,7 @@ def draw_window(delta_time):
         label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
         WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
-        graphics.draw_chunks()
+        #graphics.draw_chunks()
 
 
     pygame.display.update()
@@ -115,7 +115,8 @@ def update_objects(delta_time):
 
 def main(menu: "_menu.Menu"):
     """Main game loop"""
-    delta_time = 0
+
+    delta_time = 1
 
     global CHUNKS
     CHUNKS = init_chunks()
