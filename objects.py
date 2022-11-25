@@ -210,9 +210,6 @@ class Object():
         # Set the size (dimensions), original size of image, doesn't change when rotating
         self.size = Vector(image.get_width(), image.get_height()) * scale
 
-        # Set the image offset, based on CENTRE_POINT and size, spawns object at centre of object
-        self.offset = game.CENTRE_POINT - self.size * 0.5
-
         self.image = pygame.transform.scale(image, (self.size.to_tuple())).convert_alpha()
 
     def update(self, delta_time):
@@ -273,11 +270,6 @@ class Entity(MoveableObject):
 
     def set_rotation(self, rotation):
         self.rotation = rotation
-
-        # pygame.transform.rotate uses degrees NOT radians
-        # so rotation needs to be converted to degrees
-        #self.image = pygame.transform.rotate(self.original_image, rotation / math.pi * 180)
-        self.offset = game.CENTRE_POINT - Vector(self.image.get_width(), self.image.get_height())/2
 
     def draw(self, win: pygame.Surface, focus_point):
         image = self.get_zoomed_image()

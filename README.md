@@ -2,13 +2,6 @@
 
 
 ## TODO:
-Zoom final WIN instead of individual images
-
-Don't blit objects which will not be on the screen
-
-Limit the zooming in and out based on the chunk distance
-Make Enemy ships move around
-
 Improve asteroid image, add several asteroid images
 
 Add AI states:
@@ -17,6 +10,8 @@ Add AI states:
     Retreat state
 
 Enemy Grouping
+
+Have different shoot speed for enemy and player
 
 Add ship colliding with asteroids
 
@@ -83,3 +78,6 @@ Stop spawning anything in starting chunks
 Add zoom
 
 Don't blit objects which will not be on the screen
+
+Limit the zooming in and out based on the chunk distance
+Make Enemy ships move around
