@@ -89,7 +89,7 @@ def handle_player_movement(keys_pressed, delta_time):
         red_ship.shoot()
 
     if keys_pressed[pygame.K_UP]:
-        game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 10) # MAX ZOOM is 10x normal
+        game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
 
     if keys_pressed[pygame.K_DOWN]:
         game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
