@@ -15,7 +15,7 @@ class Enemy_Ship(Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        if self.distance_to(game.red_ship) < 750:
+        if self.distance_to(game.red_ship) < 600:
             self.attack_state(delta_time)
         else:
             self.patrol_state(delta_time)
@@ -35,14 +35,14 @@ class Enemy_Ship(Ship):
             target_position = self.patrol_point
 
         
-        self.accelerate_to_point(target_position, 500 * delta_time)
+        self.accelerate_to_point(target_position, 250 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
     
     def attack_state(self, delta_time):
-        self.max_speed = 500
+        self.max_speed = 300
         self.set_rotation(self.position.get_angle(game.red_ship.position))
         self.shoot()
-        self.accelerate_in_direction(game.red_ship.position, 500 * delta_time)
+        self.accelerate_in_direction(game.red_ship.position, 250 * delta_time)
     
     def choose_point(self, distance):
         random_direction = random.random() * 2 * math.pi    # Get random direction

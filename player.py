@@ -9,8 +9,9 @@ class Player_Ship(Ship):
 
         self,
         position: Vector, velocity: Vector,
-        max_speed, scale=1, rotation=0, max_rotation_speed=3,
-        fire_rate=1, health=20,
+        max_speed=700, scale=1,
+        rotation=0, max_rotation_speed=3,
+        fire_rate=10, health=20,
         image=images.RED_SHIP
 
         ) -> None:
@@ -30,16 +31,16 @@ class Player_Ship(Ship):
         self.rotation_speed.clamp(self.max_rotation_speed)
 
     def move_forward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, -1000))
+        self.accelerate_relative(delta_time * Vector(0, -700))
 
     def move_backward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, 800))
+        self.accelerate_relative(delta_time * Vector(0, 500))
 
     def move_left(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(-500, 0))
+        self.accelerate_relative(delta_time * Vector(-300, 0))
 
     def move_right(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(500, 0))
+        self.accelerate_relative(delta_time * Vector(300, 0))
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)

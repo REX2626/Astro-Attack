@@ -48,7 +48,7 @@ def add_player():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0), max_speed=1000, fire_rate=10)
+    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0))
     CHUNKS.add_entity(red_ship)
     return red_ship
 
