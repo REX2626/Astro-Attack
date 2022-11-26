@@ -1,6 +1,5 @@
-from objects import Vector, Vector1D, Ship, Bullet
+from objects import Vector, Ship
 import images
-import game
 
 
 
@@ -9,14 +8,14 @@ class Player_Ship(Ship):
 
         self,
         position: Vector, velocity: Vector,
-        max_speed=700, scale=1,
+        max_speed=700,
         rotation=0, max_rotation_speed=3,
         fire_rate=10, health=20,
         image=images.RED_SHIP
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, scale, rotation, fire_rate, image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, image)
 
         self.max_rotation_speed = max_rotation_speed
         self.health = health

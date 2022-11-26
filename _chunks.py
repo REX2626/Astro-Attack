@@ -76,13 +76,12 @@ class Chunk():
 
     def generate(self):
         
+        # Enemy Ship
+        # 20% chance of spawning
         if random.random() < 0.2:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
             self.entities.add(
-
-                # Alien
-                #Object(random_position, scale, image=images.ALIEN)
 
                 # Enemy_Ship
                 Enemy_Ship(random_position, Vector(0, 0))
@@ -93,8 +92,7 @@ class Chunk():
         if random.random() < 0.1:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-            scale = 1
             self.entities.add(
 
-                Asteroid(random_position, scale)
+                Asteroid(random_position)
             )

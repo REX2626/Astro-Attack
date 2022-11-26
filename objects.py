@@ -199,7 +199,7 @@ class Vector():
 
 
 class Object():
-    def __init__(self, position, scale=1, image=images.DEFAULT) -> None:
+    def __init__(self, position, image=images.DEFAULT) -> None:
         
         # Make position a vector
         if type(position) != Vector:
@@ -208,10 +208,9 @@ class Object():
             self.position: Vector = position
 
         # Set the size (dimensions), original size of image, doesn't change when rotating
-        self.size = Vector(image.get_width(), image.get_height()) * scale
+        self.size = Vector(image.get_width(), image.get_height())
 
-        self.image = pygame.transform.scale(image, (self.size.to_tuple())).convert_alpha()
-
+        self.image = image
     def update(self, delta_time):
         pass
 
@@ -231,8 +230,8 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, scale=1, image=images.DEFAULT) -> None:
-        super().__init__(position, scale, image)
+    def __init__(self, position, velocity, image=images.DEFAULT) -> None:
+        super().__init__(position, image)
 
         # Make velocity a vector
         if type(velocity) != Vector:
@@ -260,8 +259,8 @@ class MoveableObject(Object):
 
 
 class Entity(MoveableObject):
-    def __init__(self, position, velocity, scale=1, rotation=0, image=images.DEFAULT) -> None:
-        super().__init__(position, velocity, scale, image)
+    def __init__(self, position, velocity, rotation=0, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
@@ -280,8 +279,8 @@ class Entity(MoveableObject):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, scale=1, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
-        super().__init__(position, velocity, scale, rotation, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
@@ -332,7 +331,6 @@ class Ship(Entity):
 
                 position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
-                scale=1,
                 rotation=self.rotation
                 )
 
@@ -365,8 +363,8 @@ class Ship(Entity):
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, scale=1, rotation=0, image=images.BULLET) -> None:
-        super().__init__(position, velocity, scale, rotation, image)
+    def __init__(self, position, velocity, rotation=0, image=images.BULLET) -> None:
+        super().__init__(position, velocity, rotation, image)
         global player
         import player
         
@@ -390,5 +388,5 @@ class Bullet(Entity):
 
 
 class Asteroid(Object):
-    def __init__(self, position, scale=1, image=images.ASTEROID) -> None:
-        super().__init__(position, scale, image)
+    def __init__(self, position, image=images.ASTEROID) -> None:
+        super().__init__(position, image)

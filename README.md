@@ -17,8 +17,6 @@ Add ship colliding with asteroids
 
 Add animation framework
 
-Make all artwork the same scale
-
 ### POTENTIAL
 
 Add money system, different currencies, get cash from killing
@@ -81,3 +79,5 @@ Don't blit objects which will not be on the screen
 
 Limit the zooming in and out based on the chunk distance
 Make Enemy ships move around
+
+Make all artwork the same scale
