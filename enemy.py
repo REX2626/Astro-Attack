@@ -7,7 +7,7 @@ import math
 
 
 class Enemy_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, scale=2, rotation=0, fire_rate=1, state=0, image=images.GREEN_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, scale=1, rotation=0, fire_rate=1, state=0, image=images.GREEN_SHIP) -> None:
         super().__init__(position, velocity, max_speed, scale, rotation, fire_rate, image)
         self.state = state
         self.patrol_point = self.choose_point(random.randint(500, 1000)) + self.position
