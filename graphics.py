@@ -56,8 +56,8 @@ layers = 6
 stars: list[set[Vector]] = list()
 for _ in range(layers):
     layer: set[Vector] = set()
-    for _ in range(150):
-        layer.add(Vector(random.randint(-100, WIDTH + 100), random.randint(-100, HEIGHT + 100)))
+    for _ in range(100):
+        layer.add(Vector(random.randint(-10, WIDTH + 10), random.randint(-10, HEIGHT + 10)))
     stars.append(layer)
 
 def draw_stars(delta_time):
@@ -73,33 +73,33 @@ def draw_stars(delta_time):
         radius = int((layer+2) / 2)
 
         # Move each star opposite direction to red_ship
+        shiftx = game.red_ship.velocity.x * delta_time * star_speed * (layer+1)
+        shifty = game.red_ship.velocity.y * delta_time * star_speed * (layer+1)
         for star in stars[layer]:
-            star.x -= game.red_ship.velocity.x * delta_time * star_speed * (layer+1)
-            star.y -= game.red_ship.velocity.y * delta_time * star_speed * (layer+1)
-
+            star.x -= shiftx
+            star.y -= shifty
             # If the star is outside of the screen, remove it
             # 200 is the number of pixels a star can go outside the screen before being destroyed
 
-            if star.x < -200:
+            if star.x < -100:
                 stars[layer].remove(star)
                 star = Vector(WIDTH + radius, random.randint(-radius, HEIGHT+radius))
                 stars[layer].add(star)
 
-            elif star.x > WIDTH + 200:
+            elif star.x > WIDTH + 100:
                 stars[layer].remove(star)
                 star = Vector(-radius, random.randint(-radius, HEIGHT+radius))
                 stars[layer].add(star)
 
-            elif star.y < -200:
+            elif star.y < -100:
                 stars[layer].remove(star)
                 star = Vector(random.randint(-radius, WIDTH+radius), HEIGHT+radius)
                 stars[layer].add(star)
 
-            elif star.y > HEIGHT + 200:
+            elif star.y > HEIGHT + 100:
                 stars[layer].remove(star)
                 star = Vector(random.randint(-radius, WIDTH+radius), -radius)
                 stars[layer].add(star)
 
-        # Draw all the stars in this layer
-        for star in stars[layer]:
+            # Draw star
             pygame.draw.circle(WIN, (255, 255, 255), star.to_tuple(), (layer+2)/2)

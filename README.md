@@ -4,6 +4,9 @@
 ## TODO:
 Improve asteroid image, add several asteroid images
 
+Improve performance
+Cache zoomed image, check if object's image is the same as game.ZOOM
+
 Add AI states:
     Protrol state
     Attack state
@@ -11,13 +14,13 @@ Add AI states:
 
 Enemy Grouping
 
-Have different shoot speed for enemy and player
-
 Add ship colliding with asteroids
 
 Add animation framework
 
 ### POTENTIAL
+
+Have different shoot speed for enemy and player
 
 Add money system, different currencies, get cash from killing
 
