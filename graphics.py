@@ -60,6 +60,11 @@ for _ in range(layers):
         layer.add(Vector(random.randint(-10, WIDTH + 10), random.randint(-10, HEIGHT + 10)))
     stars.append(layer)
 
+MIN_X = -100
+MAX_X = WIDTH + 100
+MIN_Y = -100
+MAX_Y = HEIGHT + 100
+
 def draw_stars(delta_time):
     # Layered Stars
     # Bigger stars move more
@@ -81,25 +86,21 @@ def draw_stars(delta_time):
             # If the star is outside of the screen, remove it
             # 200 is the number of pixels a star can go outside the screen before being destroyed
 
-            if star.x < -100:
-                stars[layer].remove(star)
-                star = Vector(WIDTH + radius, random.randint(-radius, HEIGHT+radius))
-                stars[layer].add(star)
+            if star.x < MIN_X:
+                star.x = WIDTH + radius
+                star.y = random.randint(-radius, HEIGHT+radius)
 
-            elif star.x > WIDTH + 100:
-                stars[layer].remove(star)
-                star = Vector(-radius, random.randint(-radius, HEIGHT+radius))
-                stars[layer].add(star)
+            elif star.x > MAX_X:
+                star.x = -radius
+                star.y = random.randint(-radius, HEIGHT+radius)
 
-            elif star.y < -100:
-                stars[layer].remove(star)
-                star = Vector(random.randint(-radius, WIDTH+radius), HEIGHT+radius)
-                stars[layer].add(star)
+            elif star.y < MIN_Y:
+                star.x = random.randint(-radius, WIDTH+radius)
+                star.y = HEIGHT+radius
 
-            elif star.y > HEIGHT + 100:
-                stars[layer].remove(star)
-                star = Vector(random.randint(-radius, WIDTH+radius), -radius)
-                stars[layer].add(star)
+            elif star.y > MAX_Y:
+                star.x = random.randint(-radius, WIDTH+radius)
+                star.y = -radius
 
             # Draw star
             pygame.draw.circle(WIN, (255, 255, 255), star.to_tuple(), (layer+2)/2)
