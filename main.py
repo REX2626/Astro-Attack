@@ -84,6 +84,11 @@ def handle_player_movement(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_RIGHT]:
         red_ship.turn_right(delta_time)
+    
+    if keys_pressed[pygame.K_q]:
+        red_ship.boost(delta_time)
+    else:
+        red_ship.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
 
     if keys_pressed[pygame.K_SPACE]:
         red_ship.shoot()

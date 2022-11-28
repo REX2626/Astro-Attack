@@ -8,7 +8,7 @@ class Player_Ship(Ship):
 
         self,
         position: Vector, velocity: Vector,
-        max_speed=700,
+        max_speed=500,
         rotation=0, max_rotation_speed=3,
         fire_rate=10, health=20,
         image=images.RED_SHIP
@@ -40,6 +40,10 @@ class Player_Ship(Ship):
 
     def move_right(self, delta_time):
         self.accelerate_relative(delta_time * Vector(300, 0))
+
+    def boost(self, delta_time):
+        self.max_speed = 1000
+        self.accelerate_relative(delta_time * Vector(0, -2000))
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)
