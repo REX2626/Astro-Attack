@@ -53,6 +53,9 @@ def draw_window(delta_time):
         label = font.render(f"Health: {round(red_ship.health)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 50))
 
+        label = font.render(f"Boost Amount: {round(red_ship.boost_amount)}", True, (255, 255, 255))
+        WIN.blit(label, (WIDTH - 300, 100))
+
         font2 = pygame.font.SysFont("comicsans", 50)
         label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
         WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
@@ -89,6 +92,12 @@ def handle_player_movement(keys_pressed, delta_time):
         red_ship.boost(delta_time)
     else:
         red_ship.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
+
+        if red_ship.boost_amount < 10: # If the boost amount is not at the maximum, add boost over time
+
+            red_ship.boost_amount += (red_ship.boost_change * delta_time) / 2
+        else:
+            red_ship.boost_amount = 10 # Caps the boost amount to a specific max value
 
     if keys_pressed[pygame.K_SPACE]:
         red_ship.shoot()

@@ -11,6 +11,7 @@ class Player_Ship(Ship):
         max_speed=500,
         rotation=0, max_rotation_speed=3,
         fire_rate=10, health=20,
+        boost_amount=10, boost_change=5,
         image=images.RED_SHIP
 
         ) -> None:
@@ -19,6 +20,8 @@ class Player_Ship(Ship):
 
         self.max_rotation_speed = max_rotation_speed
         self.health = health
+        self.boost_amount = boost_amount
+        self.boost_change = boost_change
 
     def accelerate_relative(self, acceleration: Vector):
         acceleration.rotate(self.rotation)
@@ -42,8 +45,12 @@ class Player_Ship(Ship):
         self.accelerate_relative(delta_time * Vector(300, 0))
 
     def boost(self, delta_time):
-        self.max_speed = 1000
-        self.accelerate_relative(delta_time * Vector(0, -2000))
+        if self.boost_amount > 0: # Makes sure that you have boost to boost
+            self.max_speed = 1000
+            self.accelerate_relative(delta_time * Vector(0, -1000))
+            self.boost_amount -= self.boost_change * delta_time # Decrease the amount of boost you have while boosting over time
+        else:
+            self.max_speed = 500 # Resets max speed once you run out of boost
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)
