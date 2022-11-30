@@ -42,6 +42,9 @@ class Particle():
     def draw(self, WIN, focus_point):
         draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.size * ZOOM)
 
+    def unload(self):
+        game.CHUNKS.remove_entity(self)
+
 
 
 class ParticleSystem():

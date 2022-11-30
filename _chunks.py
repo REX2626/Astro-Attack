@@ -31,6 +31,7 @@ class Chunks():
         chunk_coords = player.position // CHUNK_SIZE
 
         # Unload all entities
+        original_entities = self.entities
         self.entities = set()
 
         # Loop through chunks in square around player's position
@@ -44,6 +45,10 @@ class Chunks():
 
                 # Load entities in loaded chunks
                 self.entities.update(self.get_chunk(position).entities)
+
+        for entity in original_entities.difference(self.entities):
+            if hasattr(entity, "unload"):
+                entity.unload()
 
     def get_chunk(self, arg: tuple[int, int] or Object) -> "Chunk":
         """Returns the chunk, arg can be a chunk_coord or an object"""

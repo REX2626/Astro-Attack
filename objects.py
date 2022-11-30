@@ -388,6 +388,9 @@ class Bullet(Entity):
                 particles.ParticleSystem(entity.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
                 break
 
+    def unload(self):
+        game.CHUNKS.remove_entity(self)
+
 
 
 class Asteroid(Object):
