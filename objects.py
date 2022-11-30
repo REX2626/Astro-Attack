@@ -357,19 +357,6 @@ class Ship(Entity):
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
-    
-    def accelerate_to_point(self, target_position: Vector, acceleration):
-        distance_to_point = (target_position - self.position).magnitude()
-
-        # Calculate the distance that it takes to decelerate to the target point
-        distance_to_decelerate = (self.velocity * self.velocity) / (2 * acceleration)
-
-        # Alternates between accelerating and decelerating to the point
-
-        if distance_to_decelerate.magnitude() >= distance_to_point:
-            self.accelerate_in_direction(target_position, -acceleration)
-        else:
-            self.accelerate_in_direction(target_position, acceleration)
 
 
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
