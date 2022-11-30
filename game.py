@@ -28,7 +28,7 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 20 # Similar to RENDER DISTANCE, how many chunks are generated
+CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 200 # How big each chunk is
 
 SPAWN_SIZE = 4

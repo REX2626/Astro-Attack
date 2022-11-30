@@ -15,9 +15,7 @@ class Particle():
         self.lifetime = lifetime
         self.time_alive = 0
 
-    def update(self, delta_time):
-        self.time_alive += delta_time
-
+    def move(self, delta_time):
         # Remove self from current chunk
         original_chunk = game.CHUNKS.get_chunk(self)
 
@@ -31,11 +29,18 @@ class Particle():
             original_chunk.entities.remove(self)
             new_chunk.entities.add(self)
 
+    def update_time(self, delta_time):
+        self.time_alive += delta_time
+
         if self.time_alive > self.lifetime:
             game.CHUNKS.remove_entity(self)
 
+    def update(self, delta_time):
+        self.move(delta_time)
+        self.update_time(delta_time)
+
     def draw(self, WIN, focus_point):
-        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.size)
+        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.size * ZOOM)
 
 
 
