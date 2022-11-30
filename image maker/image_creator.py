@@ -1,8 +1,8 @@
 from PIL import Image
 
-image = Image.open("image maker/nasa_asteroid.png")
+#image = Image.open("image maker/Asteroid1.png")
 
-image = image.convert("RGBA")
+"""image = image.convert("RGBA")
 datas = image.getdata()
 
 new_data = []
@@ -14,4 +14,8 @@ for item in datas:
         new_data.append(item)
 
 image.putdata(new_data)
-image.save("asteroid1.png")
+image.save("asteroid1.png")"""
+
+im = Image.open("Asteroid1.png")
+im2 = im.crop(im.getbbox())
+im2.save("Asteroid_crop.png")
