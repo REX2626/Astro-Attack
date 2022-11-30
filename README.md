@@ -4,9 +4,6 @@
 ## TODO:
 Improve asteroid image, add several asteroid images
 
-Improve performance
-Cache zoomed image, check if object's image is the same as game.ZOOM
-
 Add AI states:
     Protrol state
     Attack state

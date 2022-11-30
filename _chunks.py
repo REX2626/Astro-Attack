@@ -95,8 +95,8 @@ class Chunk():
             )
 
         # Asteroid
-        # 10% chance of spawning
-        if random.random() < 0.1:
+        # 2% chance of spawning
+        if random.random() < 0.02:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
