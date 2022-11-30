@@ -2,18 +2,27 @@
 
 
 ## TODO:
-Improve asteroid image, add several asteroid images
+Add 2 more asteroid images
 
-Add AI states:
-    Protrol state
-    Attack state
-    Retreat state
+Patrol state: improve grouping with mothership
 
-Enemy Grouping
+Attack state: make fighting seem more natural
+
+Enemy health: Add health to enemy ships
+
+Retreat state: If enemy health is low and player health is high - retreat
 
 Add ship colliding with asteroids
+Ship will bounce off
+Ship will take damage proportional to speed^2
 
-Add animation framework
+Make ships have a thruster animation
+
+Add boost animation to ship and particle effect
+
+Add targeting icon (space engineers)
+
+Add auto-aim, if targeting icon near ship, then it gets closer (making aiming nicer)
 
 ### POTENTIAL
 
@@ -81,3 +90,7 @@ Limit the zooming in and out based on the chunk distance
 Make Enemy ships move around
 
 Make all artwork the same scale
+
+Improve asteroid image, add several asteroid images
+
+Enemy Grouping
