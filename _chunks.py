@@ -1,4 +1,5 @@
-from objects import Vector, Object, Asteroid, Enemy_Ship
+from objects import Vector, Object, Asteroid
+from enemy import Mother_Ship
 import random
 import game
 
@@ -14,11 +15,15 @@ class Chunks():
         self.create_initial_chunks()
 
     def create_initial_chunks(self):
+        def func(_):
+            pass
+        generate = Chunk.generate
+        setattr(Chunk, "generate", func)
         for y in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
             for x in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
                 chunk = Chunk(Vector(x, y))
-                chunk.entities.clear()
                 self.list[(x, y)] = chunk
+        setattr(Chunk, "generate", generate)
 
     def update(self, player):
         
@@ -78,20 +83,24 @@ class Chunk():
         
         # Enemy Ship
         # 20% chance of spawning
-        if random.random() < 0.2:
+        if random.random() < 0.05:
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
+            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+
             self.entities.add(
 
-                # Enemy_Ship
-                Enemy_Ship(random_position, Vector(0, 0))
+                # Mother_Ship
+                Mother_Ship(random_position, Vector(0, 0))
             )
 
         # Asteroid
         # 10% chance of spawning
         if random.random() < 0.1:
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1), random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
+            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+
             self.entities.add(
 
                 Asteroid(random_position)
