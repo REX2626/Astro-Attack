@@ -88,7 +88,7 @@ def handle_player_movement(keys_pressed, delta_time):
     if keys_pressed[pygame.K_RIGHT]:
         red_ship.turn_right(delta_time)
     
-    if keys_pressed[pygame.K_q]:
+    if keys_pressed[pygame.K_SPACE]:
         red_ship.boost(delta_time)
     else:
         red_ship.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
@@ -99,7 +99,7 @@ def handle_player_movement(keys_pressed, delta_time):
         else:
             red_ship.boost_amount = 10 # Caps the boost amount to a specific max value
 
-    if keys_pressed[pygame.K_SPACE]:
+    if pygame.mouse.get_pressed()[0]:
         red_ship.shoot()
 
     if keys_pressed[pygame.K_UP]:
@@ -108,7 +108,22 @@ def handle_player_movement(keys_pressed, delta_time):
     if keys_pressed[pygame.K_DOWN]:
         game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
 
+
+    # Mouse
+    mouse_position = pygame.mouse.get_pos()
+    angle = math.atan2(-mouse_position[1]+CENTRE_POINT.y, mouse_position[0]-CENTRE_POINT.x) - math.pi/2
+    red_ship.set_rotation(angle)
+
+
     CHUNKS.update(red_ship)
+
+def scroll(scroll_amount: int):
+
+    if scroll_amount > 0:
+        game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, 20)
+
+    else:
+        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE))
 
 
 def update_objects(delta_time):
@@ -158,6 +173,9 @@ def main(menu: "_menu.Menu"):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit()
+
+                elif event.type == pygame.MOUSEWHEEL:
+                    scroll(event.y)
 
                 elif event.type == pygame.VIDEORESIZE:
                     update_playing_screen_size(menu)
