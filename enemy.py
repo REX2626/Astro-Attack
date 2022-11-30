@@ -50,9 +50,12 @@ class Enemy_Ship(Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=[], image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, state, self, image)
+        if enemy_list is None:
+            enemy_list = []
         self.enemy_list = enemy_list
+
         self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
 
         enemy_spawn_number = random.randint(3, 6)
@@ -79,11 +82,10 @@ class Mother_Ship(Enemy_Ship):
         distance = (target_position - self.position).magnitude()
 
         if distance < 50:   # Check if the enemy has reached the patrol point
-            self.patrol_point = self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
+            self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
             target_position = self.patrol_point
 
-
         #self.accelerate_to_point(target_position, 200 * delta_time, 500 * delta_time)
-        self.accelerate_in_direction(target_position, 200 * delta_time)
+        self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
 

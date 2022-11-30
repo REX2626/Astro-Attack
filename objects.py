@@ -265,6 +265,7 @@ class MoveableObject(Object):
         new_chunk.entities.add(self)
 
     def move_towards(self, target_position, speed):
+        # cringe fred code
         v: "Vector" = target_position - self.position
         v.set_magnitude(speed)
         self.velocity = v
@@ -317,7 +318,7 @@ class Ship(Entity):
         # Rotation Dampening
         """
         -> See above definition of dampening
-        -> 10 is the size of the dampening
+        -> 3 is the size of the dampening
         """
         self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
 
