@@ -4,6 +4,7 @@ import sys
 import math
 import images
 import game
+import random
 
 
 
@@ -198,6 +199,17 @@ class Vector():
 
 
 
+
+def random_vector(magnitude: float) -> Vector:
+    """Returns a vector with random direction and given magnitude"""
+    random_direction = random.random() * 2 * math.pi    # Get random direction
+
+    random_vector = Vector(magnitude * math.cos(random_direction), magnitude * math.sin(random_direction))  # Get random vector with magnitude
+    
+    return random_vector
+
+
+
 class Object():
     def __init__(self, position, image=images.DEFAULT) -> None:
         
@@ -361,6 +373,7 @@ class Ship(Entity):
 
 
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
+import particles
 
 class Bullet(Entity):
     def __init__(self, position, velocity, rotation=0, image=images.BULLET) -> None:
@@ -378,11 +391,14 @@ class Bullet(Entity):
                 game.CHUNKS.remove_entity(entity)
                 game.CHUNKS.remove_entity(self)
                 game.SCORE += 1
+                particles.ParticleSystem(entity.position, size=3, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+                particles.ParticleSystem(entity.position, size=3, colour=(255, 120, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
                 break
 
             elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
                 entity.health -= 1
                 game.CHUNKS.remove_entity(self)
+                particles.ParticleSystem(entity.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
                 break
 
 
