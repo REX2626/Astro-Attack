@@ -405,4 +405,7 @@ class Bullet(Entity):
 
 class Asteroid(Object):
     def __init__(self, position, image=images.ASTEROID) -> None:
+        
+        # Set Asteroid to random rotation
+        image = pygame.transform.rotate(image, random.random() * 360)
         super().__init__(position, image)
