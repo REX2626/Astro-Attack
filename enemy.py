@@ -50,7 +50,7 @@ class Enemy_Ship(Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, state, self, image)
         if enemy_list is None:
             enemy_list = []
