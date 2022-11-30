@@ -2,8 +2,6 @@
 
 
 ## TODO:
-Add de-spawning, e.g. bullets
-
 Fix speed instant decellerating when stopping boosting
 
 Make enemies turn smoothly
@@ -100,3 +98,5 @@ Make all artwork the same scale
 Improve asteroid image, add several asteroid images
 
 Enemy Grouping
+
+Add de-spawning, e.g. bullets

@@ -50,7 +50,7 @@ class Enemy_Ship(Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=[], image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=[], image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, state, self, image)
         self.enemy_list = enemy_list
         self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
