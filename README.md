@@ -2,6 +2,12 @@
 
 
 ## TODO:
+Add de-spawning, e.g. bullets
+
+Fix speed instant decellerating when stopping boosting
+
+Make enemies turn smoothly
+
 Add 2 more asteroid images
 
 Patrol state: improve grouping with mothership
