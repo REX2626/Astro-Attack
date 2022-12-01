@@ -406,4 +406,28 @@ class Asteroid(Object):
         
         # Set Asteroid to random rotation
         image = pygame.transform.rotate(image, random.random() * 360)
+        self.mask = pygame.mask.from_surface(image)
         super().__init__(position, image)
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        chunk_pos = self.position // game.CHUNK_SIZE
+
+        for y in range(chunk_pos.y-2, chunk_pos.y+3):
+            for x in range(chunk_pos.x-2, chunk_pos.x+3):
+
+                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+
+                    if isinstance(entity, Ship):
+                        entity_mask = pygame.mask.from_surface(entity.image)
+
+                        x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
+                        y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
+
+                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
+                            
+                            vector_to_asteroid = self.position - entity.position
+                            entity.velocity *= -1
+                            entity.damage(entity.velocity.magnitude()**2/100_000)
+                            particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=0.2, frequency=100, speed=100, speed_variance=50)
