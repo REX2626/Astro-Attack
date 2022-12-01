@@ -6,7 +6,7 @@ import random
 import particles
 
 class Enemy_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
         self.state = state
         self.mother_ship = mother_ship
@@ -15,7 +15,7 @@ class Enemy_Ship(Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        if self.distance_to(game.red_ship) < 600:
+        if self.distance_to(game.red_ship) < 600 or self.state == 1:
             self.attack_state(delta_time)
         else:
             self.patrol_state(delta_time)
@@ -47,6 +47,9 @@ class Enemy_Ship(Ship):
         self.set_rotation(self.position.get_angle(game.red_ship.position))
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+
+    def enemy_spotted(self):
+        self.mother_ship.alert_group()
     
     def destroy(self):
         super().destroy()
@@ -54,7 +57,7 @@ class Enemy_Ship(Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=3, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, state, self, image)
         if enemy_list is None:
             enemy_list = []
@@ -62,7 +65,7 @@ class Mother_Ship(Enemy_Ship):
 
         self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
 
-        enemy_spawn_number = random.randint(0, 0)
+        enemy_spawn_number = random.randint(3, 6)
 
         for _ in range(enemy_spawn_number):
 
@@ -70,6 +73,7 @@ class Mother_Ship(Enemy_Ship):
             random.randint(self.position.y, self.position.y + game.CHUNK_SIZE - 1))
 
             enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
+            self.enemy_list.append(enemy)
             
             game.CHUNKS.add_entity(enemy)
 
@@ -92,6 +96,12 @@ class Mother_Ship(Enemy_Ship):
         #self.accelerate_to_point(target_position, 200 * delta_time, 500 * delta_time)
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
+
+    def alert_group(self):
+        for enemy in range(len(self.enemy_list)):
+            enemy.state = 1
+        
+        self.state = 1
 
     def destroy(self):
         Ship.destroy(self)
