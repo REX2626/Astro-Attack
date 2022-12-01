@@ -406,14 +406,13 @@ class Asteroid(Object):
         
         # Set Asteroid to random rotation
         image = pygame.transform.rotate(image, random.random() * 360)
+        self.mask = pygame.mask.from_surface(image)
         super().__init__(position, image)
 
     def update(self, delta_time):
         super().update(delta_time)
 
         chunk_pos = self.position // game.CHUNK_SIZE
-
-        mask = pygame.mask.from_surface(self.image)
 
         for y in range(chunk_pos.y-2, chunk_pos.y+3):
             for x in range(chunk_pos.x-2, chunk_pos.x+3):
@@ -426,7 +425,7 @@ class Asteroid(Object):
                         x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
                         y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
 
-                        if mask.overlap(entity_mask, (x_offset, y_offset)):
+                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             
                             vector_to_asteroid = self.position - entity.position
                             entity.velocity *= -1
