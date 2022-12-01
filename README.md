@@ -2,6 +2,14 @@
 
 
 ## TODO:
+Add choice for ParticleSystem to spawn all particles at once
+
+Add chocie for particles to shrink over time
+
+Make bouncing off asteroid more realistic
+
+Improve asteroid collision detection performance
+
 Fix speed instant decellerating when stopping boosting
 
 Make enemies turn smoothly

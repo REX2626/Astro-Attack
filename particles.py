@@ -91,6 +91,8 @@ class ParticleSystem():
     def spawn(self):
         if self.speed_variance:
             speed = self.speed + (random.random()*2-1) * self.speed_variance
+        else:
+            speed = self.speed
 
         game.CHUNKS.add_entity(
             Particle(self.position, random_vector(speed), size=self.size, colour=self.colour, lifetime=self.lifetime)
