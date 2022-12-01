@@ -1,5 +1,6 @@
 from objects import Vector, Ship
 import images
+import particles
 
 
 
@@ -16,10 +17,9 @@ class Player_Ship(Ship):
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
 
         self.max_rotation_speed = max_rotation_speed
-        self.health = health
         self.boost_amount = boost_amount
         self.boost_change = boost_change
 
@@ -57,3 +57,11 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
+
+    def damage(self, damage):
+        super().damage(damage)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+
+    def destroy(self):
+        super().destroy()
+        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)

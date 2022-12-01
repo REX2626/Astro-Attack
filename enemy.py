@@ -3,11 +3,11 @@ from objects import random_vector
 import images
 import game
 import random
-import pygame
+import particles
 
 class Enemy_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
         self.state = state
         self.mother_ship = mother_ship
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
@@ -47,18 +47,22 @@ class Enemy_Ship(Ship):
         self.set_rotation(self.position.get_angle(game.red_ship.position))
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+    
+    def destroy(self):
+        super().destroy()
+        particles.ParticleSystem(self.position, size=3, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, state, self, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=3, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
 
         self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
 
-        enemy_spawn_number = random.randint(3, 6)
+        enemy_spawn_number = random.randint(0, 0)
 
         for _ in range(enemy_spawn_number):
 
@@ -89,3 +93,6 @@ class Mother_Ship(Enemy_Ship):
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
 
+    def destroy(self):
+        Ship.destroy(self)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 255), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)

@@ -292,7 +292,7 @@ class Entity(MoveableObject):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
@@ -300,6 +300,7 @@ class Ship(Entity):
         self.reload_time = 1 / fire_rate
         self.original_image = self.image
         self.max_speed = max_speed
+        self.health = health
         
         self.time_reloading = 0
         self.rotation_speed = Vector1D(0)
@@ -358,6 +359,15 @@ class Ship(Entity):
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
+    
+    def damage(self, damage):
+        self.health -= damage
+        particles.ParticleSystem(self.position, size=3, colour=(255, 120, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+        if self.health <= 0:
+            self.destroy()
+
+    def destroy(self):
+        game.CHUNKS.remove_entity(self)
 
 
 from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
@@ -376,17 +386,14 @@ class Bullet(Entity):
         # If it is, then destroy alien and bullet
         for entity in game.CHUNKS.get_chunk(self).entities:
             if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
-                game.CHUNKS.remove_entity(entity)
+                entity.damage(1)
                 game.CHUNKS.remove_entity(self)
                 game.SCORE += 1
-                particles.ParticleSystem(entity.position, size=3, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
-                particles.ParticleSystem(entity.position, size=3, colour=(255, 120, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
                 break
 
             elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
-                entity.health -= 1
+                entity.damage(1)
                 game.CHUNKS.remove_entity(self)
-                particles.ParticleSystem(entity.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
                 break
 
     def unload(self):
