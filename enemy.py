@@ -17,8 +17,12 @@ class Enemy_Ship(Ship):
 
         if self.distance_to(game.red_ship) < 600 or self.state == 1:
             self.attack_state(delta_time)
+            self.enemy_spotted()
         else:
             self.patrol_state(delta_time)
+
+        if self.state == 1 and self.distance_to(game.red_ship) > 1500:
+            self.state = 0
 
     # DEBUG DRAW PATROL POINTS
 
@@ -98,7 +102,7 @@ class Mother_Ship(Enemy_Ship):
         self.set_rotation(self.position.get_angle(target_position))
 
     def alert_group(self):
-        for enemy in range(len(self.enemy_list)):
+        for enemy in self.enemy_list:
             enemy.state = 1
         
         self.state = 1
