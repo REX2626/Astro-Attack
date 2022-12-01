@@ -2,7 +2,7 @@ import pygame
 
 from game import *
 import game
-from objects import Bullet
+from objects import Bullet, Asteroid
 import _menu
 import graphics
 
@@ -131,13 +131,13 @@ def update_objects(delta_time):
     
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set
-    for object in filter(lambda object: type(object) != Bullet, CHUNKS.entities.copy()):
+    for object in filter(lambda object: type(object) != Bullet and type(object) != Asteroid, CHUNKS.entities.copy()):
         
         # Update object e.g. move it
         object.update(delta_time)
 
     # Bullets are updated after everything else to ensure that the ships they may hit have been updated (and moved to the right position)
-    for object in filter(lambda object: type(object) == Bullet, CHUNKS.entities.copy()):
+    for object in filter(lambda object: type(object) == Bullet or type(object) == Asteroid, CHUNKS.entities.copy()):
         object.update(delta_time)
 
 

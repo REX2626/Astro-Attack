@@ -428,6 +428,6 @@ class Asteroid(Object):
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             
                             vector_to_asteroid = self.position - entity.position
-                            entity.velocity *= -1
+                            entity.velocity -= vector_to_asteroid/2
                             entity.damage(entity.velocity.magnitude()**2/100_000)
                             particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=0.2, frequency=100, speed=100, speed_variance=50)
