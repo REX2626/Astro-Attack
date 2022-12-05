@@ -8,13 +8,10 @@ import pygame
 import objects
 
 class Enemy_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, step_positions=None, image=images.GREEN_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
         self.state = state
         self.mother_ship = mother_ship
-        if step_positions is None:
-            step_positions = []
-        self.step_positions = step_positions
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
 
     def update(self, delta_time):
@@ -31,11 +28,10 @@ class Enemy_Ship(Ship):
 
     # DEBUG DRAW PATROL POINTS
 
-    def draw(self, win: pygame.Surface, focus_point):
-        super().draw(win, focus_point)
-        pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-        for pos in self.step_positions:
-            pygame.draw.circle(game.WIN, (0, 0, 255), ((pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 5 * game.ZOOM)
+    # def draw(self, win: pygame.Surface, focus_point):
+    #     super().draw(win, focus_point)
+    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+        
         
     def patrol_state(self, delta_time):
         self.max_speed = 150
@@ -61,16 +57,6 @@ class Enemy_Ship(Ship):
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
-    def intersect_line_points(self, distance, direction, step_distance):
-        step = int(distance // step_distance)
-        direction.set_magnitude(step_distance)
-        self.step_positions = []
-        self.step_positions.append(self.position)
-        
-        for i in range(step):
-            pos = direction + self.step_positions[i - 1]
-            self.step_positions.append(pos)
-
     def enemy_spotted(self):
         self.mother_ship.alert_group()
     
@@ -81,7 +67,7 @@ class Enemy_Ship(Ship):
 
 class Mother_Ship(Enemy_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, state, self, None, image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
@@ -102,20 +88,17 @@ class Mother_Ship(Enemy_Ship):
 
     # DEBUG DRAW PATROL POINTS
 
-    def draw(self, win: pygame.Surface, focus_point):
-        super().draw(win, focus_point)
-        pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-        for pos in self.step_positions:
-            pygame.draw.circle(game.WIN, (0, 0, 255), ((pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 10 * game.ZOOM)
+    # def draw(self, win: pygame.Surface, focus_point):
+    #     super().draw(win, focus_point)
+    #     pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
         
+
     def patrol_state(self, delta_time):
         self.max_speed = 50
 
         target_position = self.patrol_point
         direction_vector = target_position - self.position
         distance = (direction_vector).magnitude()
-
-        self.intersect_line_points(distance * 2, direction_vector, 300)
 
         chunk_pos = target_position // game.CHUNK_SIZE
 
