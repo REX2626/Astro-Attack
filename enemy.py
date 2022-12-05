@@ -4,6 +4,8 @@ import images
 import game
 import random
 import particles
+import pygame
+import objects
 
 class Enemy_Ship(Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
@@ -21,7 +23,7 @@ class Enemy_Ship(Ship):
         else:
             self.patrol_state(delta_time)
 
-        if self.state == 1 and self.distance_to(game.red_ship) > 1500:
+        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
             self.state = 0
 
     # DEBUG DRAW PATROL POINTS
@@ -30,15 +32,18 @@ class Enemy_Ship(Ship):
     #     super().draw(win, focus_point)
     #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
         
+        
     def patrol_state(self, delta_time):
         self.max_speed = 150
         
         target_position = self.patrol_point
-        target_distance = (target_position - self.position).magnitude()
+        direction_vector = target_position - self.position
+
+        distance = (direction_vector).magnitude()
 
         target_to_mothership_distance = (target_position - self.mother_ship.position).magnitude()
 
-        if target_distance < 50 or target_to_mothership_distance > 500:   # Check if the enemy has reached the patrol point
+        if distance < 50 or target_to_mothership_distance > 500:   # Check if the enemy has reached the patrol point
             self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
             target_position = self.patrol_point
         
@@ -87,17 +92,32 @@ class Mother_Ship(Enemy_Ship):
     #     super().draw(win, focus_point)
     #     pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
         
+
     def patrol_state(self, delta_time):
         self.max_speed = 50
 
         target_position = self.patrol_point
-        distance = (target_position - self.position).magnitude()
+        direction_vector = target_position - self.position
+        distance = (direction_vector).magnitude()
 
-        if distance < 50:   # Check if the enemy has reached the patrol point
+        chunk_pos = target_position // game.CHUNK_SIZE
+
+        nearby_asteroid = False
+
+        for y in range(chunk_pos.y-1, chunk_pos.y+2):
+            for x in range(chunk_pos.x-1, chunk_pos.x+2):
+
+                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+
+                    if isinstance(entity, objects.Asteroid):
+                        nearby_asteroid = True
+                        break
+
+        if distance < 50 or nearby_asteroid:   # Check if the enemy has reached the patrol point
             self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
             target_position = self.patrol_point
 
-        #self.accelerate_to_point(target_position, 200 * delta_time, 500 * delta_time)
+
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
 
