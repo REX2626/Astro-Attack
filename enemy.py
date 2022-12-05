@@ -109,4 +109,4 @@ class Mother_Ship(Enemy_Ship):
 
     def destroy(self):
         Ship.destroy(self)
-        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 255), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 255), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)

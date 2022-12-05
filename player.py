@@ -60,7 +60,7 @@ class Player_Ship(Ship):
 
     def damage(self, damage):
         super().damage(damage)
-        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
 
     def destroy(self):
         super().destroy()

@@ -362,7 +362,7 @@ class Ship(Entity):
     
     def damage(self, damage):
         self.health -= damage
-        particles.ParticleSystem(self.position, size=3, colour=(255, 120, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 120, 0), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
         if self.health <= 0:
             self.destroy()
 
@@ -429,5 +429,6 @@ class Asteroid(Object):
                             
                             vector_to_asteroid = self.position - entity.position
                             entity.velocity -= vector_to_asteroid/2
+
                             entity.damage(entity.velocity.magnitude()**2/100_000)
-                            particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=0.2, frequency=100, speed=100, speed_variance=50)
+                            particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=None, frequency=20, speed=100, speed_variance=50)

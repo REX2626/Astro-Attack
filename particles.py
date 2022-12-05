@@ -69,6 +69,9 @@ class ParticleSystem():
         CENTRE_POINT_X = game.CENTRE_POINT.x
         CENTRE_POINT_Y = game.CENTRE_POINT.y
 
+        if not duration:
+            self.burst()
+
     def update(self, delta_time):
         self.delay += delta_time
         self.time_alive += delta_time
@@ -87,6 +90,11 @@ class ParticleSystem():
 
     def draw(self, WIN, red_ship_pos):
         pass
+
+    def burst(self):
+        for _ in range(int(1/self.period)):
+            self.spawn()
+        game.CHUNKS.remove_entity(self)
 
     def spawn(self):
         if self.speed_variance:
