@@ -88,7 +88,7 @@ class Chunk():
         
         # Enemy Ship
         # 20% chance of spawning
-        if random.random() < 0.01:
+        if random.random() < 0.09:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
@@ -101,7 +101,7 @@ class Chunk():
 
         # Asteroid
         # 0.5% chance of spawning
-        if random.random() < 0.005:
+        if random.random() < 0.045:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
