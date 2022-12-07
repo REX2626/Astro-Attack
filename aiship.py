@@ -57,6 +57,9 @@ class Enemy_Ship(Ship):
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
+    def damage(self, damage):
+        super().damage(damage)
+
     def enemy_spotted(self):
         self.mother_ship.alert_group()
     
@@ -130,3 +133,59 @@ class Mother_Ship(Enemy_Ship):
     def destroy(self):
         Ship.destroy(self)
         particles.ParticleSystem(self.position, size=3, colour=(255, 0, 255), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
+
+
+class Neutral_Ship(Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, state=0, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+        self.state = state
+        self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        if self.state == 0:
+            self.patrol_state(delta_time)
+        elif self.state == 1:
+            self.attack_state(delta_time)
+
+        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
+            self.state = 0
+
+    # DEBUG DRAW PATROL POINTS
+
+    # def draw(self, win: pygame.Surface, focus_point):
+    #     super().draw(win, focus_point)
+    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+        
+        
+    def patrol_state(self, delta_time):
+        self.max_speed = 100
+        
+        target_position = self.patrol_point
+        direction_vector = target_position - self.position
+
+        distance = (direction_vector).magnitude()
+
+        if distance < 50:   # Check if the enemy has reached the patrol point
+            self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
+            target_position = self.patrol_point
+        
+        self.accelerate_in_direction(target_position, 300 * delta_time)
+        self.set_rotation(self.position.get_angle(target_position))
+    
+    def attack_state(self, delta_time):
+        self.max_speed = 300
+        self.set_rotation(self.position.get_angle(game.red_ship.position))
+        self.shoot()
+        self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+
+    def damage(self, damage):
+        super().damage(damage)
+        self.state = 1
+    
+    def destroy(self):
+        super().destroy()
+        particles.ParticleSystem(self.position, size=3, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+
+

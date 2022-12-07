@@ -1,5 +1,5 @@
 from objects import Vector, Object, Asteroid
-from enemy import Mother_Ship
+from aiship import Mother_Ship, Neutral_Ship
 import random
 import game
 
@@ -86,8 +86,8 @@ class Chunk():
 
     def generate(self):
         
-        # Enemy Ship
-        # 20% chance of spawning
+        # Mother Ship
+        # 9% chance of spawning
         if random.random() < 0.09:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
@@ -99,8 +99,20 @@ class Chunk():
                 Mother_Ship(random_position, Vector(0, 0))
             )
 
+        # Neutral Ship
+        # 10% chance of spawning
+        if random.random() < 0.1:
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
+            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+
+            self.entities.add(
+
+                # Neutral Ship
+                Neutral_Ship(random_position, Vector(0, 0))
+            )
+
         # Asteroid
-        # 0.5% chance of spawning
+        # 4.5% chance of spawning
         if random.random() < 0.045:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),

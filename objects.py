@@ -333,7 +333,6 @@ class Ship(Entity):
         self.time_reloading += delta_time
 
     def shoot(self):
-
         # Check if reloaded
         if self.time_reloading >= self.reload_time:
             
@@ -345,7 +344,8 @@ class Ship(Entity):
 
                 position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
-                rotation=self.rotation
+                rotation=self.rotation,
+                ship=self
                 )
 
             game.CHUNKS.add_entity(bullet)
@@ -370,12 +370,13 @@ class Ship(Entity):
         game.CHUNKS.remove_entity(self)
 
 
-from enemy import Enemy_Ship # Has to be done after defining Vector and Ship, used for Bullet
+from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Vector and Ship, used for Bullet
 import particles
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, rotation=0, image=images.BULLET) -> None:
+    def __init__(self, position, velocity, rotation=0, ship=None, image=images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
+        self.ship = ship
         global player
         import player
         
@@ -387,11 +388,19 @@ class Bullet(Entity):
         for entity in game.CHUNKS.get_chunk(self).entities:
             if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
                 entity.damage(1)
+                if isinstance(self.ship, player.Player_Ship):
+                    entity.enemy_spotted()
                 game.CHUNKS.remove_entity(self)
                 game.SCORE += 1
                 break
 
+
             elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
+                entity.damage(1)
+                game.CHUNKS.remove_entity(self)
+                break
+
+            elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
                 entity.damage(1)
                 game.CHUNKS.remove_entity(self)
                 break
@@ -429,6 +438,15 @@ class Asteroid(Object):
                             
                             vector_to_asteroid = self.position - entity.position
                             entity.velocity -= vector_to_asteroid/2
+                            # normal = entity.position - self.position
+
+                            # normalized_normal = normal / normal.magnitude()
+
+                            # angle = math.atan2(entity.velocity) - math.atan2(normalized_normal)
+
+                            # restitution = 1
+
+                            # entity.velocity = entity.velocity.magnitude() * (math.sin(angle)*normalized_normal + restitution*math.cos(angle)*normalized_normal)
 
                             entity.damage(entity.velocity.magnitude()**2/100_000)
                             particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=None, frequency=20, speed=100, speed_variance=50)
