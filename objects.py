@@ -402,6 +402,11 @@ class Bullet(Entity):
 
             elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
                 entity.damage(1)
+                if isinstance(self.ship, player.Player_Ship):
+                    entity.state = 1
+                elif isinstance(self.ship, Enemy_Ship):
+                    entity.state = 2
+                    entity.recent_enemy = self.ship
                 game.CHUNKS.remove_entity(self)
                 break
 

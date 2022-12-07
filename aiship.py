@@ -136,9 +136,10 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, state=0, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
         self.state = state
+        self.recent_enemy = recent_enemy
         self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
 
     def update(self, delta_time):
@@ -147,7 +148,9 @@ class Neutral_Ship(Ship):
         if self.state == 0:
             self.patrol_state(delta_time)
         elif self.state == 1:
-            self.attack_state(delta_time)
+            self.attack_player_state(delta_time)
+        elif self.state == 2:
+            self.attack_enemy_state(delta_time)
 
         if self.state == 1 and self.distance_to(game.red_ship) > 1000:
             self.state = 0
@@ -167,22 +170,41 @@ class Neutral_Ship(Ship):
 
         distance = (direction_vector).magnitude()
 
-        if distance < 50:   # Check if the enemy has reached the patrol point
+        chunk_pos = target_position // game.CHUNK_SIZE
+
+        nearby_asteroid = False
+
+        for y in range(chunk_pos.y-1, chunk_pos.y+2):
+            for x in range(chunk_pos.x-1, chunk_pos.x+2):
+
+                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+
+                    if isinstance(entity, objects.Asteroid):
+                        nearby_asteroid = True
+                        break
+
+        if distance < 50 or nearby_asteroid:   # Check if the enemy has reached the patrol point
             self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
             target_position = self.patrol_point
         
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle(target_position))
     
-    def attack_state(self, delta_time):
+    def attack_player_state(self, delta_time):
         self.max_speed = 300
         self.set_rotation(self.position.get_angle(game.red_ship.position))
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
-    def damage(self, damage):
-        super().damage(damage)
-        self.state = 1
+    def attack_enemy_state(self, delta_time):
+        if self.recent_enemy.health > 0:
+            self.max_speed = 300
+            self.set_rotation(self.position.get_angle(self.recent_enemy.position))
+            self.shoot()
+            self.accelerate_in_direction(self.recent_enemy.position, 400 * delta_time)
+        else:
+            self.recent_enemy = None
+            self.state = 0
     
     def destroy(self):
         super().destroy()
