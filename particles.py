@@ -45,7 +45,7 @@ class Particle():
         self.update_time(delta_time)
 
     def draw(self, WIN, focus_point):
-        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.current_size * ZOOM)
+        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), max(1, self.current_size * ZOOM))
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
