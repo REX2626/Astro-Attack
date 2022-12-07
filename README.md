@@ -2,8 +2,6 @@
 
 
 ## TODO:
-Add choice for ParticleSystem to spawn all particles at once
-
 Add chocie for particles to shrink over time
 
 Make bouncing off asteroid more realistic
@@ -16,11 +14,13 @@ Make enemies turn smoothly
 
 Add 2 more asteroid images
 
+Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
+
+Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
+
 Patrol state: improve grouping with mothership
 
 Attack state: make fighting seem more natural
-
-Enemy health: Add health to enemy ships
 
 Retreat state: If enemy health is low and player health is high - retreat
 
@@ -108,3 +108,11 @@ Improve asteroid image, add several asteroid images
 Enemy Grouping
 
 Add de-spawning, e.g. bullets
+
+Add choice for ParticleSystem to spawn all particles at once
+
+Enemy health: Add health to enemy ships
+
+Added Neutral Ship
+
+Neutral Ship Attacks enemies firing at it
