@@ -7,13 +7,15 @@ import random
 
 draw_circle = pygame.draw.circle
 class Particle():
-    def __init__(self, position: Vector, velocity: Vector, size: float, colour: tuple, lifetime: float) -> None:
+    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float) -> None:
         self.position = position
         self.velocity = velocity
-        self.size = size
+        self.start_size = start_size
+        self.end_size = end_size
         self.colour = colour
         self.lifetime = lifetime
         self.time_alive = 0
+        self.current_size = self.start_size
 
     def move(self, delta_time):
         # Remove self from current chunk
@@ -32,6 +34,10 @@ class Particle():
     def update_time(self, delta_time):
         self.time_alive += delta_time
 
+        size_difference = self.end_size - self.start_size
+
+        self.current_size += size_difference * (delta_time / self.lifetime)
+
         if self.time_alive > self.lifetime:
             game.CHUNKS.remove_entity(self)
 
@@ -40,7 +46,7 @@ class Particle():
         self.update_time(delta_time)
 
     def draw(self, WIN, focus_point):
-        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.size * ZOOM)
+        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), self.current_size * ZOOM)
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
@@ -48,9 +54,10 @@ class Particle():
 
 
 class ParticleSystem():
-    def __init__(self, position, size=5, colour=(255, 255, 255), duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
+    def __init__(self, position, start_size=5, end_size=0, colour=(255, 255, 255), duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
         self.position = position
-        self.size = size
+        self.start_size = start_size
+        self.end_size = end_size
         self.colour = colour
         self.duration = duration
         self.lifetime = lifetime
@@ -103,5 +110,5 @@ class ParticleSystem():
             speed = self.speed
 
         game.CHUNKS.add_entity(
-            Particle(self.position, random_vector(speed), size=self.size, colour=self.colour, lifetime=self.lifetime)
+            Particle(self.position, random_vector(speed), start_size=self.start_size, end_size=self.end_size, colour=self.colour, lifetime=self.lifetime)
             )
