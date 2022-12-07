@@ -362,7 +362,8 @@ class Ship(Entity):
     
     def damage(self, damage):
         self.health -= damage
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(255, 120, 0), duration=None, lifetime=0.5, frequency=50, speed=400, speed_variance=200)
+        particles.ParticleSystem(self.position, start_size=random.randint(10, 20), end_size=0, colour=(random.randint(200, 255), 0, 0), duration=None, lifetime=0.5, frequency=10, speed=75, speed_variance=30)
+        particles.ParticleSystem(self.position, start_size=random.randint(10,20), end_size=0, colour=(random.randint(200, 255), random.randint(125, 180), 0), duration=None, lifetime=0.5, frequency=10, speed=75, speed_variance=30)
         if self.health <= 0:
             self.destroy()
 

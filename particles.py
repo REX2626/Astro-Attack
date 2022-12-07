@@ -15,7 +15,8 @@ class Particle():
         self.colour = colour
         self.lifetime = lifetime
         self.time_alive = 0
-        self.current_size = self.start_size
+        self.current_size = start_size
+        self.size_difference = end_size - start_size
 
     def move(self, delta_time):
         # Remove self from current chunk
@@ -34,9 +35,7 @@ class Particle():
     def update_time(self, delta_time):
         self.time_alive += delta_time
 
-        size_difference = self.end_size - self.start_size
-
-        self.current_size += size_difference * (delta_time / self.lifetime)
+        self.current_size += self.size_difference * (delta_time / self.lifetime)
 
         if self.time_alive > self.lifetime:
             game.CHUNKS.remove_entity(self)

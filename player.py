@@ -4,7 +4,6 @@ import particles
 import math
 
 
-
 class Player_Ship(Ship):
     def __init__(
 
@@ -54,7 +53,7 @@ class Player_Ship(Ship):
             boost_distance = 20
             boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-            particles.ParticleSystem(self.position + boost_position, start_size=7, end_size=0, colour=(0, 0, 255), duration=None, lifetime=0.5, frequency=1)
+            particles.ParticleSystem(self.position + boost_position, start_size=6, end_size=0, colour=(20, 100, 255), duration=None, lifetime=0.5, frequency=1)
         else:
             self.max_speed = 500 # Resets max speed once you run out of boost
 
@@ -63,10 +62,6 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
-
-    def damage(self, damage):
-        super().damage(damage)
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(255, 0, 0), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
 
     def destroy(self):
         super().destroy()

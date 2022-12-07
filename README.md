@@ -2,8 +2,6 @@
 
 
 ## TODO:
-Add chocie for particles to shrink over time
-
 Make bouncing off asteroid more realistic
 
 Improve asteroid collision detection performance
@@ -29,8 +27,6 @@ Ship will bounce off
 Ship will take damage proportional to speed^2
 
 Make ships have a thruster animation
-
-Add boost animation to ship and particle effect
 
 Add targeting icon (space engineers)
 
@@ -116,3 +112,7 @@ Enemy health: Add health to enemy ships
 Added Neutral Ship
 
 Neutral Ship Attacks enemies firing at it
+
+Add chocie for particles to shrink over time
+
+Add boost animation to ship and particle effect
