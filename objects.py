@@ -338,7 +338,7 @@ class Ship(Entity):
             
             bullet_position = self.position + Vector(0, -self.original_image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -450)
+            bullet_velocity = Vector(0, -500)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
@@ -362,7 +362,7 @@ class Ship(Entity):
     
     def damage(self, damage):
         self.health -= damage
-        particles.ParticleSystem(self.position, size=3, colour=(255, 120, 0), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
+        particles.ParticleSystem(self.position, size=3, colour=(255, 120, 0), duration=None, lifetime=0.5, frequency=50, speed=400, speed_variance=200)
         if self.health <= 0:
             self.destroy()
 
