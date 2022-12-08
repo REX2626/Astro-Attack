@@ -122,14 +122,14 @@ class Ship(Entity):
     
     def damage(self, damage):
         self.health -= damage
-        particles.ParticleSystem(self.position, start_size=random.randint(3, 5), end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=30, speed=120, speed_variance=40)
+        particles.ParticleSystem(self.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.2, duration=None, lifetime=0.6, frequency=30, speed=120, speed_variance=40)
         if self.health <= 0:
             self.destroy()
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)
-        particles.ParticleSystem(self.position, start_size=random.randint(10, 20), end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=20, speed=80, speed_variance=40)
-        particles.ParticleSystem(self.position, start_size=random.randint(15, 25), end_size=1, colour=game.DARK_GREY, max_colour=None, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
+        particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
+        particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet

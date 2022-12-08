@@ -7,30 +7,20 @@ import random
 
 draw_circle = pygame.draw.circle
 class Particle():
-    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float) -> None:
+    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, bloom: int, lifetime: float) -> None:
         self.position = position
         self.velocity = velocity
         self.start_size = start_size
         self.end_size = end_size
         self.colour = colour
+        self.bloom = bloom
         self.lifetime = lifetime
         self.time_alive = 0
         self.current_size = start_size
         self.size_difference = end_size - start_size
 
     def move(self, delta_time):
-        # Remove self from current chunk
-        original_chunk = game.CHUNKS.get_chunk(self)
-
-        # Move self
-        self.position += self.velocity * delta_time
-
-        # Add self to the chunk it should now be in
-        new_chunk = game.CHUNKS.get_chunk(self)
-
-        if original_chunk != new_chunk:
-            original_chunk.entities.remove(self)
-            new_chunk.entities.add(self)
+        game.CHUNKS.move_entity(self, delta_time)
 
     def update_time(self, delta_time):
         self.time_alive += delta_time
@@ -45,6 +35,20 @@ class Particle():
         self.update_time(delta_time)
 
     def draw(self, WIN, focus_point):
+        radius = max(1, self.current_size * ZOOM*self.bloom)
+        surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
+
+        max_radius = int(self.current_size*ZOOM*self.bloom)
+        min_radius = int(self.current_size*ZOOM)
+
+        # draw circle going from out to in
+        for radius1 in range(max_radius*2, min_radius*2, -1): # e.g. range(15, 10, -1)
+            radius1 = radius1/2
+            amount_done = (max_radius-radius1) / (max_radius-min_radius)
+            draw_circle(surface, (*self.colour, amount_done*255), (radius, radius), radius1, width=2)
+
+        WIN.blit(surface, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X - radius, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y - radius))
+
         draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), max(1, self.current_size * ZOOM))
 
     def unload(self):
@@ -53,13 +57,16 @@ class Particle():
 
 
 class ParticleSystem():
-    def __init__(self, position, start_size=5, end_size=0, colour=(255, 255, 255), max_colour=None, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
+    def __init__(self, position, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=1, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
         self.position = position
+        if not max_start_size: max_start_size = start_size
         self.start_size = start_size
+        self.max_start_size = max_start_size
         self.end_size = end_size
         if not max_colour: max_colour = colour
         self.max_colour = max_colour
         self.min_colour = colour
+        self.bloom = bloom
         self.duration = duration
         self.lifetime = lifetime
         self.time_alive = 0
@@ -110,11 +117,13 @@ class ParticleSystem():
         else:
             speed = self.speed
 
+        start_size = random.randint(self.start_size, self.max_start_size)
+
         r1, r2 = self.min_colour[0], self.max_colour[0]
         g1, g2 = self.min_colour[1], self.max_colour[1]
         b1, b2 = self.min_colour[2], self.max_colour[2]
         colour = (random.randint(r1, r2), random.randint(g1, g2), random.randint(b1, b2))
 
         game.CHUNKS.add_entity(
-            Particle(self.position, random_vector(speed), start_size=self.start_size, end_size=self.end_size, colour=colour, lifetime=self.lifetime)
+            Particle(self.position, random_vector(speed), start_size=start_size, end_size=self.end_size, colour=colour, bloom=self.bloom, lifetime=self.lifetime)
             )

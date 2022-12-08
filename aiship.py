@@ -4,7 +4,6 @@ from objects import random_vector
 import images
 import game
 import random
-import objects
 
 class Enemy_Ship(Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
@@ -195,6 +194,3 @@ class Neutral_Ship(Ship):
         else:
             self.recent_enemy = None
             self.state = 0
-    
-
-

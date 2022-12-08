@@ -12,8 +12,8 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=500,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=20,
-        boost_amount=10, boost_change=5,
+        fire_rate=10, health=40,
+        boost_amount=20, boost_change=5,
         image=images.RED_SHIP
 
         ) -> None:
@@ -55,7 +55,7 @@ class Player_Ship(Ship):
             boost_distance = 20
             boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-            particles.ParticleSystem(self.position + boost_position, start_size=6, end_size=0, colour=(20, 100, 255), duration=None, lifetime=0.5, frequency=1)
+            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(20, 100, 255), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
         else:
             self.max_speed = 500 # Resets max speed once you run out of boost
 
