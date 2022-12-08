@@ -1,4 +1,5 @@
-from objects import Vector, Object, Asteroid
+from objects import Vector, Object, Entity
+from entities import Asteroid
 from aiship import Mother_Ship, Neutral_Ship
 import random
 import game
@@ -75,6 +76,16 @@ class Chunks():
         
         if entity in self.entities:
             self.entities.remove(entity)
+
+    def move_entity(self, entity: Entity, delta_time):
+        
+        original_chunk = self.get_chunk(entity)
+        entity.position += entity.velocity * delta_time
+        new_chunk = self.get_chunk(entity)
+
+        if new_chunk != original_chunk:
+            original_chunk.entities.remove(entity)
+            new_chunk.entities.add(entity)
 
 
 

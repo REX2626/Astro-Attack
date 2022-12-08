@@ -1,4 +1,5 @@
-from objects import Vector, Ship
+from objects import Vector
+from entities import Ship
 import images
 import particles
 import math
@@ -11,7 +12,7 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=500,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=20,
+        fire_rate=10, health=2000,
         boost_amount=10, boost_change=5,
         image=images.RED_SHIP
 

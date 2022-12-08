@@ -1,10 +1,9 @@
-from objects import Vector, Ship
+from objects import Vector
+from entities import Ship, Asteroid
 from objects import random_vector
 import images
 import game
 import random
-import particles
-import pygame
 import objects
 
 class Enemy_Ship(Ship):
@@ -106,7 +105,7 @@ class Mother_Ship(Enemy_Ship):
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
 
-                    if isinstance(entity, objects.Asteroid):
+                    if isinstance(entity, Asteroid):
                         nearby_asteroid = True
                         break
 
@@ -170,7 +169,7 @@ class Neutral_Ship(Ship):
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
 
-                    if isinstance(entity, objects.Asteroid):
+                    if isinstance(entity, Asteroid):
                         nearby_asteroid = True
                         break
 

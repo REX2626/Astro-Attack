@@ -103,4 +103,4 @@ def draw_stars(delta_time):
                 star.y = -radius
 
             # Draw star
-            pygame.draw.circle(WIN, (200, 200, 200), star.to_tuple(), (layer+2)/2)
+            pygame.draw.circle(WIN, (200, 200, 200), star.to_tuple(), (layer+2)/2) # Colour is a light grey, so the stars are not emphasised too much

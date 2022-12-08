@@ -2,7 +2,7 @@ import pygame
 
 from game import *
 import game
-from objects import Bullet, Asteroid
+from entities import Bullet, Asteroid
 import _menu
 import graphics
 
