@@ -111,13 +111,8 @@ class Vector():
 
     def __floordiv__(self, arg):
 
-        # Dividing Vectors
-        if type(arg) == Vector:
-            return Vector(int(self.x // arg.x), int(self.y // arg.y))
-        
         # Dividing Vector by Scalar
-        else:
-            return Vector(int(self.x // arg), int(self.y // arg))
+        return Vector(int(self.x // arg), int(self.y // arg))
     
     def __sub__(self, arg):
 

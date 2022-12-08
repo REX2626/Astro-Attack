@@ -79,13 +79,13 @@ class Chunks():
 
     def move_entity(self, entity: Entity, delta_time):
         
-        original_chunk = self.get_chunk(entity)
+        original_chunk_pos = entity.position // CHUNK_SIZE
         entity.position += entity.velocity * delta_time
-        new_chunk = self.get_chunk(entity)
+        new_chunk_pos = entity.position // CHUNK_SIZE
 
-        if new_chunk != original_chunk:
-            original_chunk.entities.remove(entity)
-            new_chunk.entities.add(entity)
+        if new_chunk_pos != original_chunk_pos:
+            self.get_chunk(original_chunk_pos.to_tuple()).entities.remove(entity)
+            self.get_chunk(new_chunk_pos.to_tuple()).entities.add(entity)
 
 
 

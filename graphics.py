@@ -65,6 +65,9 @@ MAX_X = WIDTH + 100
 MIN_Y = -100
 MAX_Y = HEIGHT + 100
 
+draw_circle = pygame.draw.circle
+
+# This function has been OPTIMIZED
 def draw_stars(delta_time):
     # Layered Stars
     # Bigger stars move more
@@ -103,4 +106,4 @@ def draw_stars(delta_time):
                 star.y = -radius
 
             # Draw star
-            pygame.draw.circle(WIN, (200, 200, 200), star.to_tuple(), (layer+2)/2) # Colour is a light grey, so the stars are not emphasised too much
+            draw_circle(WIN, (200, 200, 200), (star.x, star.y), (layer+2)/2) # Colour is a light grey, so the stars are not emphasised too much
