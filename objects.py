@@ -350,14 +350,15 @@ class Ship(Entity):
             
             bullet_position = self.position + Vector(0, -self.original_image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -500)
+            bullet_velocity = Vector(0, -750)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
                 position=bullet_position,
                 velocity=bullet_velocity + self.velocity,
                 rotation=self.rotation,
-                ship=self
+                ship=self,
+                lifetime=3
                 )
 
             game.CHUNKS.add_entity(bullet)
@@ -374,53 +375,62 @@ class Ship(Entity):
     
     def damage(self, damage):
         self.health -= damage
-        particles.ParticleSystem(self.position, start_size=random.randint(10, 20), end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=20, speed=80, speed_variance=40)
+        particles.ParticleSystem(self.position, start_size=random.randint(3, 5), end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=30, speed=120, speed_variance=40)
         if self.health <= 0:
             self.destroy()
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)
+        particles.ParticleSystem(self.position, start_size=random.randint(10, 20), end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=20, speed=80, speed_variance=40)
+        particles.ParticleSystem(self.position, start_size=random.randint(15, 25), end_size=1, colour=game.DARK_GREY, max_colour=None, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Vector and Ship, used for Bullet
 import particles
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, rotation=0, ship=None, image=images.BULLET) -> None:
+    def __init__(self, position, velocity, rotation=0, ship=None, lifetime=5, image=images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
         self.ship = ship
+        self.lifetime = lifetime
+        self.start_time = 0
         global player
         import player
         
     def update(self, delta_time):
         super().update(delta_time)
 
-        # Check if bullet is near to any aliens in it's chunk
-        # If it is, then destroy alien and bullet
-        for entity in game.CHUNKS.get_chunk(self).entities:
-            if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
-                entity.damage(1)
-                if isinstance(self.ship, player.Player_Ship):
-                    entity.enemy_spotted()
-                game.CHUNKS.remove_entity(self)
-                game.SCORE += 1
-                break
+        self.start_time += delta_time
+
+        if self.start_time > self.lifetime:
+            game.CHUNKS.remove_entity(self)
+        else:
+            # Check if bullet is near to any aliens in it's chunk
+            # If it is, then destroy alien and bullet
+            for entity in game.CHUNKS.get_chunk(self).entities:
+                if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
+                    entity.damage(1)
+                    if isinstance(self.ship, player.Player_Ship):
+                        entity.enemy_spotted()
+                    game.CHUNKS.remove_entity(self)
+                    game.SCORE += 1
+                    break
 
 
-            elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
-                entity.damage(1)
-                game.CHUNKS.remove_entity(self)
-                break
+                elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
+                    entity.damage(1)
+                    game.CHUNKS.remove_entity(self)
+                    break
 
-            elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
-                entity.damage(1)
-                if isinstance(self.ship, player.Player_Ship):
-                    entity.state = 1
-                elif isinstance(self.ship, Enemy_Ship):
-                    entity.state = 2
-                    entity.recent_enemy = self.ship
-                game.CHUNKS.remove_entity(self)
-                break
+                elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
+                    entity.damage(1)
+                    if isinstance(self.ship, player.Player_Ship):
+                        entity.state = 1
+                    elif isinstance(self.ship, Enemy_Ship):
+                        entity.state = 2
+                        entity.recent_enemy = self.ship
+                    game.CHUNKS.remove_entity(self)
+                    break
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
@@ -463,4 +473,4 @@ class Asteroid(Object):
                             entity.velocity.rotate(entity_rotation)
 
                             entity.damage(entity.velocity.magnitude()**2/100_000)
-                            particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=None, frequency=20, speed=100, speed_variance=50)
+                            particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)

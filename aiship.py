@@ -57,15 +57,9 @@ class Enemy_Ship(Ship):
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
-    def damage(self, damage):
-        super().damage(damage)
-
     def enemy_spotted(self):
         self.mother_ship.alert_group()
-    
-    def destroy(self):
-        super().destroy()
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
+
 
 
 class Mother_Ship(Enemy_Ship):
@@ -130,9 +124,6 @@ class Mother_Ship(Enemy_Ship):
         
         self.state = 1
 
-    def destroy(self):
-        Ship.destroy(self)
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(255, 0, 255), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
 
 
 class Neutral_Ship(Ship):
@@ -206,8 +197,5 @@ class Neutral_Ship(Ship):
             self.recent_enemy = None
             self.state = 0
     
-    def destroy(self):
-        super().destroy()
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(0, 255, 0), duration=0.2, lifetime=0.5, frequency=250, speed=500, speed_variance=100)
 
 
