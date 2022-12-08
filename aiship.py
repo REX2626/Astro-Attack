@@ -188,18 +188,18 @@ class Neutral_Ship(Ship):
             target_position = self.patrol_point
         
         self.accelerate_in_direction(target_position, 300 * delta_time)
-        self.set_rotation(self.position.get_angle(target_position))
+        self.set_rotation(self.position.get_angle_to(target_position))
     
     def attack_player_state(self, delta_time):
         self.max_speed = 300
-        self.set_rotation(self.position.get_angle(game.red_ship.position))
+        self.set_rotation(self.position.get_angle_to(game.red_ship.position))
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
     def attack_enemy_state(self, delta_time):
         if self.recent_enemy.health > 0:
             self.max_speed = 300
-            self.set_rotation(self.position.get_angle(self.recent_enemy.position))
+            self.set_rotation(self.position.get_angle_to(self.recent_enemy.position))
             self.shoot()
             self.accelerate_in_direction(self.recent_enemy.position, 400 * delta_time)
         else:

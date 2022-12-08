@@ -452,35 +452,15 @@ class Asteroid(Object):
                         y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
 
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
-                            
-                            """vector_to_asteroid = self.position - entity.position
-                            #entity.velocity -= vector_to_asteroid/2
-                            normal = entity.position - self.position
 
-                            normalized_normal = normal / normal.magnitude()
-
-                            angle = math.atan2(entity.velocity.y, entity.velocity.x) - math.atan2(normalized_normal.y, normalized_normal.x)
-
-                            restitution = 0
-
-                            entity.velocity = entity.velocity.magnitude() * (math.sin(angle)*normalized_normal.get_rotate(-math.pi/2) + restitution*math.cos(angle)*normalized_normal)"""
-                            
                             vector_to_asteroid = self.position - entity.position
 
-                            game.CHUNKS.remove_entity(entity)
-
-                            entity.position -= entity.velocity * delta_time * 20 # Move entity out of asteroid
-
-                            game.CHUNKS.add_entity(entity)
-
-                            tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2)
+                            tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2) # Rotate 90 degrees
                             tangent_angle = tangent_to_asteroid.get_angle()
                             entity_angle = entity.velocity.get_angle()
-                            # angle_difference = entity.velocity.get_angle_to(tangent_to_asteroid)
-                            angle_difference = tangent_angle - entity_angle
+                            angle_difference = entity_angle - tangent_angle
                             entity_rotation = 2 * angle_difference # 1 angle difference makes it go along normal, another difference reflects it through normal
                             entity.velocity.rotate(entity_rotation)
-                            print("new calculated velocity:", entity.velocity, "normal:", tangent_angle/math.pi*180, "entity:", entity_angle)
 
                             entity.damage(entity.velocity.magnitude()**2/100_000)
                             particles.ParticleSystem(entity.position, colour=game.DARK_GREY, duration=None, frequency=20, speed=100, speed_variance=50)
