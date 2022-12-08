@@ -49,11 +49,11 @@ class Enemy_Ship(Ship):
         
         #self.accelerate_to_point(target_position, 600 * delta_time, 1000 * delta_time)
         self.accelerate_in_direction(target_position, 300 * delta_time)
-        self.set_rotation(self.position.get_angle(target_position))
+        self.set_rotation(self.position.get_angle_to(target_position))
     
     def attack_state(self, delta_time):
         self.max_speed = 300
-        self.set_rotation(self.position.get_angle(game.red_ship.position))
+        self.set_rotation(self.position.get_angle_to(game.red_ship.position))
         self.shoot()
         self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
 
@@ -116,7 +116,7 @@ class Mother_Ship(Enemy_Ship):
 
 
         self.accelerate_in_direction(target_position, 300 * delta_time)
-        self.set_rotation(self.position.get_angle(target_position))
+        self.set_rotation(self.position.get_angle_to(target_position))
 
     def alert_group(self):
         for enemy in self.enemy_list:

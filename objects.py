@@ -104,6 +104,11 @@ class Vector():
         else:
             return Vector(self.x / arg, self.y / arg)
 
+    def __rtruediv__(self, arg):
+        
+        # arg can't be a Vector
+        return Vector(self.x / arg, self.y / arg)
+
     def __floordiv__(self, arg):
 
         # Dividing Vectors
@@ -136,13 +141,8 @@ class Vector():
 
     def __rmul__(self, arg):
 
-        # Multiplying Vectors with dot product
-        if type(arg) == Vector:
-            return Vector(self.x * arg.x, self.y * arg.y)
-
-        # Multiplying Vector with Scalar
-        else:
-            return Vector(self.x * arg, self.y * arg)
+        # arg can't be a Vector
+        return Vector(self.x * arg, self.y * arg)
 
     def __mod__(self, arg):
         return Vector(int(self.x) % arg, int(self.y) % arg)
@@ -173,9 +173,13 @@ class Vector():
         self.x = new_vector.x
         self.y = new_vector.y
 
-    def get_angle(self, position):
+    def get_angle_to(self, position):
         angle = math.atan((-position.y + self.y) / (position.x - self.x))
         return angle - math.pi/2 if self.x < position.x else angle + math.pi/2
+
+    def get_angle(self):
+        """Get's the Vector's angle from the origin"""
+        return math.atan2(self.y, self.x)
 
     def rotate(self, angle):
         x1, y1 = self.x, self.y
@@ -183,6 +187,14 @@ class Vector():
         # Because y increases downwards (for our coord system)
         self.x = y1*math.sin(angle) + x1*math.cos(angle)
         self.y = y1*math.cos(angle) - x1*math.sin(angle)
+
+    def get_rotate(self, angle):
+        x1, y1 = self.x, self.y
+        # The positive and negative signs are different
+        # Because y increases downwards (for our coord system)
+        x = y1*math.sin(angle) + x1*math.cos(angle)
+        y = y1*math.cos(angle) - x1*math.sin(angle)
+        return Vector(x, y)
 
     def rotate_about(self, angle, position):
         self.x -= position.x
@@ -451,17 +463,34 @@ class Asteroid(Object):
 
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             
+                            """vector_to_asteroid = self.position - entity.position
+                            #entity.velocity -= vector_to_asteroid/2
+                            normal = entity.position - self.position
+
+                            normalized_normal = normal / normal.magnitude()
+
+                            angle = math.atan2(entity.velocity.y, entity.velocity.x) - math.atan2(normalized_normal.y, normalized_normal.x)
+
+                            restitution = 0
+
+                            entity.velocity = entity.velocity.magnitude() * (math.sin(angle)*normalized_normal.get_rotate(-math.pi/2) + restitution*math.cos(angle)*normalized_normal)"""
+                            
                             vector_to_asteroid = self.position - entity.position
-                            entity.velocity -= vector_to_asteroid/2
-                            # normal = entity.position - self.position
 
-                            # normalized_normal = normal / normal.magnitude()
+                            game.CHUNKS.remove_entity(entity)
 
-                            # angle = math.atan2(entity.velocity) - math.atan2(normalized_normal)
+                            entity.position -= entity.velocity * delta_time * 20 # Move entity out of asteroid
 
-                            # restitution = 1
+                            game.CHUNKS.add_entity(entity)
 
-                            # entity.velocity = entity.velocity.magnitude() * (math.sin(angle)*normalized_normal + restitution*math.cos(angle)*normalized_normal)
+                            tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2)
+                            tangent_angle = tangent_to_asteroid.get_angle()
+                            entity_angle = entity.velocity.get_angle()
+                            # angle_difference = entity.velocity.get_angle_to(tangent_to_asteroid)
+                            angle_difference = tangent_angle - entity_angle
+                            entity_rotation = 2 * angle_difference # 1 angle difference makes it go along normal, another difference reflects it through normal
+                            entity.velocity.rotate(entity_rotation)
+                            print("new calculated velocity:", entity.velocity, "normal:", tangent_angle/math.pi*180, "entity:", entity_angle)
 
                             entity.damage(entity.velocity.magnitude()**2/100_000)
                             particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
