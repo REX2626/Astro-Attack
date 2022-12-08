@@ -62,7 +62,3 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
-
-    def destroy(self):
-        super().destroy()
-        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
