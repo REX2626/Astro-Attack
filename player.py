@@ -1,7 +1,7 @@
 from objects import Vector, Ship
 import images
 import particles
-
+import math
 
 
 class Player_Ship(Ship):
@@ -49,6 +49,11 @@ class Player_Ship(Ship):
             self.max_speed = 1000
             self.accelerate_relative(delta_time * Vector(0, -1000))
             self.boost_amount -= self.boost_change * delta_time # Decrease the amount of boost you have while boosting over time
+
+            boost_distance = 20
+            boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
+
+            particles.ParticleSystem(self.position + boost_position, start_size=6, end_size=0, colour=(20, 100, 255), duration=None, lifetime=0.5, frequency=1)
         else:
             self.max_speed = 500 # Resets max speed once you run out of boost
 
@@ -58,10 +63,6 @@ class Player_Ship(Ship):
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
 
-    def damage(self, damage):
-        super().damage(damage)
-        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=None, lifetime=0.5, frequency=50, speed=500, speed_variance=100)
-
     def destroy(self):
         super().destroy()
-        particles.ParticleSystem(self.position, size=3, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
+        particles.ParticleSystem(self.position, start_size=3, end_size=0, colour=(255, 0, 0), duration=0.2, lifetime=0.5, frequency=500, speed=500, speed_variance=100)
