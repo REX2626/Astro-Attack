@@ -12,7 +12,7 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=500,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=2000,
+        fire_rate=10, health=20,
         boost_amount=10, boost_change=5,
         image=images.RED_SHIP
 
@@ -21,6 +21,7 @@ class Player_Ship(Ship):
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
 
         self.max_rotation_speed = max_rotation_speed
+        self.max_boost_amount = boost_amount
         self.boost_amount = boost_amount
         self.boost_change = boost_change
 

@@ -2,9 +2,7 @@
 
 
 ## TODO:
-Make bouncing off asteroid more realistic
-
-Improve asteroid collision detection performance
+Fix stars moving when hitting asteroid
 
 Fix speed instant decellerating when stopping boosting
 

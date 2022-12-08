@@ -96,10 +96,14 @@ class Chunk():
         self.generate()
 
     def generate(self):
+
+        # elif is used so that ships don't spawn in an asteroid chunk
+        # the ships make sure they don't spawn inside a chunk by
+        # checking if this chunk is adjoining a chunk with an asteroid in
         
         # Mother Ship
         # 9% chance of spawning
-        if random.random() < 0.09:
+        if random.random() < 0.09 and not self.adjoining_asteroid_chunk():
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
@@ -112,7 +116,7 @@ class Chunk():
 
         # Neutral Ship
         # 10% chance of spawning
-        if random.random() < 0.1:
+        elif random.random() < 0.1 and not self.adjoining_asteroid_chunk():
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
 
@@ -124,7 +128,7 @@ class Chunk():
 
         # Asteroid
         # 4.5% chance of spawning
-        if random.random() < 0.045:
+        elif random.random() < 0.045 and not self.adjoining_asteroid_chunk():
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
@@ -133,3 +137,14 @@ class Chunk():
 
                 Asteroid(random_position)
             )
+
+    def adjoining_asteroid_chunk(self):
+
+        for y in range(self.position.y-1, self.position.y+2):
+            for x in range(self.position.x-1, self.position.x+2):
+
+                for entity in game.CHUNKS.get_chunk((x, y)).entities:
+                    if isinstance(entity, Asteroid):
+                        return True
+
+        return False

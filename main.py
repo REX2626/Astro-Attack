@@ -93,11 +93,10 @@ def handle_player_movement(keys_pressed, delta_time):
     else:
         red_ship.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
 
-        if red_ship.boost_amount < 10: # If the boost amount is not at the maximum, add boost over time
-
-            red_ship.boost_amount += (red_ship.boost_change * delta_time) / 2
-        else:
-            red_ship.boost_amount = 10 # Caps the boost amount to a specific max value
+        # Increase red_ship.boost_amount
+        red_ship.boost_amount = min(red_ship.max_boost_amount,
+                                    red_ship.boost_amount + (red_ship.boost_change * delta_time) / 2)
+                                    # Caps the boost amount to a specific max value
 
     if pygame.mouse.get_pressed()[0]:
         red_ship.shoot()
