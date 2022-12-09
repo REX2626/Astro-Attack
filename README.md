@@ -4,8 +4,6 @@
 ## TODO:
 Fix stars moving when hitting asteroid
 
-Fix speed instant decellerating when stopping boosting
-
 Make enemies turn smoothly
 
 Add 2 more asteroid images
@@ -114,3 +112,5 @@ Neutral Ship Attacks enemies firing at it
 Add chocie for particles to shrink over time
 
 Add boost animation to ship and particle effect
+
+Fix speed instant decellerating when stopping boosting
