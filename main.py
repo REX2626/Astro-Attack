@@ -105,7 +105,7 @@ def handle_player_movement(keys_pressed, delta_time):
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
+        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
 
 
     # Mouse
@@ -122,7 +122,7 @@ def scroll(scroll_amount: int):
         game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, 20)
 
     else:
-        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE))
+        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(LOAD_DISTANCE)*CHUNK_SIZE))
 
 
 def update_objects(delta_time):

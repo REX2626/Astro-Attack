@@ -8,8 +8,8 @@ import game
 
 class Chunks():
     def __init__(self) -> None:
-        global CHUNK_DISTANCE, CHUNK_SIZE
-        CHUNK_DISTANCE, CHUNK_SIZE = game.CHUNK_DISTANCE, game.CHUNK_SIZE
+        global LOAD_DISTANCE, CHUNK_SIZE
+        LOAD_DISTANCE, CHUNK_SIZE = game.LOAD_DISTANCE, game.CHUNK_SIZE
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
 
@@ -36,8 +36,8 @@ class Chunks():
         self.entities = set()
 
         # Loop through chunks in square around player's position
-        for y in range(chunk_coords.y - CHUNK_DISTANCE, chunk_coords.y + CHUNK_DISTANCE + 1):
-            for x in range(chunk_coords.x - CHUNK_DISTANCE, chunk_coords.x + CHUNK_DISTANCE + 1):
+        for y in range(chunk_coords.y - LOAD_DISTANCE, chunk_coords.y + LOAD_DISTANCE + 1):
+            for x in range(chunk_coords.x - LOAD_DISTANCE, chunk_coords.x + LOAD_DISTANCE + 1):
                 
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
