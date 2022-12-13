@@ -35,7 +35,7 @@ def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
 
-    graphics.draw_stars(delta_time)
+    graphics.draw_stars()
 
     for object in graphics.get_entities_to_draw():
         object.draw(WIN, red_ship.position)
@@ -112,6 +112,7 @@ def handle_player_movement(keys_pressed, delta_time):
     mouse_position = pygame.mouse.get_pos()
     angle = math.atan2(-mouse_position[1]+CENTRE_POINT.y, mouse_position[0]-CENTRE_POINT.x) - math.pi/2
     red_ship.set_rotation(angle)
+    game.LAST_PLAYER_POS = red_ship.position
 
 
     CHUNKS.update(red_ship)

@@ -68,9 +68,11 @@ MAX_Y = HEIGHT + 100
 draw_circle = pygame.draw.circle
 
 # This function has been OPTIMIZED
-def draw_stars(delta_time):
+def draw_stars():
     # Layered Stars
     # Bigger stars move more
+
+    player_position_difference = game.red_ship.position - game.LAST_PLAYER_POS
 
     for layer in range(layers):
 
@@ -81,8 +83,8 @@ def draw_stars(delta_time):
         radius = int((layer+2) / 2)
 
         # Move each star opposite direction to red_ship
-        shiftx = game.red_ship.velocity.x * delta_time * star_speed * (layer+1)
-        shifty = game.red_ship.velocity.y * delta_time * star_speed * (layer+1)
+        shiftx = player_position_difference.x * star_speed * (layer+1)
+        shifty = player_position_difference.y * star_speed * (layer+1)
         for star in stars[layer]:
             star.x -= shiftx
             star.y -= shifty

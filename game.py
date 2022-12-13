@@ -34,6 +34,7 @@ CHUNK_SIZE = 600 # How big each chunk is
 SPAWN_SIZE = 4
 
 SCORE: int
+LAST_PLAYER_POS = Vector(0, 0)
 
 ZOOM = 2
 
@@ -48,7 +49,7 @@ def add_player():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0))
+    red_ship = Player_Ship(position=LAST_PLAYER_POS, velocity=(0, 0))
     CHUNKS.add_entity(red_ship)
     return red_ship
 
