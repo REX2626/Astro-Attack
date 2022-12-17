@@ -9,7 +9,11 @@ import pygame
 
 
 class Asteroid(Object):
-    def __init__(self, position, image=images.ASTEROID) -> None:
+    def __init__(self, position, image=None) -> None:
+
+        # Generate random asteroid image
+        if not image:
+            image = random.choice(images.ASTEROIDS)
         
         # Set Asteroid to random rotation
         image = pygame.transform.rotate(image, random.random() * 360)

@@ -12,8 +12,6 @@ Enemies drop ammo
 
 Add death screen
 
-Add 2 more asteroid images
-
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
@@ -117,3 +115,5 @@ Fix speed instant decellerating when stopping boosting
 Add ship colliding with asteroids
 Ship will bounce off
 Ship will take damage proportional to speed^2
+
+Add 2 more asteroid images
