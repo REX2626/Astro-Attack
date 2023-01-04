@@ -3,8 +3,10 @@ import pygame
 from game import *
 import game
 from entities import Bullet, Asteroid
+from player import add_player
 import _menu
 import graphics
+import ui
 
 import math
 from time import perf_counter
@@ -37,30 +39,39 @@ def draw_window(delta_time):
 
     graphics.draw_stars()
 
+
     for object in graphics.get_entities_to_draw():
         object.draw(WIN, red_ship.position)
 
+
+    #graphics.draw_chunks()
+
+
+    ui.canvas.health_bar.update(red_ship.health/game.MAX_PLAYER_HEALTH)
+    ui.canvas.boost_bar.update(red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
+    ui.canvas.speed_bar.update(red_ship.velocity.magnitude()/1000)
+    ui.canvas.draw()
+
+
     if delta_time:
-        label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-        WIN.blit(label, (200, 0))
-
-        label = font.render(f"Speed: {round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
-        WIN.blit(label, (200, 50))
-
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
         WIN.blit(label, (WIDTH - 300, 0))
-        
-        label = font.render(f"Health: {round(red_ship.health)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 50))
 
-        label = font.render(f"Boost Amount: {round(red_ship.boost_amount)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 100))
+    label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+    WIN.blit(label, (200, 0))
 
-        font2 = pygame.font.SysFont("comicsans", 50)
-        label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
-        WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
+    font2 = pygame.font.SysFont("comicsans", 50)
+    label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
+    WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
-        #graphics.draw_chunks()
+    label = font.render(f"{round(red_ship.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-224))
+
+    label = font.render(f"{round(red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-174))
+
+    label = font.render(f"{round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-124))
 
 
     pygame.display.update()

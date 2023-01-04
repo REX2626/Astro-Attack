@@ -2,6 +2,7 @@ from objects import Vector
 from entities import Ship
 import images
 import particles
+import game
 import math
 
 
@@ -12,8 +13,8 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=500,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=40,
-        boost_amount=20, boost_change=5,
+        fire_rate=10, health=game.MAX_PLAYER_HEALTH,
+        boost_amount=game.MAX_BOOST_AMOUNT, boost_change=5,
         image=images.RED_SHIP
 
         ) -> None:
@@ -71,3 +72,13 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
+
+
+def add_player():
+
+    # Red Player Ship
+    global red_ship
+    red_ship = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
+    game.CHUNKS.add_entity(red_ship)
+    game.red_ship = red_ship
+    return red_ship

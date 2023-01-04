@@ -9,7 +9,6 @@ WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 
 import sys
 from objects import Vector
-from player import Player_Ship
 import _chunks
 
 
@@ -35,6 +34,8 @@ SPAWN_SIZE = 4
 
 SCORE: int
 LAST_PLAYER_POS = Vector(0, 0)
+MAX_PLAYER_HEALTH = 40
+MAX_BOOST_AMOUNT = 20
 
 ZOOM = 2
 
@@ -43,15 +44,6 @@ def init_chunks():
     global CHUNKS
     CHUNKS = _chunks.Chunks()
     return CHUNKS
-
-
-def add_player():
-
-    # Red Player Ship
-    global red_ship
-    red_ship = Player_Ship(position=LAST_PLAYER_POS, velocity=(0, 0))
-    CHUNKS.add_entity(red_ship)
-    return red_ship
 
 
 def quit():
