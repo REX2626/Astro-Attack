@@ -1,4 +1,4 @@
-import pygame
+import pygame                
 
 from game import *
 import game
@@ -64,7 +64,7 @@ def draw_window(delta_time):
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
-    label = font.render(f"{round(red_ship.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
+    label = font.render(f"{round(red_ship.health)} | { game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-224))
 
     label = font.render(f"{round(red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
