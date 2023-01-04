@@ -4,6 +4,7 @@ from objects import random_vector
 import images
 import game
 import random
+import pygame # rex keep this here for debugging reasons
 
 class Enemy_Ship(Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
@@ -67,7 +68,16 @@ class Mother_Ship(Enemy_Ship):
             enemy_list = []
         self.enemy_list = enemy_list
 
-        self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
+        while True:
+            self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
+            target_position = self.patrol_point
+
+            chunk_pos = target_position // game.CHUNK_SIZE
+
+            if self.check_for_asteroid(chunk_pos) == False:
+                break
+            else:
+                continue
 
         enemy_spawn_number = random.randint(3, 6)
 
@@ -85,7 +95,8 @@ class Mother_Ship(Enemy_Ship):
 
     # def draw(self, win: pygame.Surface, focus_point):
     #     super().draw(win, focus_point)
-    #     pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    #     pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    #     pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 600 * game.ZOOM, width=1)
         
 
     def patrol_state(self, delta_time):
@@ -95,26 +106,32 @@ class Mother_Ship(Enemy_Ship):
         direction_vector = target_position - self.position
         distance = (direction_vector).magnitude()
 
-        chunk_pos = target_position // game.CHUNK_SIZE
+        if distance < 50:   # Check if the enemy has reached the patrol point
+            while True:
+                self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
+                target_position = self.patrol_point
 
-        nearby_asteroid = False
+                chunk_pos = target_position // game.CHUNK_SIZE
 
+                if self.check_for_asteroid(chunk_pos) == False:
+                    break
+                else:
+                    continue
+        
+        self.accelerate_in_direction(target_position, 300 * delta_time)
+        self.set_rotation(self.position.get_angle_to(target_position))
+
+    def check_for_asteroid(self, chunk_pos):
         for y in range(chunk_pos.y-1, chunk_pos.y+2):
             for x in range(chunk_pos.x-1, chunk_pos.x+2):
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
-
                     if isinstance(entity, Asteroid):
-                        nearby_asteroid = True
-                        break
 
-        if distance < 50 or nearby_asteroid:   # Check if the enemy has reached the patrol point
-            self.patrol_point = random_vector(random.randint(1000, 1500)) + self.position
-            target_position = self.patrol_point
-
-
-        self.accelerate_in_direction(target_position, 300 * delta_time)
-        self.set_rotation(self.position.get_angle_to(target_position))
+                        return True
+                    else:
+                        # No Asteroid
+                        return False
 
     def alert_group(self):
         for enemy in self.enemy_list:
@@ -148,7 +165,7 @@ class Neutral_Ship(Ship):
 
     # def draw(self, win: pygame.Surface, focus_point):
     #     super().draw(win, focus_point)
-    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    #     pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
         
         
     def patrol_state(self, delta_time):

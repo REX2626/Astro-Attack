@@ -1,4 +1,4 @@
-import pygame
+import pygame                
 
 from game import *
 import game
@@ -60,7 +60,7 @@ def draw_window(delta_time):
         label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
         WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
-        #graphics.draw_chunks()
+        # graphics.draw_chunks()
 
 
     pygame.display.update()
