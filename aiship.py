@@ -49,6 +49,9 @@ class Enemy_Ship(Ship):
         #self.accelerate_to_point(target_position, 600 * delta_time, 1000 * delta_time)
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
+
+    def make_new_patrol_point(self):
+        self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
     
     def attack_state(self, delta_time):
         self.max_speed = 300
@@ -195,6 +198,9 @@ class Neutral_Ship(Ship):
         
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
+
+    def make_new_patrol_point(self):
+        self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
     
     def attack_player_state(self, delta_time):
         self.max_speed = 300
