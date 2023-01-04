@@ -8,8 +8,8 @@ import game
 
 class Chunks():
     def __init__(self) -> None:
-        global CHUNK_DISTANCE, CHUNK_SIZE
-        CHUNK_DISTANCE, CHUNK_SIZE = game.CHUNK_DISTANCE, game.CHUNK_SIZE
+        global LOAD_DISTANCE, CHUNK_SIZE
+        LOAD_DISTANCE, CHUNK_SIZE = game.LOAD_DISTANCE, game.CHUNK_SIZE
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
 
@@ -36,8 +36,8 @@ class Chunks():
         self.entities = set()
 
         # Loop through chunks in square around player's position
-        for y in range(chunk_coords.y - CHUNK_DISTANCE, chunk_coords.y + CHUNK_DISTANCE + 1):
-            for x in range(chunk_coords.x - CHUNK_DISTANCE, chunk_coords.x + CHUNK_DISTANCE + 1):
+        for y in range(chunk_coords.y - LOAD_DISTANCE, chunk_coords.y + LOAD_DISTANCE + 1):
+            for x in range(chunk_coords.x - LOAD_DISTANCE, chunk_coords.x + LOAD_DISTANCE + 1):
                 
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
@@ -77,15 +77,16 @@ class Chunks():
         if entity in self.entities:
             self.entities.remove(entity)
 
+    # optomized
     def move_entity(self, entity: Entity, delta_time):
         
-        original_chunk = self.get_chunk(entity)
+        original_chunk_pos = (int(entity.position.x // CHUNK_SIZE), int(entity.position.y // CHUNK_SIZE))
         entity.position += entity.velocity * delta_time
-        new_chunk = self.get_chunk(entity)
+        new_chunk_pos = (int(entity.position.x // CHUNK_SIZE), int(entity.position.y // CHUNK_SIZE))
 
-        if new_chunk != original_chunk:
-            original_chunk.entities.remove(entity)
-            new_chunk.entities.add(entity)
+        if new_chunk_pos != original_chunk_pos:
+            self.get_chunk(original_chunk_pos).entities.remove(entity)
+            self.get_chunk(new_chunk_pos).entities.add(entity)
 
 
 
@@ -100,10 +101,13 @@ class Chunk():
         # elif is used so that ships don't spawn in an asteroid chunk
         # the ships make sure they don't spawn inside a chunk by
         # checking if this chunk is adjoining a chunk with an asteroid in
+
+        if self.adjoining_asteroid_chunk():
+            return
         
         # Mother Ship
         # 9% chance of spawning
-        if random.random() < 0.09 and not self.adjoining_asteroid_chunk():
+        if random.random() < 0.09:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
@@ -116,7 +120,7 @@ class Chunk():
 
         # Neutral Ship
         # 10% chance of spawning
-        elif random.random() < 0.1 and not self.adjoining_asteroid_chunk():
+        elif random.random() < 0.1:
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
 
@@ -127,8 +131,8 @@ class Chunk():
             )
 
         # Asteroid
-        # 4.5% chance of spawning
-        elif random.random() < 0.045 and not self.adjoining_asteroid_chunk():
+        # 5% chance of spawning
+        elif random.random() < 0.05:
 
             random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
             random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
@@ -142,6 +146,9 @@ class Chunk():
 
         for y in range(self.position.y-1, self.position.y+2):
             for x in range(self.position.x-1, self.position.x+2):
+
+                if (x, y) not in game.CHUNKS.list:
+                    continue
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities:
                     if isinstance(entity, Asteroid):

@@ -2,14 +2,17 @@
 
 
 ## TODO:
-Fix stars moving when hitting asteroid
+Make ships have a thruster animation
 
-Fix speed instant decellerating when stopping boosting
+Add targeting icon (space engineers)
 
-Make enemies turn smoothly
+Add ammo system
 
-Add 2 more asteroid images
+Enemies drop ammo
 
+Add death screen
+
+---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
@@ -20,15 +23,7 @@ Attack state: make fighting seem more natural
 
 Retreat state: If enemy health is low and player health is high - retreat
 
-Add ship colliding with asteroids
-Ship will bounce off
-Ship will take damage proportional to speed^2
-
-Make ships have a thruster animation
-
-Add targeting icon (space engineers)
-
-Add auto-aim, if targeting icon near ship, then it gets closer (making aiming nicer)
+---
 
 ### POTENTIAL
 
@@ -114,3 +109,11 @@ Neutral Ship Attacks enemies firing at it
 Add chocie for particles to shrink over time
 
 Add boost animation to ship and particle effect
+
+Fix speed instant decellerating when stopping boosting
+
+Add ship colliding with asteroids
+Ship will bounce off
+Ship will take damage proportional to speed^2
+
+Add 2 more asteroid images

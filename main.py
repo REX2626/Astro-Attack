@@ -35,7 +35,7 @@ def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
 
-    graphics.draw_stars(delta_time)
+    graphics.draw_stars()
 
     for object in graphics.get_entities_to_draw():
         object.draw(WIN, red_ship.position)
@@ -105,13 +105,14 @@ def handle_player_movement(keys_pressed, delta_time):
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
+        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
 
 
     # Mouse
     mouse_position = pygame.mouse.get_pos()
     angle = math.atan2(-mouse_position[1]+CENTRE_POINT.y, mouse_position[0]-CENTRE_POINT.x) - math.pi/2
     red_ship.set_rotation(angle)
+    game.LAST_PLAYER_POS = red_ship.position
 
 
     CHUNKS.update(red_ship)
@@ -122,7 +123,7 @@ def scroll(scroll_amount: int):
         game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, 20)
 
     else:
-        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(CHUNK_DISTANCE)*CHUNK_SIZE))
+        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(LOAD_DISTANCE)*CHUNK_SIZE))
 
 
 def update_objects(delta_time):

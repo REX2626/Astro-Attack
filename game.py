@@ -28,12 +28,13 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
+LOAD_DISTANCE = 5 # Similar to RENDER DISTANCE, how many chunks are generated
 CHUNK_SIZE = 600 # How big each chunk is
 
 SPAWN_SIZE = 4
 
 SCORE: int
+LAST_PLAYER_POS = Vector(0, 0)
 
 ZOOM = 2
 
@@ -48,7 +49,7 @@ def add_player():
 
     # Red Player Ship
     global red_ship
-    red_ship = Player_Ship(position=(0, 0), velocity=(0, 0))
+    red_ship = Player_Ship(position=LAST_PLAYER_POS, velocity=(0, 0))
     CHUNKS.add_entity(red_ship)
     return red_ship
 

@@ -25,10 +25,17 @@ class Player_Ship(Ship):
         self.boost_amount = boost_amount
         self.boost_change = boost_change
 
+    def update(self, delta_time):
+
+        # If the player ship has just finished boosting, then the intertial dampening will be twice as strong
+        if self.velocity.magnitude() >= self.max_speed: self.velocity -= self.velocity.get_clamp(200 * delta_time)
+        super().update(delta_time)
+
     def accelerate_relative(self, acceleration: Vector):
         acceleration.rotate(self.rotation)
+        extra_speed = max(0, self.velocity.magnitude() + acceleration.magnitude() - self.max_speed) # get the speed above max_speed
+        acceleration.set_magnitude(max(0, acceleration.magnitude() - extra_speed))
         self.velocity += acceleration
-        self.velocity.clamp(self.max_speed)
 
     def accelerate_rotation(self, acceleration):
         self.rotation_speed += acceleration

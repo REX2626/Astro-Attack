@@ -7,7 +7,10 @@ All images have the same scale, i.e. they're pixels are all 1 game unit in size
 import pygame
 
 ALIEN = pygame.image.load("assets/alien.png").convert_alpha()
-ASTEROID = pygame.image.load("assets/asteroid1.png").convert_alpha()
+ASTEROID1 = pygame.image.load("assets/asteroid1.png").convert_alpha()
+ASTEROID2 = pygame.image.load("assets/asteroid2.png").convert_alpha()
+ASTEROID3 = pygame.image.load("assets/asteroid3.png").convert_alpha()
+ASTEROIDS = [ASTEROID1, ASTEROID2, ASTEROID3]
 BULLET = pygame.image.load("assets/bullet3.png").convert_alpha()
 DEFAULT = pygame.image.load("assets/default_image.png").convert_alpha()
 RED_SHIP = pygame.image.load("assets/red_ship2.png").convert_alpha()
