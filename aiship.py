@@ -83,8 +83,8 @@ class Mother_Ship(Enemy_Ship):
 
         for _ in range(enemy_spawn_number):
 
-            random_position = Vector(random.randint(self.position.x, self.position.x + game.CHUNK_SIZE - 1),
-            random.randint(self.position.y, self.position.y + game.CHUNK_SIZE - 1))
+            random_position = Vector(random.randint(self.position.x - game.CHUNK_SIZE/2, self.position.x + game.CHUNK_SIZE/2),
+            random.randint(self.position.y - game.CHUNK_SIZE/2, self.position.y + game.CHUNK_SIZE/2))
 
             enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
             self.enemy_list.append(enemy)
