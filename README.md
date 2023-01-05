@@ -2,6 +2,8 @@
 
 
 ## TODO:
+Improve particle system
+
 Make ships have a thruster animation
 
 Add targeting icon (space engineers)
