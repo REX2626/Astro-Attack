@@ -1,5 +1,5 @@
 from objects import Vector, Object, Entity
-from entities import Asteroid
+from entities import Asteroid, HealthPickup
 from aiship import Mother_Ship, Neutral_Ship
 import random
 import game
@@ -140,6 +140,15 @@ class Chunk():
             self.entities.add(
 
                 Asteroid(random_position)
+            )
+
+        elif random.random() < 0.1:
+
+            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
+            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+
+            self.entities.add(
+                HealthPickup(random_position)
             )
 
     def adjoining_asteroid_chunk(self):

@@ -188,3 +188,24 @@ class Bullet(Entity):
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
+
+
+
+class HealthPickup(Object):
+    def __init__(self, position, image=images.HEALTH_PICKUP) -> None:
+        super().__init__(position, image)
+
+    def update(self, delta_time):
+
+        if game.red_ship.distance_to(self) < 23 + game.red_ship.size.x/2:
+            
+            self.activate()
+
+    def activate(self):
+        
+        game.red_ship.health += 5
+
+        if game.red_ship.health > game.MAX_PLAYER_HEALTH:
+            game.red_ship.health = game.MAX_PLAYER_HEALTH
+
+        game.CHUNKS.remove_entity(self)

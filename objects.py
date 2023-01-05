@@ -230,6 +230,7 @@ class Object():
         self.size = Vector(image.get_width(), image.get_height())
 
         self.image = image
+        
     def update(self, delta_time):
         pass
 
