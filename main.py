@@ -179,7 +179,7 @@ def main(menu: "_menu.Menu"):
             draw_window(delta_time)
 
             if red_ship.health <= 0:
-                main_menu()
+                menu.death_screen(game.SCORE)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

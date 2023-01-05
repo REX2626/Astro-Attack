@@ -55,6 +55,8 @@ class Menu():
             self.controls_text
         ]
 
+        self.score_text = Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 4, "HIGHSCORE: EXAMPLE", (255, 0, 0), "comicsans", 40)
+
         self.back_to_menu_button = Button(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 2, lambda: self.main_menu(), "MAIN MENU", game.WHITE, self.box_colour, "comicsans", 40)
 
         self.text_widgets = [self.title_text]
@@ -236,6 +238,25 @@ class Menu():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
                 self.mouse_click(mouse)
+
+    def death_screen(self, score):
+        self.score_text.text = f"HIGHSCORE: {score}"
+        self.score_text.resize_text()
+        self.score_text.update()
+        self.text_widgets = [self.score_text]
+        self.buttons = [self.back_to_menu_button]
+        self.draw_menu(self.background_colour)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game.quit()
+
+                elif event.type == pygame.VIDEORESIZE:
+                    self.resize()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    self.mouse_click(mouse)
 
 
 

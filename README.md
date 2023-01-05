@@ -2,6 +2,8 @@
 
 
 ## TODO:
+Change colour of enemy bullets
+
 Improve particle system
 
 Make ships have a thruster animation
@@ -13,6 +15,9 @@ Add ammo system
 Enemies drop ammo
 
 Add death screen
+
+Upgrade menu system
+Have a page system with buttons per page
 
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
