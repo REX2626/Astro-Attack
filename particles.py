@@ -19,20 +19,18 @@ class Particle():
         self.current_size = start_size
         self.size_difference = end_size - start_size
 
-    def move(self, delta_time):
-        game.CHUNKS.move_entity(self, delta_time)
-
-    def update_time(self, delta_time):
+    def update_time(self, delta_time, system: "ParticleSystem"):
         self.time_alive += delta_time
 
         self.current_size += self.size_difference * (delta_time / self.lifetime)
 
         if self.time_alive > self.lifetime:
-            game.CHUNKS.remove_entity(self)
+            system.particles.remove(self)
 
-    def update(self, delta_time):
-        self.move(delta_time)
-        self.update_time(delta_time)
+    def update(self, delta_time, system):
+        # optomized
+        self.position = Vector(self.position.x + self.velocity.x * delta_time, self.position.y + self.velocity.y * delta_time)
+        self.update_time(delta_time, system)
 
     def draw(self, WIN, focus_point):
         radius = max(1, self.current_size * ZOOM*self.bloom)
@@ -51,13 +49,10 @@ class Particle():
 
         draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), max(1, self.current_size * ZOOM))
 
-    def unload(self):
-        game.CHUNKS.remove_entity(self)
-
 
 
 class ParticleSystem():
-    def __init__(self, position, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=1, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
+    def __init__(self, position, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
         self.position = position
         if not max_start_size: max_start_size = start_size
         self.start_size = start_size
@@ -75,6 +70,8 @@ class ParticleSystem():
         self.delay = 0
         self.speed_variance = speed_variance
 
+        self.particles: list[Particle] = []
+
         game.CHUNKS.add_entity(self)
 
         global ZOOM
@@ -85,13 +82,22 @@ class ParticleSystem():
         CENTRE_POINT_Y = game.CENTRE_POINT.y
 
         if not duration:
+            self.duration = 0
             self.burst()
 
     def update(self, delta_time):
         self.delay += delta_time
         self.time_alive += delta_time
 
-        if self.delay > self.period:
+        for particle in self.particles:
+            particle.update(delta_time, self)
+
+        if self.time_alive > self.duration: # check if the System's life time is over
+
+            if not self.particles: # if there are no more particles, then the System can be destroyed
+                game.CHUNKS.remove_entity(self)
+
+        elif self.delay > self.period: # if the System should stil be alive AND the spawning delay is over, then spawn in more particles
 
             count = self.delay // self.period
 
@@ -100,16 +106,14 @@ class ParticleSystem():
             for _ in range(int(count)):
                 self.spawn()
 
-        if self.time_alive > self.duration:
-            game.CHUNKS.remove_entity(self)
-
     def draw(self, WIN, red_ship_pos):
-        pass
+        
+        for particle in self.particles:
+            particle.draw(WIN, red_ship_pos)
 
     def burst(self):
         for _ in range(int(1/self.period)):
             self.spawn()
-        game.CHUNKS.remove_entity(self)
 
     def spawn(self):
         if self.speed_variance:
@@ -124,6 +128,6 @@ class ParticleSystem():
         b1, b2 = self.min_colour[2], self.max_colour[2]
         colour = (random.randint(r1, r2), random.randint(g1, g2), random.randint(b1, b2))
 
-        game.CHUNKS.add_entity(
+        self.particles.append(
             Particle(self.position, random_vector(speed), start_size=start_size, end_size=self.end_size, colour=colour, bloom=self.bloom, lifetime=self.lifetime)
             )
