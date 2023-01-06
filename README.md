@@ -14,8 +14,6 @@ Add ammo system
 
 Enemies drop ammo
 
-Add death screen
-
 Upgrade menu system
 Have a page system with buttons per page
 
@@ -124,3 +122,5 @@ Ship will bounce off
 Ship will take damage proportional to speed^2
 
 Add 2 more asteroid images
+
+Add death screen

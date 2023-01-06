@@ -55,13 +55,16 @@ class Menu():
             self.controls_text
         ]
 
-        self.score_text = Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 4, "HIGHSCORE: EXAMPLE", (255, 0, 0), "comicsans", 40)
+        self.death_message_text = Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 6    , "YOU DIED!"         , (255, 0, 0)    , "comicsans", 40)
+        self.score_text =         Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT * 2 / 6, "SCORE: EXAMPLE"    , (100, 100, 255), "comicsans", 40)
+        self.highscore_text =     Widget(lambda: game.WIDTH / 2, lambda: game.HEIGHT * 3 / 6, "HIGHSCORE: EXAMPLE", (255, 255, 100), "comicsans", 40)
+        self.play_again_button =  Button(lambda: game.WIDTH / 2, lambda: game.HEIGHT * 4 / 6, lambda: main(self), "PLAY AGAIN", game.WHITE, self.box_colour, "comicsans", 40)
 
         self.back_to_menu_button = Button(lambda: game.WIDTH / 2, lambda: game.HEIGHT / 2, lambda: self.main_menu(), "MAIN MENU", game.WHITE, self.box_colour, "comicsans", 40)
 
         self.text_widgets = [self.title_text]
         self.buttons = [self.singleplayer_button, self.multiplayer_button, self.settings_button, self.info_button, self.quit_button]
-        self.all_widgets: list[Widget, Button, SettingButton] = self.text_widgets + self.info_widgets + self.buttons + [*self.settings_dict.keys()] + [self.back_to_menu_button]
+        self.all_widgets: list[Widget, Button, SettingButton] = self.text_widgets + self.info_widgets + self.buttons + [*self.settings_dict.keys()] + [self.back_to_menu_button] + [self.play_again_button]
 
     def mouse_click(self, mouse):
         for button in self.buttons:
@@ -240,11 +243,19 @@ class Menu():
                 self.mouse_click(mouse)
 
     def death_screen(self, score):
-        self.score_text.text = f"HIGHSCORE: {score}"
+        self.death_message_text.resize_text()
+        self.death_message_text.update()
+        self.score_text.text = f"SCORE: {score}"
         self.score_text.resize_text()
         self.score_text.update()
-        self.text_widgets = [self.score_text]
-        self.buttons = [self.back_to_menu_button]
+        self.highscore_text.text = f"HIGHSCORE: {game.HIGHSCORE}"
+        self.highscore_text.resize_text()
+        self.highscore_text.update()
+        if score > game.HIGHSCORE:
+            game.HIGHSCORE = score
+        self.text_widgets = [self.death_message_text, self.score_text, self.highscore_text]
+        self.back_to_menu_button.y = game.HEIGHT * 5 / 6 - self.back_to_menu_button.height/2
+        self.buttons = [self.play_again_button, self.back_to_menu_button]
         self.draw_menu(self.background_colour)
         while True:
             for event in pygame.event.get():
