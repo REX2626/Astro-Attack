@@ -22,9 +22,9 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
 
-Patrol state: improve grouping with mothership
-
 Attack state: make fighting seem more natural
+    Aim to where the player is predicted to be in the future for more accurate shooting
+    POTENTIAL: dodging either incoming bullets or for the enemy to have a random strafe
 
 Retreat state: If enemy health is low and player health is high - retreat
 
@@ -124,3 +124,9 @@ Ship will take damage proportional to speed^2
 Add 2 more asteroid images
 
 Add death screen
+
+Patrol state: improve grouping with mothership
+
+Enemies dont go too close to player
+
+Enemies Strafe in a semi realistic manner
