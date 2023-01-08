@@ -109,46 +109,35 @@ class Chunk():
         # 9% chance of spawning
         if random.random() < 0.09:
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
-            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-
             self.entities.add(
 
-                # Mother_Ship
-                Mother_Ship(random_position, Vector(0, 0))
+                Mother_Ship(self.random_position(), Vector(0, 0))
             )
 
         # Neutral Ship
         # 10% chance of spawning
         elif random.random() < 0.1:
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
-            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
 
             self.entities.add(
 
-                # Neutral Ship
-                Neutral_Ship(random_position, Vector(0, 0))
+                Neutral_Ship(self.random_position(), Vector(0, 0))
             )
 
         # Asteroid
         # 5% chance of spawning
         elif random.random() < 0.05:
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
-            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-
             self.entities.add(
 
-                Asteroid(random_position)
+                Asteroid(self.random_position())
             )
 
+        # Health Pickup
+        # 10% chance of spawning
         elif random.random() < 0.1:
 
-            random_position = Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
-            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
-
             self.entities.add(
-                HealthPickup(random_position)
+                HealthPickup(self.random_position())
             )
 
     def adjoining_asteroid_chunk(self):
@@ -164,3 +153,7 @@ class Chunk():
                         return True
 
         return False
+
+    def random_position(self):
+        return Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
+            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))

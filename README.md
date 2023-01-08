@@ -20,6 +20,8 @@ Edge of button boundaries are not clickable (click for button rectangle not text
 
 Fix first full_screen click not moving the mouse properly
 
+Fix button select disappearing
+
 MOUSE_DOWN counts for scroll_wheel and right_click
 
 Add escape functions to all the pages
