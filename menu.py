@@ -267,7 +267,6 @@ class SettingButton(Button):
                     self.function_action()
 
             Menu.update()
-            self.outline_colour = self.original_outline_colour
         self.function = function
 
     def get_value(self):
@@ -372,6 +371,8 @@ def settings_click():
     for widget in Menu.current_page.widgets:
         if isinstance(widget, SettingButton):
             widget.selected = False
+            widget.outline_colour = widget.original_outline_colour
+    Menu.update()
 
 def settings_up():
     for widget in Menu.current_page.widgets:
