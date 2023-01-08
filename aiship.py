@@ -4,6 +4,7 @@ from objects import random_vector
 import images
 import game
 import random
+import math
 import pygame # rex keep this here for debugging reasons
 
 class Enemy_Ship(Ship):
@@ -12,6 +13,9 @@ class Enemy_Ship(Ship):
         self.state = state
         self.mother_ship = mother_ship
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
+        self.time_strafing = 0
+        self.time_to_stop_strafing = 0
+        self.acceleration_constant = 250
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -29,8 +33,7 @@ class Enemy_Ship(Ship):
 
     # def draw(self, win: pygame.Surface, focus_point):
     #     super().draw(win, focus_point)
-    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-        
+    #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
         
     def patrol_state(self, delta_time):
         self.max_speed = 150
@@ -46,7 +49,6 @@ class Enemy_Ship(Ship):
             self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
             target_position = self.patrol_point
         
-        #self.accelerate_to_point(target_position, 600 * delta_time, 1000 * delta_time)
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
 
@@ -54,10 +56,38 @@ class Enemy_Ship(Ship):
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
     
     def attack_state(self, delta_time):
+        # Set max speed to a higher value
         self.max_speed = 300
-        self.set_rotation(self.position.get_angle_to(game.red_ship.position))
+
+        # Aiming and shooting functionality
+        self.set_rotation(self.position.get_angle_to(self.predicted_player_position()))
         self.shoot()
-        self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+
+        # Movement
+        if self.distance_to(game.red_ship) < 100:
+            self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
+        elif self.distance_to(game.red_ship) > 400:
+            self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+        else:
+            # Strafing
+            self.strafe(delta_time)
+
+    def predicted_player_position(self):
+        return game.red_ship.position
+
+    def strafe(self, delta_time):
+        direction_vector = game.red_ship.position - self.position
+        rotated_vector = direction_vector.get_rotate(math.pi / 2)
+        final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
+
+        self.time_strafing += delta_time
+
+        if self.time_strafing > self.time_to_stop_strafing:
+            self.acceleration_constant *= -1
+            self.time_to_stop_strafing += random.randint(2, 5)
+        
+        self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
+        
 
     def enemy_spotted(self):
         self.mother_ship.alert_group()
@@ -149,6 +179,9 @@ class Neutral_Ship(Ship):
         self.state = state
         self.recent_enemy = recent_enemy
         self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
+        self.time_strafing = 0
+        self.time_to_stop_strafing = 0
+        self.acceleration_constant = 250
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -202,10 +235,37 @@ class Neutral_Ship(Ship):
         self.patrol_point = random_vector(random.randint(1000, 4000)) + self.position
     
     def attack_player_state(self, delta_time):
+        # Set max speed to a higher value
         self.max_speed = 300
-        self.set_rotation(self.position.get_angle_to(game.red_ship.position))
+
+        # Aiming and shooting functionality
+        self.set_rotation(self.position.get_angle_to(self.predicted_player_position()))
         self.shoot()
-        self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+
+        # Movement
+        if self.distance_to(game.red_ship) < 100:
+            self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
+        elif self.distance_to(game.red_ship) > 400:
+            self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+        else:
+            # Strafing
+            self.strafe(delta_time)
+
+    def predicted_player_position(self):
+        return game.red_ship.position
+
+    def strafe(self, delta_time):
+        direction_vector = game.red_ship.position - self.position
+        rotated_vector = direction_vector.get_rotate(math.pi / 2)
+        final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
+
+        self.time_strafing += delta_time
+
+        if self.time_strafing > self.time_to_stop_strafing:
+            self.acceleration_constant *= -1
+            self.time_to_stop_strafing += random.randint(2, 5)
+        
+        self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
 
     def attack_enemy_state(self, delta_time):
         if self.recent_enemy.health > 0:
