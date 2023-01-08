@@ -331,7 +331,8 @@ info = Page(
     Widget(0.5, 3.4/8, "CONTROLS"         , font_size=40),
     Text(0.5, 4.7/8, """CHANGE SETTINGS: UP AND DOWN ARROWS
                         PAUSE: ESC"""     , font_size=20),
-    Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu))
+    Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    escape=lambda: Menu.change_page(main_menu)
 )
 
 settings = Page(
@@ -341,6 +342,7 @@ settings = Page(
     SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"      , font_size=40, value="SIZE_LINK" , function_action=None),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: settings_click(),
+    escape=lambda: Menu.change_page(main_menu),
     up=lambda: settings_up(),
     down=lambda: settings_down()
 )
