@@ -2,6 +2,8 @@
 
 
 ## TODO:
+Give boost particles a velocity
+
 Change colour of enemy bullets
 
 Improve particle system
@@ -14,8 +16,21 @@ Add ammo system
 
 Enemies drop ammo
 
-Upgrade menu system
-Have a page system with buttons per page
+Edge of button boundaries are not clickable (click for button rectangle not text label)
+
+Fix first full_screen click not moving the mouse properly
+
+MOUSE_DOWN counts for scroll_wheel and right_click
+
+Add escape functions to all the pages
+
+Add button effect when hovered over
+
+Add slider for menu buttons
+
+Add padding ability to buttons
+
+Add image to menu
 
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
@@ -124,3 +139,6 @@ Ship will take damage proportional to speed^2
 Add 2 more asteroid images
 
 Add death screen
+
+Upgrade menu system
+Have a page system with buttons per page

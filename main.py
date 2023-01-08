@@ -4,7 +4,7 @@ from game import *
 import game
 from entities import Bullet, Asteroid
 from player import add_player
-import _menu
+import menu
 import graphics
 import ui
 
@@ -17,7 +17,7 @@ pygame.display.set_caption("Astro Attack")
 
 
 
-def update_playing_screen_size(menu: "_menu.Menu"):
+def update_playing_screen_size():
     """Updates live objects positions"""
 
     global WIDTH, HEIGHT
@@ -25,7 +25,7 @@ def update_playing_screen_size(menu: "_menu.Menu"):
     "Get objects position on screen by ratio e.g. 20% of the screen"
 
     WIDTH, HEIGHT = pygame.display.get_window_size()
-    menu.resize()
+    menu.Menu.resize()
 
     "Set the x and y of objects based on new width and height, with ratios"
 
@@ -152,7 +152,7 @@ def update_objects(delta_time):
         object.update(delta_time)
 
 
-def main(menu: "_menu.Menu"):
+def main():
     """Main game loop"""
 
     delta_time = 1
@@ -163,74 +163,50 @@ def main(menu: "_menu.Menu"):
     global red_ship
     red_ship = add_player()
 
+    if game.SCORE > game.HIGHSCORE:
+        game.HIGHSCORE = game.SCORE
     game.SCORE = 0
 
     running = True
-    paused = False
     while running:
-        while not paused:
-            time1 = perf_counter()
+        time1 = perf_counter()
 
-            keys_pressed = pygame.key.get_pressed()
+        keys_pressed = pygame.key.get_pressed()
 
-            handle_player_movement(keys_pressed, delta_time)
-            update_objects(delta_time)
+        handle_player_movement(keys_pressed, delta_time)
+        update_objects(delta_time)
 
-            draw_window(delta_time)
+        draw_window(delta_time)
 
-            if red_ship.health <= 0:
-                menu.death_screen(game.SCORE)
+        if red_ship.health <= 0:
+            menu.Menu.death_screen()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    quit()
-
-                elif event.type == pygame.MOUSEWHEEL:
-                    scroll(event.y)
-
-                elif event.type == pygame.VIDEORESIZE:
-                    update_playing_screen_size(menu)
-
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
-                    menu.pause()
-                    paused = True
-                    
-            time2 = perf_counter()
-            delta_time = time2 - time1
-
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
 
+            elif event.type == pygame.MOUSEWHEEL:
+                scroll(event.y)
+
             elif event.type == pygame.VIDEORESIZE:
-                update_playing_screen_size(menu)
-                draw_window(delta_time)
-                menu.pause()
+                update_playing_screen_size()
 
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
-                paused = False
+                
+                # Darken the background when paused
+                surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
+                pygame.draw.rect(surf, (0, 0, 0, 120), (0, 0, game.WIDTH, game.HEIGHT))
+                game.WIN.blit(surf, (0, 0))
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse = pygame.mouse.get_pos()
-                menu.mouse_click(mouse)
+                menu.Menu.pause()
+                
+        time2 = perf_counter()
+        delta_time = time2 - time1
 
 
 def main_menu():
-    menu = _menu.Menu()
-    menu.resize()
-    while True:
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit()
-
-            elif event.type == pygame.VIDEORESIZE:
-                menu.resize()
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse = pygame.mouse.get_pos()
-                menu.mouse_click(mouse)
+    """Initializes Menu"""
+    menu.Menu()
 
 
 if __name__ == "__main__":
