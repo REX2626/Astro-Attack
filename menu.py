@@ -15,6 +15,9 @@ class Menu():
     DEFAULT_FONT = "bahnschrift"
     DEFAULT_FONT_SIZE = 40
     DEFAULT_COLOUR = game.WHITE
+    DEFAULT_PADX = 16
+    DEFAULT_PADY = 12
+    DEFAULT_OUTLINE_COLOUR = (20, 20, 20)
     
     def __init__(self) -> None:
         """On start up, the default page is main_menu"""
@@ -159,6 +162,21 @@ class Widget():
 
 
 
+class Image(Widget):
+    """A Widget that has an image
+       scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
+    """
+    def __init__(self, x, y, image=images.DEFAULT, scale=1) -> None:
+        super().__init__(x, y)
+        self.image = pygame.transform.scale(image, (image.get_width()*scale, image.get_height()*scale))
+
+    def draw(self):
+        ratio = game.WIDTH * self.image.get_width() / 1_000_000 # Ratio of image width to game width
+        image = pygame.transform.scale(self.image, (self.image.get_width()*ratio, self.image.get_height()*ratio))
+        game.WIN.blit(image, (self.x * game.WIDTH - image.get_width()/2, self.y * game.HEIGHT - image.get_height()/2))
+
+
+
 class Text(Widget):
     """Text can be single of multi-line
        x, y is the centre of the first line of the Text
@@ -166,7 +184,7 @@ class Text(Widget):
        text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
        if text is a function it has to return a string (can be single or multi-line)
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
         super().__init__(x, y)
 
         if isinstance(text, str):
@@ -208,31 +226,19 @@ class Text(Widget):
 
 
 
-class Image(Widget):
-    """A Widget that has an image
-       scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
-    """
-    def __init__(self, x, y, image=images.DEFAULT, scale=1) -> None:
-        super().__init__(x, y)
-        self.image = pygame.transform.scale(image, (image.get_width()*scale, image.get_height()*scale))
-
-    def draw(self):
-        ratio = game.WIDTH * self.image.get_width() / 10_00000
-        image = pygame.transform.scale(self.image, (self.image.get_width()*ratio, self.image.get_height()*ratio))
-        game.WIN.blit(image, (self.x * game.WIDTH - image.get_width()/2, self.y * game.HEIGHT - image.get_height()/2))
-
-
-
 class Button(Text):
     """A Widget that can be clicked on
        When a Button is clicked, the "function" method is called
+       padx, pady is the padding, i.e. how much the button extends past the text, i.e. padx=1 means 1 pixel on the left AND 1 pixel on the right
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR, function=None, box_colour=Menu.box_colour, outline_colour=None) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR) -> None:
         super().__init__(x, y, text, font, font_size, colour)
+        self.padx = padx
+        self.pady = pady
+        self.function = function
         self.box_colour = box_colour
         if not outline_colour: outline_colour = box_colour
         self.outline_colour = outline_colour
-        self.function = function
 
     def click(self, mouse):
         if self.clicked_on(mouse):
@@ -241,25 +247,27 @@ class Button(Text):
 
     def clicked_on(self, mouse):
         label = self.get_label()
-        width, height = label.get_width(), label.get_height()
-        x, y = self.get_position_x(self, label), self.get_position_y(self, label)
+        x, y, width, height = self.get_rect(label)
+        x, y = x - self.padx, y - self.pady
         return (mouse[0] > x and mouse[0] < x + width and
                 mouse[1] > y and mouse[1] < y + height)
 
-    def get_width_and_height(self):
-        label = self.get_label()
-        return label.get_width(), label.get_height()
+    def get_width(self):
+        return self.get_label().get_width() + self.padx*2 # padding*2 as there is padding on both sides
+
+    def get_height(self):
+        return self.get_label().get_height() + self.pady*2 # padding*2 as there is padding on both sides
 
     def get_rect(self, label):
-        width, height = self.get_width_and_height()
+        width, height = self.get_width(), self.get_height()
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
         return x, y, width, height
 
     def draw(self):
         label = self.get_label()
         x, y, width, height = self.get_rect(label)
-        pygame.draw.rect(game.WIN, self.box_colour, (round(x), round(y), width, height))
-        pygame.draw.rect(game.WIN, self.outline_colour, (round(x), round(y), width, height), width=round(game.WIDTH/300))
+        pygame.draw.rect(game.WIN, self.box_colour    , (x - self.padx, y - self.pady, width, height))
+        pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
         super().draw()
 
 
@@ -272,8 +280,8 @@ class SettingButton(Button):
        text is a function
        uniform arg makes all of setting buttons on the page the same width
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR, value=None, function_action=None, box_colour=Menu.box_colour, outline_colour=None, click_outline_colour=game.LIGHT_GREY, uniform=True) -> None:
-        super().__init__(x, y, text, font, font_size, colour, function_action, box_colour, outline_colour)
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=game.LIGHT_GREY, uniform=True) -> None:
+        super().__init__(x, y, text, font, font_size, colour, padx, pady, function_action, box_colour, outline_colour)
         self.original_outline_colour = self.outline_colour
         self.click_outline_colour = click_outline_colour
         self.uniform = uniform
@@ -316,19 +324,19 @@ class SettingButton(Button):
         max_width = 0
         for widget in Menu.current_page.widgets:
             if isinstance(widget, SettingButton):
-                if widget.get_label().get_width() > max_width:
-                    max_width = widget.get_label().get_width()
+                if widget.get_width() > max_width:
+                    max_width = widget.get_width()
         return max_width
 
     def get_rect(self, label):
         """If self.uniform == True, set the width to the greatest width of all SettingButtons on the current_page"""
         if self.uniform:
-            width, height = self.get_max_width(), self.get_label().get_height()
-            width_difference = width - self.get_label().get_width()
+            width, height = self.get_max_width(), self.get_height()
+            width_difference = width - self.get_width()
             x, y = self.get_position_x(self, label) - width_difference/2, self.get_position_y(self, label)
             return x, y, width, height
 
-        width, height = self.get_width_and_height()
+        width, height = self.get_width(), self.get_height()
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
         return x, y, width, height
 
@@ -374,7 +382,7 @@ settings = Page(
 
 pause = Page(
     Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO1, scale=0.6),
-    Button(0.5, 0.345, "MAIN MENU"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 0.345, "Main Menu"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True
 )
