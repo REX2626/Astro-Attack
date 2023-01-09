@@ -1,5 +1,6 @@
 import pygame
 import game
+import images
 import main
 # menu v2
 
@@ -134,7 +135,7 @@ class Widget():
        font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
        text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR) -> None:
+    def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
 
@@ -158,18 +159,6 @@ class Widget():
             else:
                 self.get_position_y = lambda self, label: self.y - label.get_height()/2
 
-        self.text = text
-        self.font = font
-        self.font_size = font_size
-        self.colour = colour
-
-    def get_label(self):
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text
-        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
-
     def draw(self):
         label = self.get_label()
         position = self.get_position_x(self, label), self.get_position_y(self, label) # Adjust coordinates to be centre of Widget
@@ -182,23 +171,56 @@ class Text(Widget):
        x, y is the centre of the first line of the Text
     """
     def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR) -> None:
-        super().__init__(x, y, text, font, font_size, colour)
-        self.text = [sentence.lstrip() for sentence in text.split("\n")]
+        super().__init__(x, y)
+        if isinstance(text, str):
+            self.text = [sentence.lstrip() for sentence in text.split("\n")]
+        else:
+            self.text = text
+        self.font = font
+        self.font_size = font_size
+        self.colour = colour
+
+    def get_label(self):
+        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+            text = self.text()
+        else:
+            text = self.text[0]
+        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
 
     def get_labels(self):
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
-        labels = [font.render(sentence, True, self.colour) for sentence in self.text]
+        if isinstance(self.text, list):
+            labels = [font.render(sentence, True, self.colour) for sentence in self.text]
+        else:
+            if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+                text = self.text()
+                labels = [font.render(text, True, self.colour)]
         return labels
 
     def draw(self):
         labels = self.get_labels()
         for idx, label in enumerate(labels):
-            position = self.get_position_x(self, label), self.get_position_y(self, label) + idx * label.get_height() - label.get_height()/2
+            position = self.get_position_x(self, label), self.get_position_y(self, label) + idx * label.get_height()
             game.WIN.blit(label, position)
 
 
 
-class Button(Widget):
+class ImageWidget(Widget):
+    """A Widget that has an image
+       scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
+    """
+    def __init__(self, x, y, image=images.DEFAULT, scale=1) -> None:
+        super().__init__(x, y)
+        self.image = pygame.transform.scale(image, (image.get_width()*scale, image.get_height()*scale))
+
+    def draw(self):
+        ratio = game.WIDTH * self.image.get_width() / 10_00000
+        image = pygame.transform.scale(self.image, (self.image.get_width()*ratio, self.image.get_height()*ratio))
+        game.WIN.blit(image, (self.x * game.WIDTH - image.get_width()/2, self.y * game.HEIGHT - image.get_height()/2))
+
+
+
+class Button(Text):
     """A Widget that can be clicked on
        When a Button is clicked, the "function" method is called
     """
@@ -315,20 +337,21 @@ class SettingButton(Button):
 
 
 main_menu = Page(
-    Widget(0.5, 1/7, "Astro Attack" , font_size=40),
-    Button(0.5, 2/7, "Single Player", font_size=40, function=lambda: main.main()),
-    Button(0.5, 3/7, "Multiplayer"  , font_size=40, function=lambda: main.main()),
-    Button(0.5, 4/7, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
-    Button(0.5, 5/7, "Info"         , font_size=40, function=lambda: Menu.change_page(info)),
-    Button(0.5, 6/7, "Quit"         , font_size=40, function=game.quit)
+    ImageWidget(0.5, 3/16, images.ASTRO_ATTACK_LOGO1, scale=1),
+    #Text(  0.5, 1/7, "Astro Attack" , font_size=40),
+    Button(0.5, 3/8, "Single Player", font_size=40, function=lambda: main.main()),
+    Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: main.main()),
+    Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
+    Button(0.5, 6/8, "Info"         , font_size=40, function=lambda: Menu.change_page(info)),
+    Button(0.5, 7/8, "Quit"         , font_size=40, function=game.quit)
 )
 
 info = Page(
-    Widget(0.5, 1/8,   "CREDITS"          , font_size=40),
+    Text(0.5, 1/8,     "CREDITS"          , font_size=40),
     Text(0.5, 2/8,   """Rex Attwood
                         Gabriel Correia""", font_size=20),
-    Widget(0.5, 2.5/8, "Fred"             , font_size=5),
-    Widget(0.5, 3.4/8, "CONTROLS"         , font_size=40),
+    Text(0.5, 2.5/8,   "Fred"             , font_size=5),
+    Text(0.5, 3.4/8,   "CONTROLS"         , font_size=40),
     Text(0.5, 4.7/8, """CHANGE SETTINGS: UP AND DOWN ARROWS
                         PAUSE: ESC"""     , font_size=20),
     Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
@@ -348,16 +371,16 @@ settings = Page(
 )
 
 pause = Page(
-    Widget(0.5, 1/7, "Astro Attack" , font_size=40),
+    Text(0.5, 1/7,   "Astro Attack" , font_size=40),
     Button(0.5, 0.5, "MAIN MENU"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True
 )
 
 death_screen = Page(
-    Widget(0.5, 1/6, "YOU DIED!"                           , colour=(255, 0, 0)    , font_size=40),
-    Widget(0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
-    Widget(0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
+    Text(0.5, 1/6, "YOU DIED!"                           , colour=(255, 0, 0)    , font_size=40),
+    Text(0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
+    Text(0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
     Button(0.5, 4/6, "PLAY AGAIN", font_size=40, function=lambda: main.main()),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu))
 )
