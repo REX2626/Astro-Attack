@@ -16,6 +16,10 @@ Add ammo system
 
 Enemies drop ammo
 
+Fix spawning in asteroid
+
+Check / improve graphics.get_entities_to_draw performance
+
 Fix bullets going through asteroids
 
 Edge of button boundaries are not clickable (click for button rectangle not text label)
