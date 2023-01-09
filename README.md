@@ -30,8 +30,6 @@ Add slider for menu buttons
 
 Add padding ability to buttons
 
-Add image to menu
-
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
@@ -152,3 +150,5 @@ Have a page system with buttons per page
 Fix button select disappearing
 
 Add escape functions to all the pages
+
+Add image to menu

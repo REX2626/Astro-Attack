@@ -132,8 +132,6 @@ class Widget():
        if (x, y) is a float (e.g. 0.5 = 50%), the element's location is that percentage of the screen
        if (x, y) is an int (e.g. 100 or -200), the element is placed that many pixels from the edge, negative pixels are placed from the right
        x, y is the centre of the Widget
-       font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
-       text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
     """
     def __init__(self, x, y) -> None:
         self.x = x
@@ -159,53 +157,58 @@ class Widget():
             else:
                 self.get_position_y = lambda self, label: self.y - label.get_height()/2
 
-    def draw(self):
-        label = self.get_label()
-        position = self.get_position_x(self, label), self.get_position_y(self, label) # Adjust coordinates to be centre of Widget
-        game.WIN.blit(label, position)
-
 
 
 class Text(Widget):
-    """Multi-line text Widget
+    """Text can be single of multi-line
        x, y is the centre of the first line of the Text
+       font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
+       text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
+       if text is a function it has to return a string (can be single or multi-line)
     """
     def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=40, colour=Menu.DEFAULT_COLOUR) -> None:
         super().__init__(x, y)
+
         if isinstance(text, str):
             self.text = [sentence.lstrip() for sentence in text.split("\n")]
-        else:
+        else: # if text is a function
             self.text = text
+
         self.font = font
         self.font_size = font_size
         self.colour = colour
 
     def get_label(self):
+        """For buttons which currently only use the first line of text to create the button"""
         if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
             text = self.text()
         else:
             text = self.text[0]
+
         return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
 
     def get_labels(self):
+        """Creates a list of label for every sentence of the text"""
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
+
         if isinstance(self.text, list):
             labels = [font.render(sentence, True, self.colour) for sentence in self.text]
-        else:
+        else: # if text is a function
             if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
                 text = self.text()
-                labels = [font.render(text, True, self.colour)]
+                labels = [font.render(sentence.lstrip(), True, self.colour) for sentence in text.split("\n")] # split sentence up into lines, then turn each line into a label
+
         return labels
 
     def draw(self):
         labels = self.get_labels()
         for idx, label in enumerate(labels):
-            position = self.get_position_x(self, label), self.get_position_y(self, label) + idx * label.get_height()
+            position = self.get_position_x(self, label), self.get_position_y(self, label) + idx * label.get_height() # Adjust coordinates to be centre of Widget
             game.WIN.blit(label, position)
 
 
 
-class ImageWidget(Widget):
+class Image(Widget):
     """A Widget that has an image
        scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
     """
@@ -337,8 +340,7 @@ class SettingButton(Button):
 
 
 main_menu = Page(
-    ImageWidget(0.5, 3/16, images.ASTRO_ATTACK_LOGO1, scale=1),
-    #Text(  0.5, 1/7, "Astro Attack" , font_size=40),
+    Image(0.5, 3/16, images.ASTRO_ATTACK_LOGO1),
     Button(0.5, 3/8, "Single Player", font_size=40, function=lambda: main.main()),
     Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: main.main()),
     Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
@@ -347,8 +349,8 @@ main_menu = Page(
 )
 
 info = Page(
-    Text(0.5, 1/8,     "CREDITS"          , font_size=40),
-    Text(0.5, 2/8,   """Rex Attwood
+    Text(0.5, 1/8  ,   "CREDITS"          , font_size=40),
+    Text(0.5, 2/8  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
     Text(0.5, 2.5/8,   "Fred"             , font_size=5),
     Text(0.5, 3.4/8,   "CONTROLS"         , font_size=40),
@@ -371,16 +373,16 @@ settings = Page(
 )
 
 pause = Page(
-    Text(0.5, 1/7,   "Astro Attack" , font_size=40),
-    Button(0.5, 0.5, "MAIN MENU"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO1, scale=0.6),
+    Button(0.5, 0.345, "MAIN MENU"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True
 )
 
 death_screen = Page(
-    Text(0.5, 1/6, "YOU DIED!"                           , colour=(255, 0, 0)    , font_size=40),
-    Text(0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
-    Text(0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
+    Text(  0.5, 1/6, "YOU DIED!"                           , colour=(255, 0, 0)    , font_size=40),
+    Text(  0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
+    Text(  0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
     Button(0.5, 4/6, "PLAY AGAIN", font_size=40, function=lambda: main.main()),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu))
 )
