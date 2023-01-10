@@ -136,6 +136,11 @@ class Page():
         if self.background_colour:
             game.WIN.fill(self.background_colour)
 
+        # For Performance, cache the label for each button so that the buttons do not have to recalculate
+        for widget in self.widgets:
+            if isinstance(widget, Button):
+                widget.label = widget.get_label()
+
         for widget in self.widgets:
             widget.draw()
 
@@ -255,6 +260,7 @@ class Button(Text):
         if not outline_colour: outline_colour = box_colour
         self.outline_colour = outline_colour
         self.hover_colour = hover_colour
+        self.label = self.get_label() # ONLY USE FOR PERFORMANCE, NOT UPDATED REGULALRLY, used to cache labels for drawing
 
     def click(self, mouse):
         if self.touching_mouse(mouse):
@@ -277,19 +283,19 @@ class Button(Text):
         return (mouse[0] > x and mouse[0] < x + width and
                 mouse[1] > y and mouse[1] < y + height)
 
-    def get_width(self):
-        return self.get_label().get_width() + self.padx*2 # padding*2 as there is padding on both sides
+    def get_width(self, label: pygame.Surface):
+        return label.get_width() + self.padx*2 # padding*2 as there is padding on both sides
 
-    def get_height(self):
-        return self.get_label().get_height() + self.pady*2 # padding*2 as there is padding on both sides
+    def get_height(self, label: pygame.Surface):
+        return label.get_height() + self.pady*2 # padding*2 as there is padding on both sides
 
     def get_rect(self, label):
-        width, height = self.get_width(), self.get_height()
+        width, height = self.get_width(label), self.get_height(label)
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
         return x, y, width, height
 
     def draw(self):
-        label = self.get_label()
+        label = self.label # This is updated in Page.draw()
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour    , (x - self.padx, y - self.pady, width, height))
         pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
@@ -350,19 +356,19 @@ class SettingButton(Button):
         max_width = 0
         for widget in Menu.current_page.widgets:
             if isinstance(widget, SettingButton):
-                if widget.get_width() > max_width:
-                    max_width = widget.get_width()
+                if widget.get_width(widget.label) > max_width:
+                    max_width = widget.get_width(widget.label)
         return max_width
 
     def get_rect(self, label):
         """If self.uniform == True, set the width to the greatest width of all SettingButtons on the current_page"""
         if self.uniform:
-            width, height = self.get_max_width(), self.get_height()
-            width_difference = width - self.get_width()
+            width, height = self.get_max_width(), self.get_height(label)
+            width_difference = width - self.get_width(label)
             x, y = self.get_position_x(self, label) - width_difference/2, self.get_position_y(self, label)
             return x, y, width, height
 
-        width, height = self.get_width(), self.get_height()
+        width, height = self.get_width(label), self.get_height(label)
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
         return x, y, width, height
 

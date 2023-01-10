@@ -26,8 +26,6 @@ Fix first full_screen click not moving the mouse properly
 
 Add slider for menu buttons
 
-Improve Menu performance
-
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
@@ -44,6 +42,11 @@ Retreat state: If enemy health is low and player health is high - retreat
 ### POTENTIAL
 
 Have different shoot speed for enemy and player
+
+Add space stations
+Enemy ships can spawn at enemy stations
+Neutral ships can move from station to station
+Player can interact with stations
 
 Add money system, different currencies, get cash from killing
 
@@ -166,3 +169,5 @@ Change score to be number of enemies killed not damaged (more points for mothers
 MOUSE_DOWN counts for scroll_wheel and right_click
 
 Add button effect when hovered over
+
+Improve Menu performance
