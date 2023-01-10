@@ -15,7 +15,9 @@ class Enemy_Ship(Ship):
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
         self.time_strafing = 0
         self.time_to_stop_strafing = 0
-        self.acceleration_constant = 250
+        start_accelerations = [300, -300]
+        self.acceleration_constant = random.choice(start_accelerations)
+        self.new_ship_pos = Vector(0, 0)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -31,10 +33,11 @@ class Enemy_Ship(Ship):
 
     # DEBUG DRAW PATROL POINTS
 
-    # def draw(self, win: pygame.Surface, focus_point):
-    #     super().draw(win, focus_point)
+    def draw(self, win: pygame.Surface, focus_point):
+        super().draw(win, focus_point)
     #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-        
+        pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+
     def patrol_state(self, delta_time):
         self.max_speed = 150
         
@@ -73,7 +76,15 @@ class Enemy_Ship(Ship):
             self.strafe(delta_time)
 
     def predicted_player_position(self):
-        return game.red_ship.position
+        ship_pos = game.red_ship.position
+        ship_vel = game.red_ship.velocity
+        current_pos = self.position
+        current_vel = self.velocity
+        direction_to_ship = current_pos.get_angle_to(ship_pos)
+        bullet_speed = game.BULLET_SPEED
+        time_to_player = self.distance_to(game.red_ship) / bullet_speed
+        self.new_ship_pos = (ship_vel * time_to_player) + ship_pos
+        return self.new_ship_pos
 
     def strafe(self, delta_time):
         direction_vector = game.red_ship.position - self.position

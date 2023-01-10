@@ -42,6 +42,8 @@ HIGHSCORE = 0
 
 ZOOM = 2
 
+BULLET_SPEED = 750
+
 
 def init_chunks():
     global CHUNKS
