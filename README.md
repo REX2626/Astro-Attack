@@ -24,9 +24,9 @@ Fix bullets going through asteroids
 
 Fix first full_screen click not moving the mouse properly
 
-Add button effect when hovered over
-
 Add slider for menu buttons
+
+Improve Menu performance
 
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
@@ -164,3 +164,5 @@ Add padding ability to buttons
 Change score to be number of enemies killed not damaged (more points for mothership)
 
 MOUSE_DOWN counts for scroll_wheel and right_click
+
+Add button effect when hovered over
