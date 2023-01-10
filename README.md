@@ -24,9 +24,9 @@ Fix bullets going through asteroids
 
 Fix first full_screen click not moving the mouse properly
 
-Add button effect when hovered over
-
 Add slider for menu buttons
+
+Improve Menu performance
 
 ---
 
@@ -167,3 +167,5 @@ MOUSE_DOWN counts for scroll_wheel and right_click
 Attack state: make fighting seem more natural
     Aim to where the player is predicted to be in the future for more accurate shooting
     POTENTIAL: dodging either incoming bullets or for the enemy to have a random strafe
+
+Add button effect when hovered over

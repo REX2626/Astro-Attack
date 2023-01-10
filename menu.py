@@ -18,6 +18,8 @@ class Menu():
     DEFAULT_PADX = 16
     DEFAULT_PADY = 12
     DEFAULT_OUTLINE_COLOUR = (20, 20, 20)
+    DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
+    DEFAULT_CLICK_OUTLINE_COLOUR = (180, 180, 180)
     
     def __init__(self) -> None:
         """On start up, the default page is main_menu"""
@@ -55,6 +57,11 @@ class Menu():
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_click(mouse)
 
+            elif event.type == pygame.MOUSEMOTION:
+                mouse = pygame.mouse.get_pos()
+                if not Menu.mouse_hover(mouse): # if no buttons are hovered over, then refresh Menu, so that no buttons looked hovered
+                    Menu.update()
+
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
                 # runs Menu.escape_pressed, if that returns True, then follow suit and return True
                 if Menu.escape_pressed():
@@ -79,6 +86,13 @@ class Menu():
             if isinstance(widget, Button):
                 if widget.click(mouse): # if the Button has been clicked, then stop checking the Buttons
                     break
+
+    def mouse_hover(mouse):
+        """Go through all Page Widgets, if the Widget is a button then check if mouse is hovering on it"""
+        for widget in Menu.current_page.widgets:
+            if isinstance(widget, Button):
+                if widget.hover(mouse):
+                    return True
 
     def escape_pressed():
         if Menu.current_page.escape:
@@ -231,21 +245,32 @@ class Button(Text):
        When a Button is clicked, the "function" method is called
        padx, pady is the padding, i.e. how much the button extends past the text, i.e. padx=1 means 1 pixel on the left AND 1 pixel on the right
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
         super().__init__(x, y, text, font, font_size, colour)
         self.padx = padx
         self.pady = pady
         self.function = function
         self.box_colour = box_colour
+        self.current_box_colour = box_colour
         if not outline_colour: outline_colour = box_colour
         self.outline_colour = outline_colour
+        self.hover_colour = hover_colour
 
     def click(self, mouse):
-        if self.clicked_on(mouse):
+        if self.touching_mouse(mouse):
             self.function()
             return True # Tells the Menu that this Button has been clicked on
 
-    def clicked_on(self, mouse):
+    def hover(self, mouse):
+        if self.touching_mouse(mouse):
+            self.current_box_colour = self.hover_colour
+            Menu.update()
+            self.current_box_colour = self.box_colour
+            return True
+        else:
+            self.current_box_colour = self.box_colour
+
+    def touching_mouse(self, mouse):
         label = self.get_label()
         x, y, width, height = self.get_rect(label)
         x, y = x - self.padx, y - self.pady
@@ -266,7 +291,7 @@ class Button(Text):
     def draw(self):
         label = self.get_label()
         x, y, width, height = self.get_rect(label)
-        pygame.draw.rect(game.WIN, self.box_colour    , (x - self.padx, y - self.pady, width, height))
+        pygame.draw.rect(game.WIN, self.current_box_colour    , (x - self.padx, y - self.pady, width, height))
         pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
         super().draw()
 
@@ -280,8 +305,8 @@ class SettingButton(Button):
        text is a function
        uniform arg makes all of setting buttons on the page the same width
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=game.LIGHT_GREY, uniform=True) -> None:
-        super().__init__(x, y, text, font, font_size, colour, padx, pady, function_action, box_colour, outline_colour)
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR, uniform=True) -> None:
+        super().__init__(x, y, text, font, font_size, colour, padx, pady, function_action, box_colour, outline_colour, hover_colour)
         self.original_outline_colour = self.outline_colour
         self.click_outline_colour = click_outline_colour
         self.uniform = uniform
@@ -291,6 +316,7 @@ class SettingButton(Button):
 
         def function():
             self.selected = True
+            self.current_box_colour = self.hover_colour
             self.outline_colour = self.click_outline_colour
 
             # If self.value is a bool, then when this button is clicked, the value will be flipped
@@ -403,9 +429,12 @@ death_screen = Page(
 
 def settings_click():
     """Un-select all settings buttons"""
+    mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
         if isinstance(widget, SettingButton):
             widget.selected = False
+            if widget.touching_mouse(mouse): # make sure the current hovered box remains hovered
+                widget.current_box_colour = widget.hover_colour
             widget.outline_colour = widget.original_outline_colour
     Menu.update()
 
