@@ -51,7 +51,7 @@ class Menu():
             elif event.type == pygame.VIDEORESIZE:
                 Menu.resize()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # 1 is left click
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_click(mouse)
 
