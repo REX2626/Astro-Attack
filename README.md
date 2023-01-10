@@ -16,9 +16,13 @@ Add ammo system
 
 Enemies drop ammo
 
-Fix bullets going through asteroids
+Change score to be number of enemies killed not damaged (more points for mothership)
 
-Edge of button boundaries are not clickable (click for button rectangle not text label)
+Fix spawning in asteroid
+
+Check / improve graphics.get_entities_to_draw performance
+
+Fix bullets going through asteroids
 
 Fix first full_screen click not moving the mouse properly
 
@@ -27,10 +31,6 @@ MOUSE_DOWN counts for scroll_wheel and right_click
 Add button effect when hovered over
 
 Add slider for menu buttons
-
-Add padding ability to buttons
-
-Add image to menu
 
 ---
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
@@ -152,3 +152,9 @@ Have a page system with buttons per page
 Fix button select disappearing
 
 Add escape functions to all the pages
+
+Add image to menu
+
+Edge of button boundaries are not clickable (click for button rectangle not text label)
+
+Add padding ability to buttons
