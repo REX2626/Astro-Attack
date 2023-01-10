@@ -27,13 +27,12 @@ Fix first full_screen click not moving the mouse properly
 Add slider for menu buttons
 
 ---
+
+Make new npc ai ship class which the ai ships will inherit from (cleans up code)
+
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
-Attack state: make fighting seem more natural
-    Aim to where the player is predicted to be in the future for more accurate shooting
-    POTENTIAL: dodging either incoming bullets or for the enemy to have a random strafe
 
 Retreat state: If enemy health is low and player health is high - retreat
 
@@ -167,6 +166,10 @@ Add padding ability to buttons
 Change score to be number of enemies killed not damaged (more points for mothership)
 
 MOUSE_DOWN counts for scroll_wheel and right_click
+
+Attack state: make fighting seem more natural
+    Aim to where the player is predicted to be in the future for more accurate shooting
+    POTENTIAL: dodging either incoming bullets or for the enemy to have a random strafe
 
 Add button effect when hovered over
 

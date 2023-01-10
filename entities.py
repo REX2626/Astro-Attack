@@ -1,4 +1,4 @@
-from objects import Vector1D, Vector, Object, Entity
+from objects import Vector1D, Vector, Object, Entity, random_vector
 import particles
 import images
 import game
@@ -52,7 +52,7 @@ class Asteroid(Object):
                             entity.damage(entity.velocity.magnitude()**2/100_000)
 
                             if hasattr(entity, "make_new_patrol_point"):
-                                entity.make_new_patrol_point()
+                                entity.make_new_patrol_point(400, 500)
 
                             particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
 
@@ -105,7 +105,7 @@ class Ship(Entity):
             
             bullet_position = self.position + Vector(0, -self.original_image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -750)
+            bullet_velocity = Vector(0, -game.BULLET_SPEED)
             bullet_velocity.rotate(self.rotation)
             bullet = Bullet(
 
@@ -127,6 +127,9 @@ class Ship(Entity):
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
+
+    def make_new_patrol_point(self, min_dist, max_dist):
+        self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + self.position
     
     def damage(self, damage):
         self.health -= damage
