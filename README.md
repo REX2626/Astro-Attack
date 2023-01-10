@@ -16,8 +16,6 @@ Add ammo system
 
 Enemies drop ammo
 
-Change score to be number of enemies killed not damaged (more points for mothership)
-
 Fix spawning in asteroid
 
 Check / improve graphics.get_entities_to_draw performance
@@ -56,6 +54,12 @@ Add shop system
 Add loot system
 
 Add fuel system
+
+Have different items (e.g. different types of guns)
+
+Level up, the ability to upgrade weapons, armour, engine etc
+
+Have a massive asteroid or moon, with tunnels that you can go through
 
 
 ## DONE:
@@ -158,3 +162,5 @@ Add image to menu
 Edge of button boundaries are not clickable (click for button rectangle not text label)
 
 Add padding ability to buttons
+
+Change score to be number of enemies killed not damaged (more points for mothership)

@@ -167,7 +167,6 @@ class Bullet(Entity):
                     if isinstance(self.ship, player.Player_Ship):
                         entity.enemy_spotted()
                     game.CHUNKS.remove_entity(self)
-                    game.SCORE += 1
                     break
 
 
