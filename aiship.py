@@ -7,62 +7,24 @@ import random
 import math
 import pygame # rex keep this here for debugging reasons
 
-class Enemy_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+
+class AI_Ship(Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
-        self.state = state
-        self.mother_ship = mother_ship
-        self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
-        self.time_strafing = 0
-        self.time_to_stop_strafing = 0
-        start_accelerations = [300, -300]
-        self.acceleration_constant = random.choice(start_accelerations)
-        self.new_ship_pos = Vector(0, 0)
 
-    def update(self, delta_time):
-        super().update(delta_time)
+    def check_for_asteroid(self, chunk_pos):
+        for y in range(chunk_pos.y-1, chunk_pos.y+2):
+            for x in range(chunk_pos.x-1, chunk_pos.x+2):
 
-        if self.distance_to(game.red_ship) < 600 or self.state == 1:
-            self.attack_state(delta_time)
-            self.enemy_spotted()
-        else:
-            self.patrol_state(delta_time)
+                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+                    if isinstance(entity, Asteroid):
 
-        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
-            self.state = 0
+                        return True
+                    else:
+                        # No Asteroid
+                        return False
 
-    # DEBUG DRAW PATROL POINTS
-
-    # def draw(self, win: pygame.Surface, focus_point):
-    #     super().draw(win, focus_point)
-    #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-    #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-
-    def destroy(self):
-        super().destroy()
-        if type(self) == Enemy_Ship:
-            game.SCORE += 1
-        elif type(self) == Mother_Ship:
-            game.SCORE += 3
-
-    def patrol_state(self, delta_time):
-        self.max_speed = 150
-        
-        target_position = self.patrol_point
-        direction_vector = target_position - self.position
-
-        distance = (direction_vector).magnitude()
-
-        target_to_mothership_distance = (target_position - self.mother_ship.position).magnitude()
-
-        if distance < 50 or target_to_mothership_distance > 500:   # Check if the enemy has reached the patrol point
-            self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
-            target_position = self.patrol_point
-        
-        self.accelerate_in_direction(target_position, 300 * delta_time)
-        self.set_rotation(self.position.get_angle_to(target_position))
-    
-    def attack_state(self, delta_time):
+    def attack_player_state(self, delta_time):
         # Set max speed to a higher value
         self.max_speed = 300
 
@@ -100,7 +62,63 @@ class Enemy_Ship(Ship):
             self.time_to_stop_strafing += random.randint(2, 5)
         
         self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
+
+
+class Enemy_Ship(AI_Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+        self.state = state
+        self.mother_ship = mother_ship
+        self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
+        self.time_strafing = 0
+        self.time_to_stop_strafing = 0
+        start_accelerations = [300, -300]
+        self.acceleration_constant = random.choice(start_accelerations)
+        self.new_ship_pos = Vector(0, 0)
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        if self.distance_to(game.red_ship) < 600 or self.state == 1:
+            self.attack_player_state(delta_time)
+            self.enemy_spotted()
+        else:
+            self.patrol_state(delta_time)
+
+        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
+            self.state = 0
+
+    # DEBUG DRAW PATROL POINTS
+
+    # def draw(self, win: pygame.Surface, focus_point):
+    #     super().draw(win, focus_point)
+    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+
+    def destroy(self):
+        super().destroy()
+        if type(self) == Enemy_Ship:
+            game.SCORE += 1
+        elif type(self) == Mother_Ship:
+            game.SCORE += 3
+
+    def patrol_state(self, delta_time):
+        self.max_speed = 150
         
+        target_position = self.patrol_point
+        direction_vector = target_position - self.position
+
+        distance = (direction_vector).magnitude()
+
+        target_to_mothership_distance = (target_position - self.mother_ship.position).magnitude()
+
+        if distance < 50 or target_to_mothership_distance > 500:   # Check if the enemy has reached the patrol point
+            self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
+            target_position = self.patrol_point
+        
+        self.accelerate_in_direction(target_position, 300 * delta_time)
+        self.set_rotation(self.position.get_angle_to(target_position))
+
 
     def enemy_spotted(self):
         self.mother_ship.alert_group()
@@ -166,18 +184,6 @@ class Mother_Ship(Enemy_Ship):
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
 
-    def check_for_asteroid(self, chunk_pos):
-        for y in range(chunk_pos.y-1, chunk_pos.y+2):
-            for x in range(chunk_pos.x-1, chunk_pos.x+2):
-
-                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
-                    if isinstance(entity, Asteroid):
-
-                        return True
-                    else:
-                        # No Asteroid
-                        return False
-
     def alert_group(self):
         for enemy in self.enemy_list:
             enemy.state = 1
@@ -186,7 +192,7 @@ class Mother_Ship(Enemy_Ship):
 
 
 
-class Neutral_Ship(Ship):
+class Neutral_Ship(AI_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
         self.state = state
@@ -243,45 +249,7 @@ class Neutral_Ship(Ship):
         
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
-    
-    def attack_player_state(self, delta_time):
-        # Set max speed to a higher value
-        self.max_speed = 300
 
-        # Aiming and shooting functionality
-        self.set_rotation(self.position.get_angle_to(self.predicted_player_position()))
-        self.shoot()
-
-        # Movement
-        if self.distance_to(game.red_ship) < 100:
-            self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
-        elif self.distance_to(game.red_ship) > 400:
-            self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
-        else:
-            # Strafing
-            self.strafe(delta_time)
-
-    def predicted_player_position(self):
-        ship_pos = game.red_ship.position
-        ship_vel = game.red_ship.velocity
-        current_vel = self.velocity
-        bullet_speed = game.BULLET_SPEED
-        time_to_player = self.distance_to(game.red_ship) / bullet_speed
-        self.new_ship_pos = ((ship_vel - current_vel) * time_to_player) + ship_pos
-        return self.new_ship_pos
-
-    def strafe(self, delta_time):
-        direction_vector = game.red_ship.position - self.position
-        rotated_vector = direction_vector.get_rotate(math.pi / 2)
-        final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
-
-        self.time_strafing += delta_time
-
-        if self.time_strafing > self.time_to_stop_strafing:
-            self.acceleration_constant *= -1
-            self.time_to_stop_strafing += random.randint(2, 5)
-        
-        self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
 
     def attack_enemy_state(self, delta_time):
         if self.recent_enemy.health > 0:
