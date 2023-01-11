@@ -372,6 +372,8 @@ class SettingButton(Button):
             elif value > self.max: value = self.max
 
             setattr(game, self.value, value)
+            if self.function_action:
+                self.function_action()
 
         super().hover(mouse)
 
@@ -464,8 +466,8 @@ info = Page(
 )
 
 settings = Page(
-    SettingButton(0.25, 1/6, lambda: f"SCREEN WIDTH: {game.WIDTH}"    , font_size=40, value="WIDTH"     , function_action=lambda: make_windowed(), max=game.FULLSCREEN_SIZE[0]),
-    SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"  , font_size=40, value="HEIGHT"    , function_action=lambda: make_windowed(), max=game.FULLSCREEN_SIZE[1]),
+    SettingButton(0.25, 1/6, lambda: f"SCREEN WIDTH: {game.WIDTH}"    , font_size=40, value="WIDTH"     , function_action=lambda: make_windowed(), min=192, max=game.FULLSCREEN_SIZE[0]),
+    SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"  , font_size=40, value="HEIGHT"    , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}", font_size=40, value="FULLSCREEN", function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"   , font_size=40, value="SIZE_LINK" , function_action=None),
     SettingButton(0.25, 3/6, lambda: f"HEALTH: {game.MAX_PLAYER_HEALTH}", font_size=40, value="MAX_PLAYER_HEALTH", function_action=None, max=100),
