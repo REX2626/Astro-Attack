@@ -28,13 +28,9 @@ Add slider for menu buttons
 
 ---
 
-Make new npc ai ship class which the ai ships will inherit from (cleans up code)
-
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
-Retreat state: If enemy health is low and player health is high - retreat
 
 ---
 
@@ -174,3 +170,7 @@ Attack state: make fighting seem more natural
 Add button effect when hovered over
 
 Improve Menu performance
+
+Retreat state: If enemy health is low and player health is high - retreat
+
+Make new npc ai ship class which the ai ships will inherit from (cleans up code)

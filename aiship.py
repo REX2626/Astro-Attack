@@ -86,7 +86,7 @@ class Enemy_Ship(AI_Ship):
 
         distance_to_player = self.distance_to(game.red_ship)
 
-        if self.health == 1 and distance_to_player < 1000 and game.red_ship.health > 5 and len(self.mother_ship.enemy_list) <= 2:
+        if self.health == 1 and distance_to_player < 2000 and game.red_ship.health > 5 and len(self.mother_ship.enemy_list) <= 2:
             self.retreat_state(delta_time)
         else:
             if distance_to_player < 600 or self.state == 1:
