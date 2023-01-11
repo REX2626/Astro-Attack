@@ -63,6 +63,11 @@ class AI_Ship(Ship):
         
         self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
 
+    def retreat_state(self, delta_time):
+        self.max_speed = 500
+        self.set_rotation(self.position.get_angle_to(game.red_ship.position) + math.pi)
+        self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
+
 
 class Enemy_Ship(AI_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
@@ -79,14 +84,19 @@ class Enemy_Ship(AI_Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        if self.distance_to(game.red_ship) < 600 or self.state == 1:
-            self.attack_player_state(delta_time)
-            self.enemy_spotted()
-        else:
-            self.patrol_state(delta_time)
+        distance_to_player = self.distance_to(game.red_ship)
 
-        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
-            self.state = 0
+        if self.health == 1 and distance_to_player < 1000 and game.red_ship.health > 5 and len(self.mother_ship.enemy_list) <= 2:
+            self.retreat_state(delta_time)
+        else:
+            if distance_to_player < 600 or self.state == 1:
+                self.attack_player_state(delta_time)
+                self.enemy_spotted()
+            else:
+                self.patrol_state(delta_time)
+
+            if self.state == 1 and distance_to_player > 1000:
+                self.state = 0
 
     # DEBUG DRAW PATROL POINTS
 
@@ -98,6 +108,7 @@ class Enemy_Ship(AI_Ship):
     def destroy(self):
         super().destroy()
         if type(self) == Enemy_Ship:
+            self.mother_ship.enemy_list.remove(self)
             game.SCORE += 1
         elif type(self) == Mother_Ship:
             game.SCORE += 3
