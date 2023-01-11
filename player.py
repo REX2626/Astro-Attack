@@ -13,17 +13,17 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=500,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=game.MAX_PLAYER_HEALTH,
-        boost_amount=game.MAX_BOOST_AMOUNT, boost_change=5,
+        fire_rate=10, health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
+        boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
         image=images.RED_SHIP
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), image)
 
         self.max_rotation_speed = max_rotation_speed
-        self.max_boost_amount = boost_amount
-        self.boost_amount = boost_amount
+        self.max_boost_amount = boost_amount()
+        self.boost_amount = boost_amount()
         self.boost_change = boost_change
 
     def update(self, delta_time):
