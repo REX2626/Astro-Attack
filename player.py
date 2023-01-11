@@ -78,6 +78,7 @@ def add_player():
 
     # Red Player Ship
     global red_ship
+    game.LAST_PLAYER_POS = Vector(0, 0)
     red_ship = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
     game.CHUNKS.add_entity(red_ship)
     game.red_ship = red_ship

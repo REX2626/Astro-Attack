@@ -16,8 +16,6 @@ Add ammo system
 
 Enemies drop ammo
 
-Fix spawning in asteroid
-
 Check / improve graphics.get_entities_to_draw performance
 
 Fix bullets going through asteroids
@@ -174,3 +172,5 @@ Retreat state: If enemy health is low and player health is high - retreat
 Make new npc ai ship class which the ai ships will inherit from (cleans up code)
 
 Add slider for menu buttons
+
+Fix spawning in asteroid
