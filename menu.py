@@ -283,7 +283,7 @@ class Button(Text):
             self.current_box_colour = self.box_colour
 
     def touching_mouse(self, mouse):
-        label = self.get_label()
+        label = self.label
         x, y, width, height = self.get_rect(label)
         x, y = x - self.padx, y - self.pady
         return (mouse[0] > x and mouse[0] < x + width and
