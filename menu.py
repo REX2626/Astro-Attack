@@ -9,9 +9,8 @@ import main
 class Menu():
     """Menu controls the current page and checks for mouse clicks"""
     
-    background_colour = game.DARK_GREY
-    box_colour = game.MEDIUM_GREY
-
+    DEFAULT_BACKGROUND_COLOUR = game.DARK_GREY
+    DEFAULT_BOX_COLOUR = game.MEDIUM_GREY
     DEFAULT_FONT = "bahnschrift"
     DEFAULT_FONT_SIZE = 40
     DEFAULT_COLOUR = game.WHITE
@@ -20,6 +19,9 @@ class Menu():
     DEFAULT_OUTLINE_COLOUR = (20, 20, 20)
     DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
     DEFAULT_CLICK_OUTLINE_COLOUR = (180, 180, 180)
+    SLIDER_WIDTH = 25
+    SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
+    SLIDER_OUTLINE = (30, 30, 30, 150)
     
     def __init__(self) -> None:
         """On start up, the default page is main_menu"""
@@ -56,6 +58,11 @@ class Menu():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # 1 is left click
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_click(mouse)
+
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1: # 1 is left click
+                for widget in Menu.current_page.widgets: # Stop sliding for all sliders
+                    if hasattr(widget, "sliding"):
+                        widget.sliding = False
 
             elif event.type == pygame.MOUSEMOTION:
                 mouse = pygame.mouse.get_pos()
@@ -122,7 +129,7 @@ class Page():
        up is a function that is called when the up key is pressed
        down is a function that is called when the down key is pressed
     """
-    def __init__(self, *widgets, background_colour=Menu.background_colour, click=None, escape=None, up=None, down=None) -> None:
+    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, up=None, down=None) -> None:
         self.background_colour = background_colour
         self.click = click
         self.escape = escape
@@ -250,7 +257,7 @@ class Button(Text):
        When a Button is clicked, the "function" method is called
        padx, pady is the padding, i.e. how much the button extends past the text, i.e. padx=1 means 1 pixel on the left AND 1 pixel on the right
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
         super().__init__(x, y, text, font, font_size, colour)
         self.padx = padx
         self.pady = pady
@@ -271,7 +278,6 @@ class Button(Text):
         if self.touching_mouse(mouse):
             self.current_box_colour = self.hover_colour
             Menu.update()
-            self.current_box_colour = self.box_colour
             return True
         else:
             self.current_box_colour = self.box_colour
@@ -295,10 +301,15 @@ class Button(Text):
         return x, y, width, height
 
     def draw(self):
+        if self.touching_mouse(pygame.mouse.get_pos()):
+            self.current_box_colour = self.hover_colour
+        else:
+            self.current_box_colour = self.box_colour
+
         label = self.label # This is updated in Page.draw()
         x, y, width, height = self.get_rect(label)
-        pygame.draw.rect(game.WIN, self.current_box_colour    , (x - self.padx, y - self.pady, width, height))
-        pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
+        pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
+        pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
         super().draw()
 
 
@@ -309,9 +320,10 @@ class SettingButton(Button):
        value is the value that the setting button affects, NOTE: value is a string and has to be an attribute of game, e.g. game.WIDTH and value="WIDTH"
        function_action is called after the value is modified
        text is a function
+       min and max are the minimum and maximum values of value
        uniform arg makes all of setting buttons on the page the same width
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, box_colour=Menu.box_colour, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR, uniform=True) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, min=1, max=100, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR, uniform=True) -> None:
         super().__init__(x, y, text, font, font_size, colour, padx, pady, function_action, box_colour, outline_colour, hover_colour)
         self.original_outline_colour = self.outline_colour
         self.click_outline_colour = click_outline_colour
@@ -319,6 +331,9 @@ class SettingButton(Button):
         self.value = value
         self.function_action = function_action
         self.selected = False
+        if isinstance(self.get_value(), int):
+            self.min = min
+            self.max = max
 
         def function():
             self.selected = True
@@ -336,14 +351,51 @@ class SettingButton(Button):
 
     def get_value(self):
         return getattr(game, self.value)
-        
+
+    def get_slider(self):
+        label = self.label
+        ratio = (self.get_value() - self.min) / (self.max - self.min) # percentage of max value
+        x, y, width, height = self.get_rect(label)
+        x += ratio*(width-Menu.SLIDER_WIDTH) - self.padx
+        width = Menu.SLIDER_WIDTH
+        height -= self.pady*2
+        return x, y, width, height
+
+    def hover(self, mouse):
+        if hasattr(self, "sliding") and self.sliding:
+            
+            x, _, width, _ = self.get_rect(self.label) # get button rect
+            ratio = (self.max - self.min) / (width - Menu.SLIDER_WIDTH) # value per pixel
+            left_slider = mouse[0] - Menu.SLIDER_WIDTH*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
+            value = int((left_slider - x + self.padx) * ratio) + self.min # get relative mouse position from left of button * ratio
+            if value < self.min: value = self.min # clip value so that it is between min and max
+            elif value > self.max: value = self.max
+
+            setattr(game, self.value, value)
+
+        super().hover(mouse)
+
+    def click(self, mouse):
+        super().click(mouse)
+        x, y, width, height = self.get_slider()
+        if (mouse[0] > x and mouse[0] < x + width and
+            mouse[1] > y and mouse[1] < y + height):
+            self.sliding = True
+            self.slider_ratio = (mouse[0] - x) / width # The percentage (0 to 1) of the mouse position on the sliding segment
+
     def up(self):
-        setattr(game, self.value, self.get_value() + 1)
+        if type(self.get_value()) == bool:
+            setattr(game, self.value, not self.get_value())
+        else:
+            setattr(game, self.value, self.get_value() + 1 if self.get_value() < self.max else self.max)
         if self.function_action:
             self.function_action()
 
     def down(self):
-        setattr(game, self.value, self.get_value() - 1)
+        if type(self.get_value()) == bool:
+            setattr(game, self.value, not self.get_value())
+        else:
+            setattr(game, self.value, self.get_value() - 1 if self.get_value() > self.min else self.min)
         if self.function_action:
             self.function_action()
 
@@ -372,7 +424,18 @@ class SettingButton(Button):
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
         return x, y, width, height
 
-# FRAMEWORK
+    def draw(self):
+        super().draw()
+        # If this is an integer setting, then automatically make it a slider
+        if type(self.get_value()) == int:
+            x, y, width, height = self.get_slider()
+            surf = pygame.Surface((width, height), flags=pygame.SRCALPHA)
+            pygame.draw.rect(surf, Menu.SLIDER_COLOUR, (0, 0, width, height))
+            pygame.draw.rect(surf, Menu.SLIDER_OUTLINE, (0, 0, width, height), width=round(game.WIDTH/300))
+            game.WIN.blit(surf, (x, y))
+
+
+# FRAMEWORK                                                                                           
 ########################################################################################################################################################
 # PAGES
 
@@ -401,10 +464,11 @@ info = Page(
 )
 
 settings = Page(
-    SettingButton(0.25, 1/6, lambda: f"SCREEN WIDTH: {game.WIDTH}"       , font_size=40, value="WIDTH"     , function_action=lambda: make_windowed()),
-    SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"     , font_size=40, value="HEIGHT"    , function_action=lambda: make_windowed()),
-    SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"   , font_size=40, value="FULLSCREEN", function_action=lambda: change_fullscreen()),
-    SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"      , font_size=40, value="SIZE_LINK" , function_action=None),
+    SettingButton(0.25, 1/6, lambda: f"SCREEN WIDTH: {game.WIDTH}"    , font_size=40, value="WIDTH"     , function_action=lambda: make_windowed(), max=game.FULLSCREEN_SIZE[0]),
+    SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"  , font_size=40, value="HEIGHT"    , function_action=lambda: make_windowed(), max=game.FULLSCREEN_SIZE[1]),
+    SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}", font_size=40, value="FULLSCREEN", function_action=lambda: change_fullscreen()),
+    SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"   , font_size=40, value="SIZE_LINK" , function_action=None),
+    SettingButton(0.25, 3/6, lambda: f"HEALTH: {game.MAX_PLAYER_HEALTH}", font_size=40, value="MAX_PLAYER_HEALTH", function_action=None, max=100),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: settings_click(),
     escape=lambda: Menu.change_page(main_menu),
@@ -414,7 +478,7 @@ settings = Page(
 
 pause = Page(
     Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO1, scale=0.6),
-    Button(0.5, 0.345, "Main Menu"    , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 0.345, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True
 )

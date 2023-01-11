@@ -24,8 +24,6 @@ Fix bullets going through asteroids
 
 Fix first full_screen click not moving the mouse properly
 
-Add slider for menu buttons
-
 ---
 
 Make new npc ai ship class which the ai ships will inherit from (cleans up code)
@@ -174,3 +172,5 @@ Attack state: make fighting seem more natural
 Add button effect when hovered over
 
 Improve Menu performance
+
+Add slider for menu buttons
