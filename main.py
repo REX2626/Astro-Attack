@@ -2,11 +2,14 @@ import pygame
 
 from game import *
 import game
+from objects import Object
 from entities import Bullet, Asteroid
+from aiship import AI_Ship
 from player import add_player
 import menu
 import graphics
 import ui
+import images
 
 import math
 from time import perf_counter
@@ -52,7 +55,17 @@ def draw_window(delta_time):
     ui.canvas.health_bar.update(red_ship.health/game.MAX_PLAYER_HEALTH)
     ui.canvas.boost_bar.update(red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
     ui.canvas.speed_bar.update(red_ship.velocity.magnitude()/1000)
+
     ui.canvas.cursor_image.update(pygame.mouse.get_pos())
+
+    x, y = pygame.mouse.get_pos()
+    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + red_ship.position
+    for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
+        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
+            ui.canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
+        else:
+            ui.canvas.cursor_image.image = images.CURSOR
+    
     ui.canvas.draw()
 
 
