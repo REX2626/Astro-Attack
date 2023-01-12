@@ -28,6 +28,12 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
 
+Custom cursor
+
+Change custom cursor colour based on whether you are hovering over an enemy or not
+
+Enemy tracking for player
+
 ---
 
 ### POTENTIAL
