@@ -25,11 +25,11 @@ class Bar():
 
 
 class Image():
-    def __init__(self, position, width, height, image=images.Default) -> None:
+    def __init__(self, position, image=images.DEFAULT) -> None:
         self.position = position
         self.x, self.y = self.position
-        self.width = width
-        self.height = height
+        self.width = image.get_width()
+        self.height = image.get_height()
         self.image = image
 
     def update(self, new_position):
@@ -49,7 +49,7 @@ class Canvas():
         self.add("health_bar", Bar(Vector(100, game.HEIGHT-200), width=200, height=40, colour=(255, 0, 0)))
         self.add("boost_bar", Bar(Vector(100, game.HEIGHT-150), width=200, height=40, colour=(0, 0, 255)))
         self.add("speed_bar", Bar(Vector(100, game.HEIGHT-100), width=200, height=40, colour=(30, 190, 190)))
-        self.add("cursor_image", Image(pygame.mouse.get_pos(), width=16, height=16, image=images.CURSOR1))
+        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR1))
 
     def add(self, name, element):
         self.__setattr__(name, element)
