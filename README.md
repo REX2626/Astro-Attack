@@ -28,8 +28,6 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
 
-Custom cursor
-
 Change custom cursor colour based on whether you are hovering over an enemy or not
 
 Enemy tracking for player
@@ -180,3 +178,5 @@ Make new npc ai ship class which the ai ships will inherit from (cleans up code)
 Add slider for menu buttons
 
 Fix spawning in asteroid
+
+Custom cursor
