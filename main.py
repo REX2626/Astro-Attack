@@ -46,10 +46,13 @@ def draw_window(delta_time):
 
     #graphics.draw_chunks()
 
+    pygame.mouse.set_visible(False)
+
 
     ui.canvas.health_bar.update(red_ship.health/game.MAX_PLAYER_HEALTH)
     ui.canvas.boost_bar.update(red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
     ui.canvas.speed_bar.update(red_ship.velocity.magnitude()/1000)
+    ui.canvas.cursor_image.update(pygame.mouse.get_pos())
     ui.canvas.draw()
 
 

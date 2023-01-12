@@ -29,6 +29,7 @@ class Menu():
 
     def change_page(page: "Page"):
         """Draw the new page, and then wait for a mouse click"""
+        pygame.mouse.set_visible(True)
         Menu.current_page = page
         page.draw()
 
