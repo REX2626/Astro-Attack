@@ -19,7 +19,7 @@ class Menu():
     DEFAULT_OUTLINE_COLOUR = (20, 20, 20)
     DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
     DEFAULT_CLICK_OUTLINE_COLOUR = (180, 180, 180)
-    SLIDER_WIDTH = 25
+    SLIDER_WIDTH = 0.02 # percentage (0 to 1) of screen width
     SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
     SLIDER_OUTLINE = (30, 30, 30, 150)
     
@@ -66,8 +66,8 @@ class Menu():
 
             elif event.type == pygame.MOUSEMOTION:
                 mouse = pygame.mouse.get_pos()
-                if not Menu.mouse_hover(mouse): # if no buttons are hovered over, then refresh Menu, so that no buttons looked hovered
-                    Menu.update()
+                Menu.mouse_moved(mouse)
+                Menu.update() # buttons will be checked if they are hovered on or not
 
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
                 # runs Menu.escape_pressed, if that returns True, then follow suit and return True
@@ -94,12 +94,11 @@ class Menu():
                 if widget.click(mouse): # if the Button has been clicked, then stop checking the Buttons
                     break
 
-    def mouse_hover(mouse):
-        """Go through all Page Widgets, if the Widget is a button then check if mouse is hovering on it"""
+    def mouse_moved(mouse):
+        """Go through all Page Widgets, if the Widget is a SettingButton then check if slider should be moved"""
         for widget in Menu.current_page.widgets:
-            if isinstance(widget, Button):
-                if widget.hover(mouse):
-                    return True
+            if isinstance(widget, SettingButton):
+                widget.mouse_moved(mouse) # moves slider if need be
 
     def escape_pressed():
         if Menu.current_page.escape:
@@ -139,6 +138,7 @@ class Page():
         self.widgets: tuple[Widget] = widgets
 
     def draw(self):
+        """Draws all widgets onto the Menu, widget.draw checks if a button is hovered over"""
         
         if self.background_colour:
             game.WIN.fill(self.background_colour)
@@ -222,15 +222,6 @@ class Text(Widget):
         self.font_size = font_size
         self.colour = colour
 
-    def get_label(self):
-        """For buttons which currently only use the first line of text to create the button"""
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text[0]
-
-        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
-
     def get_labels(self):
         """Creates a list of label for every sentence of the text"""
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
@@ -267,20 +258,12 @@ class Button(Text):
         if not outline_colour: outline_colour = box_colour
         self.outline_colour = outline_colour
         self.hover_colour = hover_colour
-        self.label = self.get_label() # ONLY USE FOR PERFORMANCE, NOT UPDATED REGULALRLY, used to cache labels for drawing
+        self.label = self.get_label() # Called at the start of Page.draw, use self.label instead of self.get_label for performance
 
     def click(self, mouse):
         if self.touching_mouse(mouse):
             self.function()
             return True # Tells the Menu that this Button has been clicked on
-
-    def hover(self, mouse):
-        if self.touching_mouse(mouse):
-            self.current_box_colour = self.hover_colour
-            Menu.update()
-            return True
-        else:
-            self.current_box_colour = self.box_colour
 
     def touching_mouse(self, mouse):
         label = self.label
@@ -298,7 +281,16 @@ class Button(Text):
     def get_rect(self, label):
         width, height = self.get_width(label), self.get_height(label)
         x, y = self.get_position_x(self, label), self.get_position_y(self, label)
-        return x, y, width, height
+        return x, y, width, height#
+
+    def get_label(self):
+        """For buttons which currently only use the first line of text to create the button"""
+        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+            text = self.text()
+        else:
+            text = self.text[0]
+
+        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
 
     def draw(self):
         if self.touching_mouse(pygame.mouse.get_pos()):
@@ -310,7 +302,8 @@ class Button(Text):
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
         pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
-        super().draw()
+        position = self.get_position_x(self, label), self.get_position_y(self, label) # Adjust coordinates to be centre of Widget
+        game.WIN.blit(label, position)
 
 
 
@@ -352,21 +345,24 @@ class SettingButton(Button):
     def get_value(self):
         return getattr(game, self.value)
 
+    def get_slider_width(self):
+        return Menu.SLIDER_WIDTH * game.WIDTH
+
     def get_slider(self):
         label = self.label
         ratio = (self.get_value() - self.min) / (self.max - self.min) # percentage of max value
         x, y, width, height = self.get_rect(label)
-        x += ratio*(width-Menu.SLIDER_WIDTH) - self.padx
-        width = Menu.SLIDER_WIDTH
+        x += ratio*(width-self.get_slider_width()) - self.padx
+        width = self.get_slider_width()
         height -= self.pady*2
         return x, y, width, height
 
-    def hover(self, mouse):
+    def mouse_moved(self, mouse):
         if hasattr(self, "sliding") and self.sliding:
             
             x, _, width, _ = self.get_rect(self.label) # get button rect
-            ratio = (self.max - self.min) / (width - Menu.SLIDER_WIDTH) # value per pixel
-            left_slider = mouse[0] - Menu.SLIDER_WIDTH*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
+            ratio = (self.max - self.min) / (width - self.get_slider_width()) # value per pixel
+            left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
             value = int((left_slider - x + self.padx) * ratio) + self.min # get relative mouse position from left of button * ratio
             if value < self.min: value = self.min # clip value so that it is between min and max
             elif value > self.max: value = self.max
@@ -374,8 +370,6 @@ class SettingButton(Button):
             setattr(game, self.value, value)
             if self.function_action:
                 self.function_action()
-
-        super().hover(mouse)
 
     def click(self, mouse):
         super().click(mouse)
@@ -503,15 +497,14 @@ death_screen = Page(
 #################
 
 def settings_click():
-    """Un-select all settings buttons"""
+    """If there is a selected widget that shouldn't be, un-select it"""
     mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
-        if isinstance(widget, SettingButton):
+        if isinstance(widget, SettingButton) and widget.selected and not widget.touching_mouse(mouse): # if widget should be un-selected
             widget.selected = False
-            if widget.touching_mouse(mouse): # make sure the current hovered box remains hovered
-                widget.current_box_colour = widget.hover_colour
             widget.outline_colour = widget.original_outline_colour
-    Menu.update()
+            Menu.update()
+            break
 
 def settings_up():
     for widget in Menu.current_page.widgets:
