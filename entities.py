@@ -56,6 +56,15 @@ class Asteroid(Object):
 
                             particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
 
+                    elif isinstance(entity, Bullet):
+                        entity_mask = pygame.mask.from_surface(entity.image)
+
+                        x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
+                        y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
+
+                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
+                            entity.unload() # if bullet collides with asteroid then destroy bullet
+
 
 
 class Ship(Entity):

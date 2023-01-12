@@ -151,7 +151,10 @@ def update_objects(delta_time):
         object.update(delta_time)
 
     # Bullets are updated after everything else to ensure that the ships they may hit have been updated (and moved to the right position)
-    for object in filter(lambda object: type(object) == Bullet or type(object) == Asteroid, CHUNKS.entities.copy()):
+    for object in filter(lambda object: type(object) == Asteroid, CHUNKS.entities.copy()):
+        object.update(delta_time)
+
+    for object in filter(lambda object: type(object) == Bullet, CHUNKS.entities.copy()):
         object.update(delta_time)
 
 

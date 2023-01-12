@@ -18,8 +18,6 @@ Enemies drop ammo
 
 Check / improve graphics.get_entities_to_draw performance
 
-Fix bullets going through asteroids
-
 Fix first full_screen click not moving the mouse properly
 
 ---
@@ -180,3 +178,5 @@ Add slider for menu buttons
 Fix spawning in asteroid
 
 Custom cursor
+
+Fix bullets going through asteroids
