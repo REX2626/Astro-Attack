@@ -49,7 +49,7 @@ class Canvas():
         self.add("health_bar", Bar(Vector(100, game.HEIGHT-200), width=200, height=40, colour=(255, 0, 0)))
         self.add("boost_bar", Bar(Vector(100, game.HEIGHT-150), width=200, height=40, colour=(0, 0, 255)))
         self.add("speed_bar", Bar(Vector(100, game.HEIGHT-100), width=200, height=40, colour=(30, 190, 190)))
-        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR1))
+        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
 
     def add(self, name, element):
         self.__setattr__(name, element)
