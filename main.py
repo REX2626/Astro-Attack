@@ -70,23 +70,23 @@ def draw_window(delta_time):
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 4))
+        WIN.blit(label, (WIDTH - 300, 8))
 
     label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-    WIN.blit(label, (200, 4))
+    WIN.blit(label, (200, 8))
 
     font2 = pygame.font.SysFont("bahnschrift", 50)
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
     label = font.render(f"{round(red_ship.health)} | { game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-220))
+    WIN.blit(label, (108, game.HEIGHT-214))
 
     label = font.render(f"{round(red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-170))
+    WIN.blit(label, (108, game.HEIGHT-164))
 
     label = font.render(f"{round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-120))
+    WIN.blit(label, (108, game.HEIGHT-114))
 
 
     pygame.display.update()
