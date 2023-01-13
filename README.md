@@ -2,6 +2,8 @@
 
 
 ## TODO:
+FIX ENEMIES SPAWNING INSIDE ASTEROIDS NOW
+
 Give boost particles a velocity
 
 Change colour of enemy bullets
@@ -25,8 +27,6 @@ Fix first full_screen click not moving the mouse properly
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
-Change custom cursor colour based on whether you are hovering over an enemy or not
 
 Enemy tracking for player
 
@@ -180,3 +180,5 @@ Fix spawning in asteroid
 Custom cursor
 
 Fix bullets going through asteroids
+
+Change custom cursor colour based on whether you are hovering over an enemy or not
