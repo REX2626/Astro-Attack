@@ -34,8 +34,12 @@ class Player_Ship(Ship):
 
     def accelerate_relative(self, acceleration: Vector):
         acceleration.rotate(self.rotation)
-        extra_speed = max(0, self.velocity.magnitude() + acceleration.magnitude() - self.max_speed) # get the speed above max_speed
-        acceleration.set_magnitude(max(0, acceleration.magnitude() - extra_speed))
+
+        # the acceleration is clamped so that velocity will not increase over max_speed
+        # if velocity is already above max_speed, the new velocity will be of the same magnitude
+        acceleration = ((self.velocity + acceleration).get_clamp(max(self.velocity.magnitude(), self.max_speed))
+                        - self.velocity) # velocity + acceleration that is the same speed as current velocity
+
         self.velocity += acceleration
 
     def accelerate_rotation(self, acceleration):
