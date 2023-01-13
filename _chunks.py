@@ -106,7 +106,6 @@ class Chunk():
             return
         
         # Mother Ship
-        # 9% chance of spawning
         if random.random() < 0.09:
 
             self.entities.add(
@@ -115,7 +114,6 @@ class Chunk():
             )
 
         # Neutral Ship
-        # 10% chance of spawning
         elif random.random() < 0.1:
 
             self.entities.add(
@@ -124,8 +122,7 @@ class Chunk():
             )
 
         # Asteroid
-        # 5% chance of spawning
-        elif random.random() < 0.05:
+        elif random.random() < 0.08 and self.adjoining_empty_chunks():
 
             self.entities.add(
 
@@ -133,7 +130,6 @@ class Chunk():
             )
 
         # Health Pickup
-        # 10% chance of spawning
         elif random.random() < 0.1:
 
             self.entities.add(
@@ -153,6 +149,19 @@ class Chunk():
                         return True
 
         return False
+
+    def adjoining_empty_chunks(self):
+
+        for y in range(self.position.y-1, self.position.y+2):
+            for x in range(self.position.x-1, self.position.x+2):
+
+                if (x, y) not in game.CHUNKS.list:
+                    continue
+
+                if len(game.CHUNKS.get_chunk((x, y)).entities) > 0: # check if there are any entities in the chunk
+                    return False
+
+        return True
 
     def random_position(self):
         return Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),

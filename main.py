@@ -67,6 +67,7 @@ def draw_window(delta_time):
     
     ui.canvas.draw()
 
+    # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))

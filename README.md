@@ -2,8 +2,6 @@
 
 
 ## TODO:
-FIX ENEMIES SPAWNING INSIDE ASTEROIDS NOW
-
 Give boost particles a velocity
 
 Change colour of enemy bullets
@@ -184,3 +182,5 @@ Custom cursor
 Fix bullets going through asteroids
 
 Change custom cursor colour based on whether you are hovering over an enemy or not
+
+FIX ENEMIES SPAWNING INSIDE ASTEROIDS NOW
