@@ -230,6 +230,8 @@ class Object():
         self.size = Vector(image.get_width(), image.get_height())
 
         self.image = image
+        self.scale = 1
+        self.scaled_image = image
         
     def update(self, delta_time):
         pass
@@ -238,7 +240,12 @@ class Object():
         return (self.position - object.position).magnitude()
 
     def get_zoomed_image(self):
-        return pygame.transform.scale(self.image, (game.ZOOM * self.size).to_tuple())
+        if self.scale != game.ZOOM:
+            # if self.scaled_image isn't the right scale -> recalculate the scaled_image
+            self.scale = game.ZOOM
+            self.scaled_image = pygame.transform.scale_by(self.image, self.scale)
+
+        return self.scaled_image
 
     def draw(self, win: pygame.Surface, focus_point):
         image = self.get_zoomed_image()
@@ -275,14 +282,32 @@ class Entity(MoveableObject):
 
         # self.rotation is stored as radians
         self.rotation = rotation
-        self.original_image = self.image
+        self.image_rotation = 0
+        self.rotated_image = image
         self.set_rotation(rotation) 
 
     def set_rotation(self, rotation):
         self.rotation = rotation
 
+    def get_image(self):
+        if self.scale != game.ZOOM:
+            # if self.scaled_image isn't the right scale -> recalculate the scaled_image
+            self.scale = game.ZOOM
+            self.scaled_image = pygame.transform.scale_by(self.image, self.scale)
+
+            # if image has been rescaled, then it will also need to be rotated again
+            self.image_rotation = self.rotation
+            self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
+
+            return self.rotated_image
+        
+        if self.image_rotation != self.rotation:
+            self.image_rotation = self.rotation
+            self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
+
+        return self.rotated_image
+
     def draw(self, win: pygame.Surface, focus_point):
-        image = self.get_zoomed_image()
-        image = pygame.transform.rotate(image, self.rotation / math.pi * 180)
+        image = self.get_image()
         offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
         win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())

@@ -35,6 +35,7 @@ def update_playing_screen_size():
 
 
 font = pygame.font.SysFont("bahnschrift", 30)
+font2 = pygame.font.SysFont("bahnschrift", 50)
 def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
@@ -76,7 +77,6 @@ def draw_window(delta_time):
     label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
     WIN.blit(label, (200, 8))
 
-    font2 = pygame.font.SysFont("bahnschrift", 50)
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 

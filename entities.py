@@ -74,7 +74,6 @@ class Ship(Entity):
         # self.rotation is stored as radians
         self.rotation = rotation
         self.reload_time = 1 / fire_rate
-        self.original_image = self.image
         self.max_speed = max_speed
         self.health = health
         
@@ -112,7 +111,7 @@ class Ship(Entity):
         # Check if reloaded
         if self.time_reloading >= self.reload_time:
             
-            bullet_position = self.position + Vector(0, -self.original_image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
+            bullet_position = self.position + Vector(0, -self.image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
             bullet_position.rotate_about(self.rotation, self.position)
             bullet_velocity = Vector(0, -game.BULLET_SPEED)
             bullet_velocity.rotate(self.rotation)

@@ -122,7 +122,7 @@ class Chunk():
             )
 
         # Asteroid
-        elif random.random() < 0.08 and self.adjoining_empty_chunks():
+        elif random.random() < 0.1 and self.adjoining_empty_chunks():
 
             self.entities.add(
 
