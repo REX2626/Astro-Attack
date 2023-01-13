@@ -22,6 +22,8 @@ Check / improve graphics.get_entities_to_draw performance
 
 Fix first full_screen click not moving the mouse properly
 
+Improve player movement (left and right doesn't work when moving forward)
+
 ---
 
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)

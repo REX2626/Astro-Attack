@@ -2,7 +2,6 @@ import pygame
 
 from game import *
 import game
-from objects import Object
 from entities import Bullet, Asteroid
 from aiship import AI_Ship
 from player import add_player
@@ -35,7 +34,7 @@ def update_playing_screen_size():
     "Clip the coords of any object out of bounds"
 
 
-font = pygame.font.SysFont("comicsans", 30)
+font = pygame.font.SysFont("bahnschrift", 30)
 def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
@@ -71,23 +70,23 @@ def draw_window(delta_time):
 
     if delta_time:
         label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 0))
+        WIN.blit(label, (WIDTH - 300, 4))
 
     label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-    WIN.blit(label, (200, 0))
+    WIN.blit(label, (200, 4))
 
-    font2 = pygame.font.SysFont("comicsans", 50)
+    font2 = pygame.font.SysFont("bahnschrift", 50)
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
 
     label = font.render(f"{round(red_ship.health)} | { game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-224))
+    WIN.blit(label, (108, game.HEIGHT-220))
 
     label = font.render(f"{round(red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-174))
+    WIN.blit(label, (108, game.HEIGHT-170))
 
     label = font.render(f"{round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-124))
+    WIN.blit(label, (108, game.HEIGHT-120))
 
 
     pygame.display.update()
