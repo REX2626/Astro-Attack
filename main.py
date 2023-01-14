@@ -102,6 +102,7 @@ def handle_player_movement(keys_pressed, delta_time):
 
     CHUNKS.update(red_ship)
 
+
 def scroll(scroll_amount: int):
 
     if scroll_amount > 0:
