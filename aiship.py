@@ -33,25 +33,25 @@ class AI_Ship(Ship):
         self.shoot()
 
         # Movement
-        if self.distance_to(game.red_ship) < 100:
-            self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
-        elif self.distance_to(game.red_ship) > 400:
-            self.accelerate_in_direction(game.red_ship.position, 400 * delta_time)
+        if self.distance_to(game.player) < 100:
+            self.accelerate_in_direction(game.player.position, 400 * -delta_time)
+        elif self.distance_to(game.player) > 400:
+            self.accelerate_in_direction(game.player.position, 400 * delta_time)
         else:
             # Strafing
             self.strafe(delta_time)
 
     def predicted_player_position(self):
-        ship_pos = game.red_ship.position
-        ship_vel = game.red_ship.velocity
+        ship_pos = game.player.position
+        ship_vel = game.player.velocity
         current_vel = self.velocity
         bullet_speed = game.BULLET_SPEED
-        time_to_player = self.distance_to(game.red_ship) / bullet_speed
+        time_to_player = self.distance_to(game.player) / bullet_speed
         self.new_ship_pos = ((ship_vel - current_vel) * time_to_player) + ship_pos
         return self.new_ship_pos
 
     def strafe(self, delta_time):
-        direction_vector = game.red_ship.position - self.position
+        direction_vector = game.player.position - self.position
         rotated_vector = direction_vector.get_rotate(math.pi / 2)
         final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
 
@@ -65,8 +65,8 @@ class AI_Ship(Ship):
 
     def retreat_state(self, delta_time):
         self.max_speed = 500
-        self.set_rotation(self.position.get_angle_to(game.red_ship.position) + math.pi)
-        self.accelerate_in_direction(game.red_ship.position, 400 * -delta_time)
+        self.set_rotation(self.position.get_angle_to(game.player.position) + math.pi)
+        self.accelerate_in_direction(game.player.position, 400 * -delta_time)
 
 
 class Enemy_Ship(AI_Ship):
@@ -84,9 +84,9 @@ class Enemy_Ship(AI_Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        distance_to_player = self.distance_to(game.red_ship)
+        distance_to_player = self.distance_to(game.player)
 
-        if self.health == 1 and distance_to_player < 2000 and game.red_ship.health > 5 and len(self.mother_ship.enemy_list) <= 2:
+        if self.health == 1 and distance_to_player < 2000 and game.player.health > 5 and len(self.mother_ship.enemy_list) <= 2:
             self.retreat_state(delta_time)
         else:
             if distance_to_player < 600 or self.state == 1:
@@ -223,7 +223,7 @@ class Neutral_Ship(AI_Ship):
         elif self.state == 2:
             self.attack_enemy_state(delta_time)
 
-        if self.state == 1 and self.distance_to(game.red_ship) > 1000:
+        if self.state == 1 and self.distance_to(game.player) > 1000:
             self.state = 0
 
     # DEBUG DRAW PATROL POINTS

@@ -71,13 +71,13 @@ def draw(delta_time):
     pygame.mouse.set_visible(False)
 
 
-    canvas.health_bar.update(game.red_ship.health/game.MAX_PLAYER_HEALTH)
-    canvas.boost_bar.update(game.red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
-    canvas.speed_bar.update(game.red_ship.velocity.magnitude()/1000)
+    canvas.health_bar.update(game.player.health/game.MAX_PLAYER_HEALTH)
+    canvas.boost_bar.update(game.player.boost_amount/game.MAX_BOOST_AMOUNT)
+    canvas.speed_bar.update(game.player.velocity.magnitude()/1000)
 
     canvas.cursor_image.update(pygame.mouse.get_pos())
 
-    game.red_ship.cursor_highlighting()
+    game.player.cursor_highlighting()
     
     canvas.draw()
 
@@ -86,17 +86,17 @@ def draw(delta_time):
     label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH - 300, 8))
 
-    label = font.render(f"Angle: {round(game.red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+    label = font.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
     WIN.blit(label, (200, 8))
 
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (game.WIDTH/2 - label.get_width()/2, 100))
 
-    label = font.render(f"{round(game.red_ship.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
+    label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))
 
-    label = font.render(f"{round(game.red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
+    label = font.render(f"{round(game.player.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-164))
 
-    label = font.render(f"{round(game.red_ship.velocity.magnitude())}", True, (255, 255, 255))
+    label = font.render(f"{round(game.player.velocity.magnitude())}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-114))

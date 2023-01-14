@@ -92,7 +92,7 @@ class Player_Ship(Ship):
 
     def cursor_highlighting(self):
         x, y = pygame.mouse.get_pos()
-        cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + red_ship.position
+        cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + player.position
         ui.canvas.cursor_image.image = images.CURSOR
         self.cursor_highlighted = False
         for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
@@ -124,9 +124,9 @@ class Player_Ship(Ship):
 def add_player():
 
     # Red Player Ship
-    global red_ship
+    global player
     game.LAST_PLAYER_POS = Vector(0, 0)
-    red_ship = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
-    game.CHUNKS.add_entity(red_ship)
-    game.red_ship = red_ship
-    return red_ship
+    player = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
+    game.CHUNKS.add_entity(player)
+    game.player = player
+    return player

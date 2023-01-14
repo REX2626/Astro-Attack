@@ -18,7 +18,7 @@ FULLSCREEN_SIZE = WIDTH, HEIGHT
 WINDOW_SIZE = WIDTH * 0.8, HEIGHT * 0.8
 SIZE_LINK = True
 
-# CENTRE_POINT is the position of red_ship on screen
+# CENTRE_POINT is the position of player on screen
 CENTRE_POINT = Vector(WIDTH/2, HEIGHT/2)
 
 WHITE = (255, 255, 255)

@@ -106,10 +106,10 @@ class ParticleSystem():
             for _ in range(int(count)):
                 self.spawn()
 
-    def draw(self, WIN, red_ship_pos):
+    def draw(self, WIN, player_pos):
         
         for particle in self.particles:
-            particle.draw(WIN, red_ship_pos)
+            particle.draw(WIN, player_pos)
 
     def burst(self):
         for _ in range(int(1/self.period)):

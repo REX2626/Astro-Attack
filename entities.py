@@ -207,15 +207,15 @@ class HealthPickup(Object):
 
     def update(self, delta_time):
 
-        if game.red_ship.distance_to(self) < 23 + game.red_ship.size.x/2:
+        if game.player.distance_to(self) < 23 + game.player.size.x/2:
             
             self.activate()
 
     def activate(self):
         
-        game.red_ship.health += 5
+        game.player.health += 5
 
-        if game.red_ship.health > game.MAX_PLAYER_HEALTH:
-            game.red_ship.health = game.MAX_PLAYER_HEALTH
+        if game.player.health > game.MAX_PLAYER_HEALTH:
+            game.player.health = game.MAX_PLAYER_HEALTH
 
         game.CHUNKS.remove_entity(self)

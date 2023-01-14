@@ -17,7 +17,7 @@ def get_entities_to_draw():
     # Get number of chunks until going off the screen
     radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
 
-    centre: Vector = game.CHUNKS.get_chunk(game.red_ship).position
+    centre: Vector = game.CHUNKS.get_chunk(game.player).position
 
     entities: set[Object] = set()
 
@@ -38,7 +38,7 @@ def draw_chunks():
     loaded_chunks = set()
     for chunk in game.CHUNKS.list:
         c = game.CHUNKS.get_chunk(chunk)
-        pos = c.position * CHUNK_SIZE * game.ZOOM - game.red_ship.position * game.ZOOM + CENTRE_POINT
+        pos = c.position * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
         rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
         if len(c.entities.intersection(game.CHUNKS.entities)):
             loaded_chunks.add(c)
@@ -46,7 +46,7 @@ def draw_chunks():
             pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
     
     for c in loaded_chunks:
-        pos = c.position * CHUNK_SIZE * game.ZOOM - game.red_ship.position * game.ZOOM + CENTRE_POINT
+        pos = c.position * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
         rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
         pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
 
@@ -72,7 +72,7 @@ def draw_stars():
     # Layered Stars
     # Bigger stars move more
 
-    player_position_difference = game.red_ship.position - game.LAST_PLAYER_POS
+    player_position_difference = game.player.position - game.LAST_PLAYER_POS
 
     for layer in range(layers):
 
@@ -82,7 +82,7 @@ def draw_stars():
 
         radius = int((layer+2) / 2)
 
-        # Move each star opposite direction to red_ship
+        # Move each star opposite direction to player
         shiftx = player_position_difference.x * star_speed * (layer+1)
         shifty = player_position_difference.y * star_speed * (layer+1)
         for star in stars[layer]:

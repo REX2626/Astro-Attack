@@ -42,7 +42,7 @@ def draw_window(delta_time):
 
 
     for object in graphics.get_entities_to_draw():
-        object.draw(WIN, red_ship.position)
+        object.draw(WIN, player.position)
 
 
     #graphics.draw_chunks()
@@ -57,39 +57,39 @@ def handle_player_movement(keys_pressed, delta_time):
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
     if keys_pressed[pygame.K_w]:
-        red_ship.move_forward(delta_time)
+        player.move_forward(delta_time)
 
     if keys_pressed[pygame.K_s]:
-        red_ship.move_backward(delta_time)
+        player.move_backward(delta_time)
 
     if keys_pressed[pygame.K_a]:
-        red_ship.move_left(delta_time)
+        player.move_left(delta_time)
 
     if keys_pressed[pygame.K_d]:
-        red_ship.move_right(delta_time)
+        player.move_right(delta_time)
 
     if keys_pressed[pygame.K_LEFT]:
-        red_ship.turn_left(delta_time)
+        player.turn_left(delta_time)
 
     if keys_pressed[pygame.K_RIGHT]:
-        red_ship.turn_right(delta_time)
+        player.turn_right(delta_time)
     
     if keys_pressed[pygame.K_SPACE]:
-        red_ship.boost(delta_time)
+        player.boost(delta_time)
     else:
-        red_ship.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
+        player.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
 
-        # Increase red_ship.boost_amount
-        red_ship.boost_amount = min(red_ship.max_boost_amount,
-                                    red_ship.boost_amount + (red_ship.boost_change * delta_time) / 2)
+        # Increase player.boost_amount
+        player.boost_amount = min(player.max_boost_amount,
+                                    player.boost_amount + (player.boost_change * delta_time) / 2)
                                     # Caps the boost amount to a specific max value
 
     if pygame.mouse.get_pressed()[0]:
-        red_ship.shoot()
+        player.shoot()
 
-    if red_ship.cursor_highlighted == True and pygame.mouse.get_pressed()[2]:
-        red_ship.is_tracking_enemy = True
-        red_ship.current_enemy_tracking = red_ship.current_enemy_aiming
+    if player.cursor_highlighted == True and pygame.mouse.get_pressed()[2]:
+        player.is_tracking_enemy = True
+        player.current_enemy_tracking = player.current_enemy_aiming
 
     if keys_pressed[pygame.K_UP]:
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
@@ -101,11 +101,11 @@ def handle_player_movement(keys_pressed, delta_time):
     # Mouse
     mouse_position = pygame.mouse.get_pos()
     angle = math.atan2(-mouse_position[1]+CENTRE_POINT.y, mouse_position[0]-CENTRE_POINT.x) - math.pi/2
-    red_ship.set_rotation(angle)
-    game.LAST_PLAYER_POS = red_ship.position
+    player.set_rotation(angle)
+    game.LAST_PLAYER_POS = player.position
 
 
-    CHUNKS.update(red_ship)
+    CHUNKS.update(player)
 
 
 def scroll(scroll_amount: int):
@@ -143,8 +143,8 @@ def main():
     global CHUNKS
     CHUNKS = init_chunks()
 
-    global red_ship
-    red_ship = add_player()
+    global player
+    player = add_player()
 
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE
@@ -161,7 +161,7 @@ def main():
 
         draw_window(delta_time)
 
-        if red_ship.health <= 0:
+        if player.health <= 0:
             menu.Menu.death_screen()
 
         for event in pygame.event.get():
