@@ -449,19 +449,19 @@ main_menu = Page(
 )
 
 info = Page(
-    Text(0.5, 1/8  ,   "CREDITS"          , font_size=40),
-    Text(0.5, 2/8  , """Rex Attwood
+    Text(0.5, 0.125,   "CREDITS"          , font_size=40),
+    Text(0.5, 0.2  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
-    Text(0.5, 2.5/8,   "Fred"             , font_size=5),
-    Text(0.5, 3.4/8,   "CONTROLS"         , font_size=40),
-    Text(0.5, 4/8, """Change Settings: Up, Down, Drag
+    Text(0.5, 0.27 ,   "Fred"             , font_size=5),
+    Text(0.5, 0.35 ,   "CONTROLS"         , font_size=40),
+    Text(0.5, 0.43 , """Change Settings: Up, Down, Drag
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
                         Look: Mouse
                         Zoom: Scroll
                         Shoot: Left Click
-                        Target: Right Click"""     , font_size=20),
+                        Target: Right Click""", font_size=20),
     Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )

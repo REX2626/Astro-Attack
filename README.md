@@ -10,8 +10,6 @@ Improve particle system
 
 Make ships have a thruster animation
 
-Add targeting icon (space engineers)
-
 Add ammo system
 
 Enemies drop ammo
@@ -25,8 +23,6 @@ Fix first full_screen click not moving the mouse properly
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
-Enemy tracking for player
 
 ---
 
@@ -52,6 +48,8 @@ Have different items (e.g. different types of guns)
 Level up, the ability to upgrade weapons, armour, engine etc
 
 Have a massive asteroid or moon, with tunnels that you can go through
+
+Strict Rendering (only rendering objects which will defo be on screen)
 
 
 ## DONE:
@@ -186,3 +184,7 @@ FIX ENEMIES SPAWNING INSIDE ASTEROIDS NOW
 Improve player movement (left and right doesn't work when moving forward)
 
 Move UI code from main to ui.py
+
+Add targeting icon (space engineers)
+
+Enemy tracking for player
