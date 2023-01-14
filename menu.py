@@ -43,7 +43,6 @@ class Menu():
 
     def resize():
         """Re-draw the current_page but with the updated screen dimensions"""
-        game.WIDTH, game.HEIGHT = pygame.display.get_window_size()
         game.update_screen_size()
         Menu.update()
 

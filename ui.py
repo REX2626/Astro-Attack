@@ -8,8 +8,10 @@ import pygame
 
 
 class Bar():
-    def __init__(self, position, width, height, colour) -> None:
-        self.position = position
+    """x, y are functions"""
+    def __init__(self, x, y, width, height, colour) -> None:
+        self.x = x
+        self.y = y
         self.width = width
         self.height = height
         self.original_width = width
@@ -21,7 +23,7 @@ class Bar():
 
     def draw(self):
         pygame.draw.rect(game.WIN, self.colour,
-                        rect=(self.position.x, self.position.y - self.height*0.5, # bar position is middle left
+                        rect=(self.x(), self.y() - self.height*0.5, # bar position is middle left
                               self.width, self.height)
                         )
 
@@ -48,9 +50,9 @@ class Canvas():
     def __init__(self) -> None:
         self.elements = set()
 
-        self.add("health_bar", Bar(Vector(100, game.HEIGHT-200), width=200, height=40, colour=(255, 0, 0)))
-        self.add("boost_bar", Bar(Vector(100, game.HEIGHT-150), width=200, height=40, colour=(0, 0, 255)))
-        self.add("speed_bar", Bar(Vector(100, game.HEIGHT-100), width=200, height=40, colour=(30, 190, 190)))
+        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-200, width=200, height=40, colour=(255, 0, 0)))
+        self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-150, width=200, height=40, colour=(0, 0, 255)))
+        self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(30, 190, 190)))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
 
     def add(self, name, element):

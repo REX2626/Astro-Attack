@@ -66,5 +66,9 @@ def update_screen_size():
     """Updates objects size and position with new screen size"""
     "Adjust any constants"
 
+    global WIDTH, HEIGHT, CENTRE_POINT
+    WIDTH, HEIGHT = pygame.display.get_window_size()
+    CENTRE_POINT = Vector(WIDTH/2, HEIGHT/2)
+
     if SIZE_LINK:
         "Adjust objects size"

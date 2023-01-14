@@ -18,12 +18,9 @@ pygame.display.set_caption("Astro Attack")
 def update_playing_screen_size():
     """Updates live objects positions"""
 
-    global WIDTH, HEIGHT
-
     "Get objects position on screen by ratio e.g. 20% of the screen"
 
-    WIDTH, HEIGHT = pygame.display.get_window_size()
-    menu.Menu.resize()
+    game.update_screen_size()
 
     "Set the x and y of objects based on new width and height, with ratios"
 
@@ -90,12 +87,12 @@ def handle_player_input(keys_pressed, delta_time):
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
+        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
 
 
     # Mouse
     mouse_position = pygame.mouse.get_pos()
-    angle = math.atan2(-mouse_position[1]+CENTRE_POINT.y, mouse_position[0]-CENTRE_POINT.x) - math.pi/2
+    angle = math.atan2(-mouse_position[1]+game.CENTRE_POINT.y, mouse_position[0]-game.CENTRE_POINT.x) - math.pi/2
     player.set_rotation(angle)
     game.LAST_PLAYER_POS = player.position
 
@@ -109,7 +106,7 @@ def scroll(scroll_amount: int):
         game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, 20)
 
     else:
-        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE))
+        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE))
 
 
 def update_objects(delta_time):
