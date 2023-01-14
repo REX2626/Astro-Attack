@@ -88,7 +88,7 @@ class Player_Ship(Ship):
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
 
-    def track_enemy(self, enemy):
+    def track_enemy(self, enemy: Ship):
         enemy_pos = enemy.position
         enemy_vel = enemy.velocity
         time_to_enemy = self.distance_to(enemy) / game.BULLET_SPEED
@@ -102,8 +102,9 @@ class Player_Ship(Ship):
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
-        if self.is_tracking_enemy == True:
-            pygame.draw.circle(game.WIN, (255, 0, 0), ((self.aim_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.aim_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+
+        if self.is_tracking_enemy:
+            pygame.draw.circle(game.WIN, (255, 0, 0), ((self.aim_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.aim_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20*game.ZOOM, width=round(2*game.ZOOM))
      
 
 
