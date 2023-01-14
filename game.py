@@ -7,6 +7,9 @@ import pygame
 
 WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 
+import images
+pygame.display.set_icon(images.RED_SHIP)
+
 pygame.init()
 
 import sys

@@ -12,6 +12,7 @@ ASTEROID2 = pygame.image.load("assets/asteroid2.png").convert_alpha()
 ASTEROID3 = pygame.image.load("assets/asteroid3.png").convert_alpha()
 ASTEROIDS = [ASTEROID1, ASTEROID2, ASTEROID3]
 BULLET = pygame.image.load("assets/bullet.png").convert_alpha()
+RED_BULLET = pygame.image.load("assets/red_bullet.png").convert_alpha()
 RED_SHIP = pygame.image.load("assets/red_ship.png").convert_alpha()
 GREEN_SHIP = pygame.image.load("assets/green_ship.png").convert_alpha()
 MOTHER_SHIP = pygame.image.load("assets/mother_ship.png").convert_alpha()
