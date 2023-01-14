@@ -103,7 +103,7 @@ class Enemy_Ship(AI_Ship):
     # def draw(self, win: pygame.Surface, focus_point):
     #     super().draw(win, focus_point)
     #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-    #   pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    #     pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
 
     def destroy(self):
         super().destroy()

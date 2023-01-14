@@ -58,13 +58,7 @@ def draw_window(delta_time):
 
     ui.canvas.cursor_image.update(pygame.mouse.get_pos())
 
-    x, y = pygame.mouse.get_pos()
-    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + red_ship.position
-    ui.canvas.cursor_image.image = images.CURSOR
-    for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
-        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
-            ui.canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
-            break
+    red_ship.cursor_highlighting()
     
     ui.canvas.draw()
 
@@ -127,6 +121,10 @@ def handle_player_movement(keys_pressed, delta_time):
 
     if pygame.mouse.get_pressed()[0]:
         red_ship.shoot()
+
+    if red_ship.cursor_highlighted == True and pygame.mouse.get_pressed()[2]:
+        red_ship.is_tracking_enemy = True
+        red_ship.current_enemy_tracking = red_ship.current_enemy_aiming
 
     if keys_pressed[pygame.K_UP]:
         game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
