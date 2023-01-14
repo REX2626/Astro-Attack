@@ -78,7 +78,7 @@ def cursor_highlighting():
             if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
                 canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
                 game.player.cursor_highlighted = True
-                game.player.current_enemy_aiming = entity
+                game.player.aiming_enemy = entity
                 break
 
 

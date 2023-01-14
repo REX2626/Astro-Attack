@@ -82,6 +82,9 @@ class Ship(Entity):
 
     def update(self, delta_time):
 
+        # Move the ship by it's velocity
+        super().update(delta_time)
+
         # Inertial Dampening
         """
         -> velocity is added with the inverse velocity, making velocity 0
@@ -97,9 +100,6 @@ class Ship(Entity):
         -> 3 is the size of the dampening
         """
         self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
-
-        # Move the ship by it's velocity
-        super().update(delta_time)
 
         # Change rotation by rotation speed
         self.set_rotation(self.rotation + self.rotation_speed * delta_time)
