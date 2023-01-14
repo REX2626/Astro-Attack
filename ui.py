@@ -77,13 +77,7 @@ def draw(delta_time):
 
     canvas.cursor_image.update(pygame.mouse.get_pos())
 
-    x, y = pygame.mouse.get_pos()
-    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.red_ship.position
-    canvas.cursor_image.image = images.CURSOR
-    for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
-        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
-            canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
-            break
+    game.red_ship.cursor_highlighting()
     
     canvas.draw()
 

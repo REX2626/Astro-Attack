@@ -3,7 +3,6 @@ import pygame
 from game import *
 import game
 from entities import Bullet, Asteroid
-from player import add_player
 import menu
 import graphics
 
@@ -13,6 +12,8 @@ from time import perf_counter
 pygame.init()
 
 import ui # has to be done after pygame.init()
+
+from player import add_player
 
 pygame.display.set_caption("Astro Attack")
 
