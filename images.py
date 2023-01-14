@@ -5,18 +5,33 @@ All images have the same scale, i.e. they're pixels are all 1 game unit in size
 """
 
 import pygame
+import sys
+import os
 
-DEFAULT = pygame.image.load("assets/default_image.png").convert_alpha()
-ASTEROID1 = pygame.image.load("assets/asteroid1.png").convert_alpha()
-ASTEROID2 = pygame.image.load("assets/asteroid2.png").convert_alpha()
-ASTEROID3 = pygame.image.load("assets/asteroid3.png").convert_alpha()
+def resource_path(relative_path):
+    """Get absolute path to asset, used because the .exe stores assets in a different place"""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+def load_image(path):
+    return pygame.image.load(resource_path(path)).convert_alpha()
+
+DEFAULT = load_image("assets/default_image.png")
+ASTEROID1 = load_image("assets/asteroid1.png")
+ASTEROID2 = load_image("assets/asteroid2.png")
+ASTEROID3 = load_image("assets/asteroid3.png")
 ASTEROIDS = [ASTEROID1, ASTEROID2, ASTEROID3]
-BULLET = pygame.image.load("assets/bullet.png").convert_alpha()
-RED_BULLET = pygame.image.load("assets/red_bullet.png").convert_alpha()
-RED_SHIP = pygame.image.load("assets/red_ship.png").convert_alpha()
-GREEN_SHIP = pygame.image.load("assets/green_ship.png").convert_alpha()
-MOTHER_SHIP = pygame.image.load("assets/mother_ship.png").convert_alpha()
-HEALTH_PICKUP = pygame.image.load("assets/health_pickup.png").convert_alpha()
-ASTRO_ATTACK_LOGO = pygame.image.load("assets/AstroAttackLogo.png").convert_alpha()
-CURSOR = pygame.image.load("assets/cursor.png").convert_alpha()
-CURSOR_HIGHLIGHTED = pygame.image.load("assets/cursor_highlighted.png").convert_alpha()
+BULLET = load_image("assets/bullet.png")
+RED_BULLET = load_image("assets/red_bullet.png")
+RED_SHIP = load_image("assets/red_ship.png")
+GREEN_SHIP = load_image("assets/green_ship.png")
+MOTHER_SHIP = load_image("assets/mother_ship.png")
+HEALTH_PICKUP = load_image("assets/health_pickup.png")
+ASTRO_ATTACK_LOGO = load_image("assets/AstroAttackLogo.png")
+CURSOR = load_image("assets/cursor.png")
+CURSOR_HIGHLIGHTED = load_image("assets/cursor_highlighted.png")
