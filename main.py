@@ -3,17 +3,16 @@ import pygame
 from game import *
 import game
 from entities import Bullet, Asteroid
-from aiship import AI_Ship
 from player import add_player
 import menu
 import graphics
-import ui
-import images
 
 import math
 from time import perf_counter
 
 pygame.init()
+
+import ui # has to be done after pygame.init()
 
 pygame.display.set_caption("Astro Attack")
 
@@ -34,8 +33,6 @@ def update_playing_screen_size():
     "Clip the coords of any object out of bounds"
 
 
-font = pygame.font.SysFont("bahnschrift", 30)
-font2 = pygame.font.SysFont("bahnschrift", 50)
 def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
@@ -49,40 +46,7 @@ def draw_window(delta_time):
 
     #graphics.draw_chunks()
 
-    pygame.mouse.set_visible(False)
-
-
-    ui.canvas.health_bar.update(red_ship.health/game.MAX_PLAYER_HEALTH)
-    ui.canvas.boost_bar.update(red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
-    ui.canvas.speed_bar.update(red_ship.velocity.magnitude()/1000)
-
-    ui.canvas.cursor_image.update(pygame.mouse.get_pos())
-
-    red_ship.cursor_highlighting()
-    
-    ui.canvas.draw()
-
-    # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results
-
-    if delta_time:
-        label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
-        WIN.blit(label, (WIDTH - 300, 8))
-
-    label = font.render(f"Angle: {round(red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-    WIN.blit(label, (200, 8))
-
-    label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
-    WIN.blit(label, (WIDTH/2 - label.get_width()/2, 100))
-
-    label = font.render(f"{round(red_ship.health)} | { game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-214))
-
-    label = font.render(f"{round(red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-164))
-
-    label = font.render(f"{round(red_ship.velocity.magnitude())}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-114))
-
+    ui.draw(delta_time)
 
     pygame.display.update()
 
@@ -141,6 +105,7 @@ def handle_player_movement(keys_pressed, delta_time):
 
 
     CHUNKS.update(red_ship)
+
 
 def scroll(scroll_amount: int):
 

@@ -440,7 +440,7 @@ class SettingButton(Button):
 
 
 main_menu = Page(
-    Image(0.5, 3/16, images.ASTRO_ATTACK_LOGO1),
+    Image(0.5, 3/16, images.ASTRO_ATTACK_LOGO),
     Button(0.5, 3/8, "Single Player", font_size=40, function=lambda: main.main()),
     Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: main.main()),
     Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
@@ -477,7 +477,7 @@ settings = Page(
 )
 
 pause = Page(
-    Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO1, scale=0.6),
+    Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO, scale=0.6),
     Button(0.5, 0.345, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True

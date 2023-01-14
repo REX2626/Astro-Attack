@@ -184,3 +184,5 @@ Change custom cursor colour based on whether you are hovering over an enemy or n
 FIX ENEMIES SPAWNING INSIDE ASTEROIDS NOW
 
 Improve player movement (left and right doesn't work when moving forward)
+
+Move UI code from main to ui.py

@@ -1,6 +1,8 @@
 import game
 import images
 from objects import Vector
+from aiship import AI_Ship
+import math
 import pygame
 
 
@@ -60,3 +62,47 @@ class Canvas():
             element.draw()
 
 canvas = Canvas()
+
+
+WIN = game.WIN
+font = pygame.font.SysFont("bahnschrift", 30)
+font2 = pygame.font.SysFont("bahnschrift", 50)
+def draw(delta_time):
+    pygame.mouse.set_visible(False)
+
+
+    canvas.health_bar.update(game.red_ship.health/game.MAX_PLAYER_HEALTH)
+    canvas.boost_bar.update(game.red_ship.boost_amount/game.MAX_BOOST_AMOUNT)
+    canvas.speed_bar.update(game.red_ship.velocity.magnitude()/1000)
+
+    canvas.cursor_image.update(pygame.mouse.get_pos())
+
+    x, y = pygame.mouse.get_pos()
+    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.red_ship.position
+    canvas.cursor_image.image = images.CURSOR
+    for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
+        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
+            canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
+            break
+    
+    canvas.draw()
+
+    # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results
+
+    label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
+    WIN.blit(label, (game.WIDTH - 300, 8))
+
+    label = font.render(f"Angle: {round(game.red_ship.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+    WIN.blit(label, (200, 8))
+
+    label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
+    WIN.blit(label, (game.WIDTH/2 - label.get_width()/2, 100))
+
+    label = font.render(f"{round(game.red_ship.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-214))
+
+    label = font.render(f"{round(game.red_ship.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-164))
+
+    label = font.render(f"{round(game.red_ship.velocity.magnitude())}", True, (255, 255, 255))
+    WIN.blit(label, (108, game.HEIGHT-114))
