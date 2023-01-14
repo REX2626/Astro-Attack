@@ -1,7 +1,5 @@
 from objects import Vector
 from entities import Ship
-from aiship import AI_Ship
-import ui
 import images
 import particles
 import game
@@ -89,18 +87,6 @@ class Player_Ship(Ship):
 
     def turn_right(self, delta_time):
         self.accelerate_rotation(delta_time * -8)
-
-    def cursor_highlighting(self):
-        x, y = pygame.mouse.get_pos()
-        cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + player.position
-        ui.canvas.cursor_image.image = images.CURSOR
-        self.cursor_highlighted = False
-        for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
-            if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
-                ui.canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
-                self.cursor_highlighted = True
-                self.current_enemy_aiming = entity
-                break
 
     def track_enemy(self, enemy):
         enemy_pos = enemy.position

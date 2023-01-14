@@ -7,6 +7,8 @@ import pygame
 
 WIN = pygame.display.set_mode(flags=pygame.FULLSCREEN+pygame.RESIZABLE)
 
+pygame.init()
+
 import sys
 from objects import Vector
 import _chunks

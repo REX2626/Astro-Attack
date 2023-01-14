@@ -3,17 +3,13 @@ import pygame
 from game import *
 import game
 from entities import Bullet, Asteroid
+from player import add_player
+import ui
 import menu
 import graphics
 
 import math
 from time import perf_counter
-
-pygame.init()
-
-import ui # has to be done after pygame.init()
-
-from player import add_player
 
 pygame.display.set_caption("Astro Attack")
 
@@ -52,7 +48,7 @@ def draw_window(delta_time):
     pygame.display.update()
 
 
-def handle_player_movement(keys_pressed, delta_time):
+def handle_player_input(keys_pressed, delta_time):
 
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
     # Example:
@@ -84,10 +80,10 @@ def handle_player_movement(keys_pressed, delta_time):
                                     player.boost_amount + (player.boost_change * delta_time) / 2)
                                     # Caps the boost amount to a specific max value
 
-    if pygame.mouse.get_pressed()[0]:
+    if pygame.mouse.get_pressed()[0]: # left click
         player.shoot()
 
-    if player.cursor_highlighted == True and pygame.mouse.get_pressed()[2]:
+    if player.cursor_highlighted and pygame.mouse.get_pressed()[2]: # right click
         player.is_tracking_enemy = True
         player.current_enemy_tracking = player.current_enemy_aiming
 
@@ -156,7 +152,7 @@ def main():
 
         keys_pressed = pygame.key.get_pressed()
 
-        handle_player_movement(keys_pressed, delta_time)
+        handle_player_input(keys_pressed, delta_time)
         update_objects(delta_time)
 
         draw_window(delta_time)

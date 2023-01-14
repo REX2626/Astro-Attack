@@ -67,6 +67,21 @@ canvas = Canvas()
 WIN = game.WIN
 font = pygame.font.SysFont("bahnschrift", 30)
 font2 = pygame.font.SysFont("bahnschrift", 50)
+
+
+def cursor_highlighting():
+        x, y = pygame.mouse.get_pos()
+        cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
+        canvas.cursor_image.image = images.CURSOR
+        game.player.cursor_highlighted = False
+        for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
+            if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
+                canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
+                game.player.cursor_highlighted = True
+                game.player.current_enemy_aiming = entity
+                break
+
+
 def draw(delta_time):
     pygame.mouse.set_visible(False)
 
@@ -77,7 +92,7 @@ def draw(delta_time):
 
     canvas.cursor_image.update(pygame.mouse.get_pos())
 
-    game.player.cursor_highlighting()
+    cursor_highlighting()
     
     canvas.draw()
 
