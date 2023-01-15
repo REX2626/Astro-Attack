@@ -1,5 +1,8 @@
 # Astro-Attack
 
+# Compilation command:
+pyinstaller --noconfirm --onefile --windowed --name "Astro Attack a1.0.1" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
+
 
 ## TODO:
 Give boost particles a velocity
@@ -45,7 +48,19 @@ Add fuel system
 
 Have different items (e.g. different types of guns)
 
+One type of ammo
+But different weapons use up a different amount of ammo (e.g. 0.2 for machine gun or 3 for missile)
+
 Level up, the ability to upgrade weapons, armour, engine etc
+--
+One type of ship
+You can collect / buy items, which you can use to upgrade your ship (e.g. scrap)
+Example things you can upgrade: armour, weapon, engine, shield generator, radar etc...
+Example: For engine you could upgrade: boost, acceleration, top speed...
+You can also use money to buy consumables, repair ship and purchase small items that give you a buff or special ability
+There are different types of weapons, each of which you can upgrade
+Example weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
+--
 
 Have a massive asteroid or moon, with tunnels that you can go through
 
