@@ -49,6 +49,10 @@ ZOOM = 2
 
 BULLET_SPEED = 750
 
+PICKUP_DISTANCE = 200
+
+SCRAP_COUNT = 0
+
 
 def init_chunks():
     global CHUNKS

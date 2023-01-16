@@ -103,7 +103,7 @@ def draw(delta_time):
     label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH - 300, 8))
 
-    label = font.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+    label = font.render(f"SCRAP: {game.SCRAP_COUNT}", True, (255, 255, 255))
     WIN.blit(label, (200, 8))
 
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))

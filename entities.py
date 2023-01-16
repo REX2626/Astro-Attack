@@ -126,15 +126,10 @@ class Ship(Entity):
 
             game.CHUNKS.add_entity(bullet)
             self.time_reloading = 0
-    
+
     def accelerate(self, acceleration: Vector):
-        self.velocity += acceleration
+        super().accelerate(acceleration)
         self.velocity.clamp(self.max_speed)
-    
-    def accelerate_in_direction(self, target_position: Vector, magnitude: float):
-        acceleration = target_position - self.position
-        acceleration.set_magnitude(magnitude)
-        self.accelerate(acceleration)
 
     def make_new_patrol_point(self, min_dist, max_dist):
         self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + self.position
@@ -199,17 +194,37 @@ class Bullet(Entity):
     def unload(self):
         game.CHUNKS.remove_entity(self)
 
-
-
-class HealthPickup(Object):
-    def __init__(self, position, image=images.HEALTH_PICKUP) -> None:
-        super().__init__(position, image)
+class Pickup(Entity):
+    def __init__(self, position, velocity=Vector(0, 0), max_speed=200, rotation=0, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, rotation, image)
+        self.max_speed = max_speed
 
     def update(self, delta_time):
+        super().update(delta_time)
 
-        if game.player.distance_to(self) < 23 + game.player.size.x/2:
-            
+        # Dear rex, This is Inertial Dampening!
+        self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        if game.player.distance_to(self) < game.PICKUP_DISTANCE:
+            self.move_to_player(delta_time)
+
+        if game.player.distance_to(self) < 13 + game.player.size.x/2:
             self.activate()
+
+    def accelerate(self, acceleration: Vector):
+        super().accelerate(acceleration)
+        self.velocity.clamp(self.max_speed)
+
+    def move_to_player(self, delta_time):
+        self.accelerate_in_direction(game.player.position, 1500 * delta_time)
+
+    def activate(self):
+        # Have set function for each pickup
+        return
+
+class HealthPickup(Pickup):
+    def __init__(self, position, velocity=Vector(0, 0), max_speed=600, rotation=0, image=images.HEALTH_PICKUP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, image)
 
     def activate(self):
         
@@ -217,5 +232,14 @@ class HealthPickup(Object):
 
         if game.player.health > game.MAX_PLAYER_HEALTH:
             game.player.health = game.MAX_PLAYER_HEALTH
+
+        game.CHUNKS.remove_entity(self)
+
+class Scrap(Pickup):
+    def __init__(self, position, velocity=Vector(0, 0), max_speed=600, rotation=0, image=images.SCRAP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, image)
+
+    def activate(self):
+        game.SCRAP_COUNT += 1
 
         game.CHUNKS.remove_entity(self)

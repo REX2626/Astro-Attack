@@ -289,6 +289,14 @@ class Entity(MoveableObject):
     def set_rotation(self, rotation):
         self.rotation = rotation
 
+    def accelerate(self, acceleration: Vector):
+        self.velocity += acceleration
+
+    def accelerate_in_direction(self, target_position: Vector, magnitude: float):
+        acceleration = target_position - self.position
+        acceleration.set_magnitude(magnitude)
+        self.accelerate(acceleration)
+
     def get_image(self):
         if self.scale != game.ZOOM:
             # if self.scaled_image isn't the right scale -> recalculate the scaled_image

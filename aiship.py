@@ -135,6 +135,9 @@ class Enemy_Ship(AI_Ship):
         elif type(self) == Mother_Ship:
             game.SCORE += 3
 
+        scrap = entities.Scrap(self.position, rotation=random.random() * math.pi * 2)
+        game.CHUNKS.add_entity(scrap)
+
     def patrol_state(self, delta_time):
         self.max_speed = 150
         
