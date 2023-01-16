@@ -82,6 +82,11 @@ class Menu():
                 elif event.__dict__["key"] == pygame.K_DOWN:
                     Menu.down_pressed()
 
+                elif event.__dict__["key"] == pygame.K_e:
+                    # if e_pressed return True, then go back to the game
+                    if Menu.e_pressed():
+                        return True
+
                 Menu.update()
 
     def mouse_click(mouse):
@@ -104,6 +109,11 @@ class Menu():
         if Menu.current_page.escape:
             if Menu.current_page.escape(): return True # return True allows for a propagation which relieves Menu's control
 
+    def e_pressed():
+        if Menu.current_page.e_press:
+            if Menu.current_page.e_press():
+                return True # return to playing
+
     def up_pressed():
         if Menu.current_page.up:
             Menu.current_page.up()
@@ -114,6 +124,9 @@ class Menu():
 
     def pause():
         Menu.change_page(pause)
+
+    def systems():
+        Menu.change_page(systems)
 
     def death_screen():
         Menu.change_page(death_screen)
@@ -128,10 +141,11 @@ class Page():
        up is a function that is called when the up key is pressed
        down is a function that is called when the down key is pressed
     """
-    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, up=None, down=None) -> None:
+    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, e_press=None, up=None, down=None) -> None:
         self.background_colour = background_colour
         self.click = click
         self.escape = escape
+        self.e_press = e_press
         self.up = up
         self.down = down
 
@@ -169,6 +183,51 @@ class Widget():
         # pos is - width/2 to centre the object, objects are drawn from the top left coord
         # NOTE: get_position_x and get_position_y return the top left part of the Widget
         if type(self.x) == float:
+            self.get_position_x = lambda self: self.x * game.WIDTH
+
+        elif type(self.x) == int:
+            if self.x < 0:
+                self.get_position_x = lambda self: game.WIDTH + self.x
+            else:
+                self.get_position_x = lambda self: self.x
+        
+        if type(self.y) == float:
+            self.get_position_y = lambda self: self.y * game.HEIGHT
+
+        if type(self.y) == int:
+            if self.y < 0:
+                self.get_position_y = lambda self: game.HEIGHT + self.y
+            else:
+                self.get_position_y = lambda self: self.y
+
+
+
+class Image(Widget):
+    """A Widget that has an image
+       scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
+    """
+    def __init__(self, x, y, image=images.DEFAULT, scale=1) -> None:
+        super().__init__(x, y)
+        self.image = pygame.transform.scale_by(image, scale)
+
+    def draw(self):
+        ratio = game.WIDTH * self.image.get_width() / 1_000_000 # Ratio of image width to game width
+        image = pygame.transform.scale_by(self.image, ratio)
+        game.WIN.blit(image, (self.get_position_x(self) - image.get_width()/2, self.get_position_y(self) - image.get_height()/2))
+
+
+
+class Text(Widget):
+    """Text can be single of multi-line
+       x, y is the centre of the first line of the Text
+       font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
+       text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
+       if text is a function it has to return a string (can be single or multi-line)
+    """
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
+        super().__init__(x, y)
+
+        if type(self.x) == float:
             self.get_position_x = lambda self, label: self.x * game.WIDTH - label.get_width()/2
 
         elif type(self.x) == int:
@@ -185,33 +244,6 @@ class Widget():
                 self.get_position_y = lambda self, label: game.HEIGHT + self.y - label.get_height()/2
             else:
                 self.get_position_y = lambda self, label: self.y - label.get_height()/2
-
-
-
-class Image(Widget):
-    """A Widget that has an image
-       scale is the scale of the image, e.g. scale=1 wouldn't change image size, scale=2 would double the size
-    """
-    def __init__(self, x, y, image=images.DEFAULT, scale=1) -> None:
-        super().__init__(x, y)
-        self.image = pygame.transform.scale_by(image, scale)
-
-    def draw(self):
-        ratio = game.WIDTH * self.image.get_width() / 1_000_000 # Ratio of image width to game width
-        image = pygame.transform.scale_by(self.image, ratio)
-        game.WIN.blit(image, (self.x * game.WIDTH - image.get_width()/2, self.y * game.HEIGHT - image.get_height()/2))
-
-
-
-class Text(Widget):
-    """Text can be single of multi-line
-       x, y is the centre of the first line of the Text
-       font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
-       text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
-       if text is a function it has to return a string (can be single or multi-line)
-    """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
-        super().__init__(x, y)
 
         if isinstance(text, str):
             self.text = [sentence.lstrip() for sentence in text.split("\n")]
@@ -431,6 +463,20 @@ class SettingButton(Button):
             game.WIN.blit(surf, (x, y))
 
 
+
+class Rectangle(Widget):
+    """A rectangular object of given width, height and colour"""
+    def __init__(self, x, y, width, height, colour) -> None:
+        super().__init__(x, y)
+        self.width = width
+        self.height = height
+        self.colour = colour
+
+    def draw(self):
+        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.width, self.height))
+
+
+
 # FRAMEWORK                                                                                           
 ########################################################################################################################################################
 # PAGES
@@ -485,7 +531,15 @@ pause = Page(
     Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO, scale=0.6),
     Button(0.5, 0.345, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
-    escape=lambda: True
+    escape=lambda: True,
+)
+
+systems = Page(
+    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
+    Text(0.5, 0.12, "Systems"),
+    background_colour=None,
+    escape=lambda: True,
+    e_press=lambda: True
 )
 
 death_screen = Page(

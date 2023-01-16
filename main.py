@@ -166,7 +166,13 @@ def main():
             elif event.type == pygame.VIDEORESIZE:
                 update_playing_screen_size()
 
+            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_e:
+                menu.Menu.systems()
+
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
+
+                # Fix delta_time so that time paused is not included
+                start = perf_counter()
                 
                 # Darken the background when paused
                 surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
@@ -174,6 +180,9 @@ def main():
                 game.WIN.blit(surf, (0, 0))
 
                 menu.Menu.pause()
+
+                # Correct time1
+                time1 = perf_counter() - start + time1
                 
         time2 = perf_counter()
         delta_time = time2 - time1

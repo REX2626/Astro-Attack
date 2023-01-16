@@ -1,7 +1,7 @@
 # Astro-Attack
 
-# Compilation command:
-pyinstaller --noconfirm --onefile --windowed --name "Astro Attack a1.0.1" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
+### Package command:
+pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/red_ship.ico" --name "Astro Attack a1.0.2" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
 
 
 ## TODO:
