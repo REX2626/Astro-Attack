@@ -653,10 +653,12 @@ pause = Page(
 systems = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Systems"),
-    Button(0.25, 0.4, "Armour", function=lambda: Menu.change_page(armour)),
-    Button(0.75, 0.4, "Weapon", function=lambda: Menu.change_page(weapon)),
-    Button(0.25, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
-    Button(0.75, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
+    Button(0.3, 0.4, "Armour", function=lambda: Menu.change_page(armour)),
+    Button(0.7, 0.4, "Weapon", function=lambda: Menu.change_page(weapon)),
+    Button(0.3, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
+    Button(0.7, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
+    Image(0.3, 0.6, images.ENGINE_ICON, scale=6),
+    Image(0.7, 0.6, images.RADAR_ICON, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
