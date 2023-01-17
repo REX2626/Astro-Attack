@@ -8,6 +8,8 @@ import main
 
 class Menu():
     """Menu controls the current page and checks for mouse clicks"""
+
+    running = False
     
     DEFAULT_BACKGROUND_COLOUR = game.DARK_GREY
     DEFAULT_BOX_COLOUR = game.MEDIUM_GREY
@@ -33,9 +35,14 @@ class Menu():
         Menu.current_page = page
         page.draw()
 
-        while True:
+        if not Menu.running:
+            Menu.running = True
+            Menu.run()
+
+    def run():
+        while Menu.running:
             if Menu.check_for_inputs(): # if check_for_inputs() returns True, then break out of Menu control
-                break
+                Menu.running = False
 
     def update():
         """Re-draw the current_page"""
@@ -537,8 +544,44 @@ pause = Page(
 systems = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
     Text(0.5, 0.12, "Systems"),
+    Button(0.25, 0.4, "Armour", function=lambda: Menu.change_page(armour)),
+    Button(0.75, 0.4, "Weapon", function=lambda: Menu.change_page(weapon)),
+    Button(0.25, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
+    Button(0.75, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
     background_colour=None,
     escape=lambda: True,
+    e_press=lambda: True
+)
+
+armour = Page(
+    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
+    Text(0.5, 0.12, "Armour"),
+    background_colour=None,
+    escape=lambda: Menu.change_page(systems),
+    e_press=lambda: True
+)
+
+weapon = Page(
+    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
+    Text(0.5, 0.12, "Weapon"),
+    background_colour=None,
+    escape=lambda: Menu.change_page(systems),
+    e_press=lambda: True
+)
+
+engine = Page(
+    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
+    Text(0.5, 0.12, "Engine"),
+    background_colour=None,
+    escape=lambda: Menu.change_page(systems),
+    e_press=lambda: True
+)
+
+radar = Page(
+    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, (50, 50, 50)),
+    Text(0.5, 0.12, "Radar"),
+    background_colour=None,
+    escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
 )
 

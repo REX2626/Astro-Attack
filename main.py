@@ -143,6 +143,8 @@ def main():
     game.SCORE = 0
     game.SCRAP_COUNT = 0
 
+    menu.Menu.running = False
+
     running = True
     while running:
         time1 = perf_counter()
@@ -168,7 +170,12 @@ def main():
                 update_playing_screen_size()
 
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_e:
+
+                start = perf_counter()
+
                 menu.Menu.systems()
+
+                time1 = perf_counter() - start + time1
 
             elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
 
