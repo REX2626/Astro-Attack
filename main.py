@@ -141,6 +141,7 @@ def main():
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE
     game.SCORE = 0
+    game.SCRAP_COUNT = 0
 
     running = True
     while running:
