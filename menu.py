@@ -542,6 +542,7 @@ class UpgradeBar(Widget):
         self.max_value = max_value
         self.step = int((max_value - min_value) / bars)
         self.level = 0
+        self.padlock = images.PADLOCK
 
     def get_value(self):
         return getattr(game, self.value)
@@ -592,6 +593,8 @@ class UpgradeBar(Widget):
 
     def draw(self):
 
+        padlock = pygame.transform.scale_by(self.padlock, game.WIDTH/1000)
+
         width = game.WIDTH * self.bar_width
         height = game.HEIGHT * self.height
         button_width = game.WIDTH * self.button_width
@@ -629,6 +632,13 @@ class UpgradeBar(Widget):
 
             else: # fill in with background colour
                 Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
+
+                if bar == self.level: # the first locked bar shows a price instead of a padlock
+                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/100)).render(str(bar+1), True, Menu.DEFAULT_COLOUR)
+                    game.WIN.blit(number, (x + width/2 - number.get_width()/2, self.get_position_y(self) + height/2 - number.get_height()/2))
+
+                else: # all of the locked bars show padlocks
+                    game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.get_position_y(self) + height/2 - padlock.get_height()/2))
 
 
 
