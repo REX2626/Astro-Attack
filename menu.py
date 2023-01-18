@@ -580,7 +580,8 @@ class UpgradeBar(Widget):
                     Menu.update()
 
                 # if bar is the next level, upgrade to that level
-                elif bar == self.level:
+                elif bar == self.level and game.SCRAP_COUNT >= bar+1:
+                    game.SCRAP_COUNT -= bar+1
                     self.level += 1
                     self.set_value(self.min_value + self.level * self.step)
                     Menu.update()
@@ -593,7 +594,8 @@ class UpgradeBar(Widget):
 
     def draw(self):
 
-        padlock = pygame.transform.scale_by(self.padlock, game.WIDTH/1000)
+        padlock = pygame.transform.scale_by(self.padlock, game.WIDTH/1200)
+        scrap = pygame.transform.scale_by(images.SCRAP, game.WIDTH/1500)
 
         width = game.WIDTH * self.bar_width
         height = game.HEIGHT * self.height
@@ -634,8 +636,11 @@ class UpgradeBar(Widget):
                 Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
 
                 if bar == self.level: # the first locked bar shows a price instead of a padlock
-                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/100)).render(str(bar+1), True, Menu.DEFAULT_COLOUR)
-                    game.WIN.blit(number, (x + width/2 - number.get_width()/2, self.get_position_y(self) + height/2 - number.get_height()/2))
+                    if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
+                    else: colour = (255, 0, 0)
+                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(bar+1), True, colour)
+                    game.WIN.blit(number, (x + width*0.3 - number.get_width()/2, self.get_position_y(self) + height/2 - number.get_height()/2))
+                    game.WIN.blit(scrap , (x + width*0.7 - scrap.get_width()/2 , self.get_position_y(self) + height/2 - scrap.get_height()/2))
 
                 else: # all of the locked bars show padlocks
                     game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.get_position_y(self) + height/2 - padlock.get_height()/2))
