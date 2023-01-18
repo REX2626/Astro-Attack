@@ -70,10 +70,10 @@ def handle_player_input(keys_pressed, delta_time):
     if keys_pressed[pygame.K_SPACE]:
         player.boost(delta_time)
     else:
-        player.max_speed = 500 # Reset max speed so that the high velocity is not maintained after a boost
+        player.max_speed = game.MAX_PLAYER_SPEED # Reset max speed so that the high velocity is not maintained after a boost
 
         # Increase player.boost_amount
-        player.boost_amount = min(player.max_boost_amount,
+        player.boost_amount = min(game.MAX_BOOST_AMOUNT,
                                     player.boost_amount + (player.boost_change * delta_time) / 2)
                                     # Caps the boost amount to a specific max value
 

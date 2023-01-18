@@ -12,7 +12,7 @@ class Player_Ship(Ship):
 
         self,
         position: Vector, velocity: Vector,
-        max_speed=500,
+        max_speed=game.MAX_PLAYER_SPEED,
         rotation=0, max_rotation_speed=3,
         fire_rate=10, health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
         boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
@@ -23,7 +23,6 @@ class Player_Ship(Ship):
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), image)
 
         self.max_rotation_speed = max_rotation_speed
-        self.max_boost_amount = boost_amount()
         self.boost_amount = boost_amount()
         self.boost_change = boost_change
         self.aiming_enemy = None
@@ -58,16 +57,16 @@ class Player_Ship(Ship):
         self.rotation_speed.clamp(self.max_rotation_speed)
 
     def move_forward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, -700))
+        self.accelerate_relative(delta_time * Vector(0, -game.PLAYER_ACCELERATION))
 
     def move_backward(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(0, 500))
+        self.accelerate_relative(delta_time * Vector(0, 0.8*game.PLAYER_ACCELERATION))
 
     def move_left(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(-300, 0))
+        self.accelerate_relative(delta_time * Vector(-0.5*game.PLAYER_ACCELERATION, 0))
 
     def move_right(self, delta_time):
-        self.accelerate_relative(delta_time * Vector(300, 0))
+        self.accelerate_relative(delta_time * Vector(0.5*game.PLAYER_ACCELERATION, 0))
 
     def boost(self, delta_time):
         if self.boost_amount > 0: # Makes sure that you have boost to boost
@@ -80,7 +79,7 @@ class Player_Ship(Ship):
 
             particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(20, 100, 255), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
         else:
-            self.max_speed = 500 # Resets max speed once you run out of boost
+            self.max_speed = game.MAX_PLAYER_SPEED # Resets max speed once you run out of boost
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)
