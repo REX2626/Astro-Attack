@@ -523,7 +523,7 @@ class UpgradeBar(Widget):
        value is the variable that the bar is upgrading, it is a string and has to be a variable of game (e.g. game.WIDTH, value="WIDTH")
        bar_width and bar_height are floats, which is the percentage (0 to 1) of the screen width and height
        bars is the number of bars"""
-    def __init__(self, x, y, text, value, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), selected_colour=(255, 255, 0), button_width=0.1, bar_width=0.05, height=0.05, gap=5, bars=10, min_value=20, max_value=60) -> None:
+    def __init__(self, x, y, text, value, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), select_colour=(230, 110, 0), select_outline_colour=(25, 235, 20), button_width=0.1, bar_width=0.05, height=0.05, gap=5, bars=10, min_value=20, max_value=60) -> None:
         super().__init__(x, y)
         self.text = text
         self.value = value
@@ -531,7 +531,8 @@ class UpgradeBar(Widget):
         self.button_colour = button_colour
         self.bar_colour = bar_colour
         self.outline_colour = outline_colour
-        self.selected_colour = selected_colour
+        self.select_colour = select_colour
+        self.select_outline_colour = select_outline_colour
         self.button_width = button_width
         self.bar_width = bar_width
         self.height = height
@@ -550,6 +551,15 @@ class UpgradeBar(Widget):
 
     def click(self, mouse):
         mx, my = mouse[0], mouse[1]
+
+        # check if text bar is clicked on
+        x = self.get_position_x(self)
+        y = self.get_position_y(self)
+        width = game.WIDTH * self.button_width
+        height = game.HEIGHT * self.height
+        if mx > x and mx < x + width and my > y and my < y + height:
+            self.set_value(self.min_value)
+            Menu.update()
 
         # go through every bar to see if it is clicked on
         for bar in range(self.bars):
@@ -586,8 +596,12 @@ class UpgradeBar(Widget):
         height = game.HEIGHT * self.height
         button_width = game.WIDTH * self.button_width
 
-        # draw button
-        Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.outline_colour, curve=10).draw()
+        # draw text bar
+        if self.get_value() == self.min_value: # if level 0, text bar has a select outline
+            Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.select_outline_colour, curve=10).draw()
+        else:
+            Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.outline_colour, curve=10).draw()
+
         Rectangle(int(self.get_position_x(self)+2), int(self.get_position_y(self)+2), button_width-4, height-4, self.button_colour, curve=10).draw()
         label = self.get_label()
         game.WIN.blit(label, (self.get_position_x(self) + button_width/2 - label.get_width()/2, self.get_position_y(self) + height/2 - label.get_height()/2))
@@ -598,17 +612,17 @@ class UpgradeBar(Widget):
 
             x = self.get_position_x(self) + bar * (width + self.gap) + button_width + self.gap
 
-            # draw bar outline, different colour if current level
-            if (bar+1) * self.step + self.min_value == self.get_value():
-                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.selected_colour, curve=10).draw()
+            # draw bar outline
+            if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different outline colour
+                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.select_outline_colour, curve=10).draw()
             else:
                 Rectangle(int(x), int(self.get_position_y(self)), width, height, self.outline_colour, curve=10).draw()
 
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
             if bar+1 <= self.level:
 
-                if (bar+1) * self.step + self.min_value == self.get_value(): # if selected choose a darker orange
-                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, (255, 100, 0), curve=10).draw()
+                if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
+                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.select_colour, curve=10).draw()
 
                 else: # fill in with regular colour
                     Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.bar_colour, curve=10).draw()
