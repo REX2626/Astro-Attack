@@ -523,7 +523,7 @@ class UpgradeBar(Widget):
        value is the variable that the bar is upgrading, it is a string and has to be a variable of game (e.g. game.WIDTH, value="WIDTH")
        bar_width and bar_height are floats, which is the percentage (0 to 1) of the screen width and height
        bars is the number of bars"""
-    def __init__(self, x, y, text, value, font_size=Menu.DEFAULT_FONT_SIZE, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), button_width=0.07, bar_width=0.05, height=0.05, gap=5, bars=10, min_value=20, max_value=60) -> None:
+    def __init__(self, x, y, text, value, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), selected_colour=(255, 255, 0), button_width=0.1, bar_width=0.05, height=0.05, gap=5, bars=10, min_value=20, max_value=60) -> None:
         super().__init__(x, y)
         self.text = text
         self.value = value
@@ -531,6 +531,7 @@ class UpgradeBar(Widget):
         self.button_colour = button_colour
         self.bar_colour = bar_colour
         self.outline_colour = outline_colour
+        self.selected_colour = selected_colour
         self.button_width = button_width
         self.bar_width = bar_width
         self.height = height
@@ -539,19 +540,41 @@ class UpgradeBar(Widget):
         self.min_value = min_value
         self.max_value = max_value
         self.step = int((max_value - min_value) / bars)
+        self.level = 0
+
+    def get_value(self):
+        return getattr(game, self.value)
+
+    def set_value(self, value):
+        setattr(game, self.value, value)
 
     def click(self, mouse):
         mx, my = mouse[0], mouse[1]
-        x = self.get_position_x(self)
-        y = self.get_position_y(self)
-        width = game.WIDTH * self.button_width
-        height = game.HEIGHT * self.height
-        if mx > x and mx < x + width and my > y and my < y + height:
-            self.upgrade()
 
-    def upgrade(self):
-        setattr(game, self.value, min(getattr(game, self.value) + self.step, self.max_value))
-        Menu.update()
+        # go through every bar to see if it is clicked on
+        for bar in range(self.bars):
+
+            width = game.WIDTH * self.bar_width
+            height = game.HEIGHT * self.height
+            button_width = game.WIDTH * self.button_width
+            x = self.get_position_x(self) + bar * (width + self.gap) + button_width + self.gap
+            y = self.get_position_y(self)
+
+            # if clicked on
+            if mx > x and mx < x + width and my > y and my < y + height:
+                
+                # if bar is less than level then switch to that level
+                if bar < self.level:
+                    self.set_value(self.min_value + (bar+1) * self.step)
+                    Menu.update()
+
+                # if bar is the next level, upgrade to that level
+                elif bar == self.level:
+                    self.level += 1
+                    self.set_value(self.min_value + self.level * self.step)
+                    Menu.update()
+
+                break
 
     def get_label(self):
         """Gets a text label"""
@@ -564,7 +587,6 @@ class UpgradeBar(Widget):
         button_width = game.WIDTH * self.button_width
 
         # draw button
-        #pygame.draw.rect(game.WIN, self.outline_colour, (self.get_position_x(self), self.get_position_y(self), button_width, height), width=2)
         Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.outline_colour, curve=10).draw()
         Rectangle(int(self.get_position_x(self)+2), int(self.get_position_y(self)+2), button_width-4, height-4, self.button_colour, curve=10).draw()
         label = self.get_label()
@@ -576,24 +598,28 @@ class UpgradeBar(Widget):
 
             x = self.get_position_x(self) + bar * (width + self.gap) + button_width + self.gap
 
-            # draw bar outlines
-            Rectangle(int(x), int(self.get_position_y(self)), width, height, self.outline_colour, curve=10).draw()
-            #pygame.draw.rect(game.WIN, self.outline_colour, (x, self.get_position_y(self), width, height), width=2)
-
-            # fill in bar if neseccary
-            value = getattr(game, self.value) - self.min_value
-
-            if value > bar * self.step:
-                Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.bar_colour, curve=10).draw()
-                #pygame.draw.rect(game.WIN, self.bar_colour, (x+2, self.get_position_y(self)+2, width-4, height-4))
-
+            # draw bar outline, different colour if current level
+            if (bar+1) * self.step + self.min_value == self.get_value():
+                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.selected_colour, curve=10).draw()
             else:
+                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.outline_colour, curve=10).draw()
+
+            # fill in bar if neseccary, bar+1 so that the first bar is level 1
+            if bar+1 <= self.level:
+
+                if (bar+1) * self.step + self.min_value == self.get_value(): # if selected choose a darker orange
+                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, (255, 100, 0), curve=10).draw()
+
+                else: # fill in with regular colour
+                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.bar_colour, curve=10).draw()
+
+            else: # fill in with background colour
                 Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
 
 
 
 
-# FRAMEWORK                                                                                           
+# FRAMEWORK
 ########################################################################################################################################################
 # PAGES
 
@@ -667,7 +693,7 @@ systems = Page(
 armour = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
-    UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH", font_size=15),
+    UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH"),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
@@ -684,9 +710,9 @@ weapon = Page(
 engine = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Engine"),
-    UpgradeBar(0.2, 0.3, "Acceleration", "MAX_PLAYER_HEALTH", font_size=15),
-    UpgradeBar(0.2, 0.3, "Max Speed", "MAX_PLAYER_HEALTH", font_size=15),
-    UpgradeBar(0.2, 0.3, "Max Boost", "MAX_PLAYER_HEALTH", font_size=15),
+    UpgradeBar(0.2, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
+    UpgradeBar(0.2, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
+    UpgradeBar(0.2, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
