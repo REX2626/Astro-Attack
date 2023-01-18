@@ -109,6 +109,10 @@ def draw(delta_time):
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (game.WIDTH/2 - label.get_width()/2, 100))
 
+    if game.DEBUG_SCREEN:
+        label = font.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+        WIN.blit(label, (400, 8))
+
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))
 

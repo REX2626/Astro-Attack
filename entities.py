@@ -202,14 +202,16 @@ class Pickup(Entity):
     def update(self, delta_time):
         super().update(delta_time)
 
-        # Dear rex, This is Inertial Dampening!
-        self.velocity -= self.velocity.get_clamp(1500 * delta_time)
+        if game.player.health < game.MAX_PLAYER_HEALTH:
 
-        if game.player.distance_to(self) < game.PICKUP_DISTANCE:
-            self.move_to_player(delta_time)
+            # Dear rex, This is Inertial Dampening!
+            self.velocity -= self.velocity.get_clamp(1500 * delta_time)
 
-        if game.player.distance_to(self) < 13 + game.player.size.x/2:
-            self.activate()
+            if game.player.distance_to(self) < game.PICKUP_DISTANCE:
+                self.move_to_player(delta_time)
+
+            if game.player.distance_to(self) < 13 + game.player.size.x/2:
+                self.activate()
 
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)

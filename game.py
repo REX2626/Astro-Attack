@@ -53,6 +53,8 @@ PICKUP_DISTANCE = 150
 
 SCRAP_COUNT = 0
 
+DEBUG_SCREEN = False
+
 
 def init_chunks():
     global CHUNKS

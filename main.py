@@ -37,8 +37,8 @@ def draw_window(delta_time):
     for object in graphics.get_entities_to_draw():
         object.draw(WIN, player.position)
 
-
-    #graphics.draw_chunks()
+    if game.DEBUG_SCREEN:
+        graphics.draw_chunks()
 
     ui.draw(delta_time)
 
@@ -191,6 +191,12 @@ def main():
 
                 # Correct time1
                 time1 = perf_counter() - start + time1
+
+            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_F3:
+                if game.DEBUG_SCREEN:
+                    game.DEBUG_SCREEN = False
+                else:
+                    game.DEBUG_SCREEN = True
                 
         time2 = perf_counter()
         delta_time = time2 - time1
