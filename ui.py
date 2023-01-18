@@ -90,7 +90,7 @@ def draw(delta_time):
 
     canvas.health_bar.update(game.player.health/game.MAX_PLAYER_HEALTH)
     canvas.boost_bar.update(game.player.boost_amount/game.MAX_BOOST_AMOUNT)
-    canvas.speed_bar.update(game.player.velocity.magnitude()/1000)
+    canvas.speed_bar.update(game.player.velocity.magnitude()/(game.MAX_PLAYER_SPEED*2))
 
     canvas.cursor_image.update(pygame.mouse.get_pos())
 
@@ -103,15 +103,12 @@ def draw(delta_time):
     label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH - 300, 8))
 
-    label = font.render(f"SCRAP: {game.SCRAP_COUNT}", True, (255, 255, 255))
-    WIN.blit(label, (200, 8))
-
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
     WIN.blit(label, (game.WIDTH/2 - label.get_width()/2, 100))
 
     if game.DEBUG_SCREEN:
         label = font.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-        WIN.blit(label, (400, 8))
+        WIN.blit(label, (200, 8))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))

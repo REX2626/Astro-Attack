@@ -70,7 +70,7 @@ class Player_Ship(Ship):
 
     def boost(self, delta_time):
         if self.boost_amount > 0: # Makes sure that you have boost to boost
-            self.max_speed = 1000
+            self.max_speed = game.MAX_PLAYER_SPEED*2
             self.accelerate_relative(delta_time * Vector(0, -1000))
             self.boost_amount -= self.boost_change * delta_time # Decrease the amount of boost you have while boosting over time
 

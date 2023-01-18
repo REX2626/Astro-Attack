@@ -724,7 +724,7 @@ systems = Page(
 armour = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
-    UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH"),
+    UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
