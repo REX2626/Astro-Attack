@@ -714,6 +714,8 @@ systems = Page(
     Button(0.7, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
     Image(0.3, 0.6, images.ENGINE_ICON, scale=6),
     Image(0.7, 0.6, images.RADAR_ICON, scale=6),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -723,6 +725,8 @@ armour = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
     UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH"),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
@@ -731,6 +735,8 @@ armour = Page(
 weapon = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Weapon"),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
@@ -742,6 +748,8 @@ engine = Page(
     UpgradeBar(0.2, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.2, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.2, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
@@ -750,6 +758,8 @@ engine = Page(
 radar = Page(
     Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
     e_press=lambda: True
