@@ -107,8 +107,20 @@ def draw(delta_time):
     WIN.blit(label, (game.WIDTH/2 - label.get_width()/2, 100))
 
     if game.DEBUG_SCREEN:
+        label = font.render(f"Position: {round(game.LAST_PLAYER_POS)}", True, (255, 255, 255))
+        WIN.blit(label, (0, 8))
+
+        label = font.render(f"Chunk Position: {game.LAST_PLAYER_POS // game.CHUNK_SIZE}", True, (255, 255, 255))
+        WIN.blit(label, (0, 50))
+
         label = font.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-        WIN.blit(label, (200, 8))
+        WIN.blit(label, (0, 92))
+
+        label = font.render(f"Zoom: {round(game.ZOOM, 3)}", True, (255, 255, 255))
+        WIN.blit(label, (0, 134))
+
+        label = font.render(f"Mouse Pos: {pygame.mouse.get_pos()}", True, (255, 255, 255))
+        WIN.blit(label, (0, 176))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))

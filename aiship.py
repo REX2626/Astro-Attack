@@ -126,7 +126,6 @@ class Enemy_Ship(AI_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-            pygame.draw.circle(game.WIN, (255, 0, 0), ((self.new_ship_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.new_ship_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
 
     def destroy(self):
         super().destroy()
@@ -197,7 +196,6 @@ class Mother_Ship(Enemy_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-            pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 600 * game.ZOOM, width=1)
         
 
     def patrol_state(self, delta_time):
