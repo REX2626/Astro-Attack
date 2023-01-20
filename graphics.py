@@ -35,20 +35,27 @@ def draw_chunks():
 
     # Developer Tools
     # Chunk drawer
-    loaded_chunks = set()
-    for chunk in game.CHUNKS.list:
-        c = game.CHUNKS.get_chunk(chunk)
-        pos = c.position * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
-        rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
-        if len(c.entities.intersection(game.CHUNKS.entities)):
-            loaded_chunks.add(c)
-        else:
-            pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
-    
-    for c in loaded_chunks:
-        pos = c.position * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
-        rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
-        pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
+
+    # Get number of chunks until going off the screen
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
+
+    centre: Vector = game.CHUNKS.get_chunk(game.player).position
+
+    for y in range(centre.y - radius, centre.y + radius + 1):
+        for x in range(centre.x - radius, centre.x + radius + 1):
+
+            chunk_pos = (x, y)
+            chunk = game.CHUNKS.get_chunk(chunk_pos)
+
+            pos = Vector(chunk_pos[0], chunk_pos[1]) * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
+            rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
+
+            if len(chunk.entities.intersection(game.CHUNKS.entities)):
+                pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
+
+            else:
+                pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
+        
 
 
 star_speed = 0.005
