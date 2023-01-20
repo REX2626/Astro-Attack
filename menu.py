@@ -481,40 +481,8 @@ class Rectangle(Widget):
         self.colour = colour
         self.curve = curve
 
-    def draw_rect_curved_corners(self):
-
-        # main rect
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self) + self.curve, self.get_position_y(self) + self.curve, self.width - 2*self.curve, self.height - 2*self.curve))
-
-        # top rect
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self) + self.curve, self.get_position_y(self), self.width - 2*self.curve, self.curve))
-
-        # bottom rect
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self) + self.curve, self.get_position_y(self) + self.height - self.curve, self.width - 2*self.curve, self.curve))
-
-        # left rect
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self) + self.curve, self.curve, self.height - 2*self.curve))
-
-        # right rect
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self) + self.width - self.curve, self.get_position_y(self) + self.curve, self.curve, self.height - 2*self.curve))
-
-        # top left circle
-        pygame.draw.circle(game.WIN, self.colour, (self.get_position_x(self) + self.curve, self.get_position_y(self) + self.curve), self.curve)
-
-        # top right circle
-        pygame.draw.circle(game.WIN, self.colour, (self.get_position_x(self) + self.width - self.curve, self.get_position_y(self) + self.curve), self.curve)
-
-        # bottom left circle
-        pygame.draw.circle(game.WIN, self.colour, (self.get_position_x(self) + self.curve, self.get_position_y(self) + self.height - self.curve), self.curve)
-
-        # bottom right circle
-        pygame.draw.circle(game.WIN, self.colour, (self.get_position_x(self) + self.width - self.curve, self.get_position_y(self) + self.height - self.curve), self.curve)
-
     def draw(self):
-        if self.curve:
-            self.draw_rect_curved_corners()
-        else:
-            pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.width, self.height))
+        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.width, self.height), border_radius=self.curve)
 
 
 
