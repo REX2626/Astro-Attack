@@ -57,6 +57,10 @@ PICKUP_DISTANCE = 150
 SCRAP_COUNT = 0
 
 DEBUG_SCREEN = False
+CPU_USAGE = 0
+MEMORY_USAGE = 0
+CPU_BAR = ""
+MEMORY_BAR = ""
 
 
 def init_chunks():
