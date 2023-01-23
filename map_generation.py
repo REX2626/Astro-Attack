@@ -1,6 +1,6 @@
 import random
 
-size = (6, 6)
+size = (20, 20)
 
 row = []
 last_row = None
@@ -44,10 +44,8 @@ def check_for_ateroid(x, r, lr):
         return True
 
 for y in range(size[1]):
-    count += 1
     for x in range(size[0]):
-        count += 1
-        random.seed(seed + count)
+        random.seed(seed + x**2 + y)
         if random.random() < 0.2 and check_for_ateroid(x, row, last_row):
             row.append(1)
         else:
@@ -56,6 +54,9 @@ for y in range(size[1]):
     map.append(row)
     last_row = row
     row = []
+
+def retrieve_chunk_value(x, y):
+    return map[y][x]
 
 for _ in map:
     print(_)
