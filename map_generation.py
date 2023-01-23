@@ -7,11 +7,9 @@ last_row = None
 
 map = []
 
-seed = int(input())
+seed = 34124
 if seed == 0:
     seed = random.randint(1, 1000000)
-
-count = 0
 
 def check_for_ateroid(x, r, lr):
     if x > 0:
@@ -43,20 +41,24 @@ def check_for_ateroid(x, r, lr):
     else:
         return True
 
-for y in range(size[1]):
-    for x in range(size[0]):
-        random.seed(seed + x**2 + y)
-        if random.random() < 0.2 and check_for_ateroid(x, row, last_row):
-            row.append(1)
-        else:
-            row.append(0)
+# for y in range(size[1]):
+#     for x in range(size[0]):
+#         random.seed(seed + x**2 + y)
+#         if random.random() < 0.2 and check_for_ateroid(x, row, last_row):
+#             row.append(1)
+#         else:
+#             row.append(0)
 
-    map.append(row)
-    last_row = row
-    row = []
+#     map.append(row)
+#     last_row = row
+#     row = []
 
 def retrieve_chunk_value(x, y):
-    return map[y][x]
+    random.seed(seed + x**2 + y)
+    if random.random() < 0.8 and check_for_ateroid(x, row, last_row):
+        return 1
+    else:
+        return 0
 
-for _ in map:
-    print(_)
+# for _ in map:
+#     print(_)

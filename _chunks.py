@@ -3,6 +3,7 @@ from entities import Asteroid, HealthPickup
 from aiship import Mother_Ship, Neutral_Ship
 import random
 import game
+from map_generation import retrieve_chunk_value
 
 
 
@@ -104,6 +105,11 @@ class Chunk():
 
         if self.adjoining_asteroid_chunk():
             return
+
+        elif retrieve_chunk_value == 1:
+            self.entities.add(
+                Asteroid(self.random_position())
+            )
         
         # Mother Ship
         if random.random() < 0.09:
@@ -122,12 +128,12 @@ class Chunk():
             )
 
         # Asteroid
-        elif random.random() < 0.1 and self.adjoining_empty_chunks():
+        # elif random.random() < 0.1 and self.adjoining_empty_chunks():
 
-            self.entities.add(
+        #     self.entities.add(
 
-                Asteroid(self.random_position())
-            )
+        #         Asteroid(self.random_position())
+        #     )
 
         # Health Pickup
         elif random.random() < 0.1:
