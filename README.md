@@ -5,6 +5,57 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 
 ## TODO:
+
+### a1.1.0 (upgrades and f3)
+Add weapon upgrades: fire rate, damage, speed, range?
+
+Add radar upgrades: max zoom out
+
+Add shield image to systems menu
+
+Add "e" control to info menu (for systems)
+
+Add continue button to pause menu
+
+### a1.2.0 (enemy improvements and player improvements)
+Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
+
+Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
+
+Improve enemy AI, so they don't shoot at each other
+
+New mothership image, large and powerful
+
+New neutral ship image, cargo vessel
+
+Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
+
+Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
+
+Change weapon system so that each weapon can be individually upgraded
+
+Add player shield, can recharge
+
+Add shield upgrades to armour
+
+Add seed system
+
+Add mini map
+
+Add radar upgrades so that mini map can be improved
+
+### a1.3.0 (station)
+Add space stations
+
+Enemies spawn from enemy stations
+
+Enemy stations have weapons, can be destroyed for loot
+
+Neutral ships travel between neutral stations
+
+Neutral stations can be traded with
+
+### Other
 Give boost particles a velocity
 
 Change colour of enemy bullets
@@ -21,15 +72,9 @@ Check / improve graphics.get_entities_to_draw performance
 
 Fix first full_screen click not moving the mouse properly
 
----
-
-Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
-
-Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
----
-
 ### POTENTIAL
+
+At some point, lower the initial upgrade values (high atm so testing is easier)
 
 Have different shoot speed for enemy and player
 
@@ -51,8 +96,8 @@ Have different items (e.g. different types of guns)
 One type of ammo
 But different weapons use up a different amount of ammo (e.g. 0.2 for machine gun or 3 for missile)
 
-Level up, the ability to upgrade weapons, armour, engine etc
---
+---
+
 One type of ship
 You can collect / buy items, which you can use to upgrade your ship (e.g. scrap)
 Example things you can upgrade: armour, weapon, engine, shield generator, radar etc...
@@ -60,7 +105,8 @@ Example: For engine you could upgrade: boost, acceleration, top speed...
 You can also use money to buy consumables, repair ship and purchase small items that give you a buff or special ability
 There are different types of weapons, each of which you can upgrade
 Example weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
---
+
+---
 
 Have a massive asteroid or moon, with tunnels that you can go through
 
@@ -203,3 +249,5 @@ Move UI code from main to ui.py
 Add targeting icon (space engineers)
 
 Enemy tracking for player
+
+Level up, the ability to upgrade weapons, armour, engine etc
