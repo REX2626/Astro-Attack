@@ -703,6 +703,7 @@ systems = Page(
     Button(0.7, 0.43, "Weapon", function=lambda: Menu.change_page(weapon)),
     Button(0.3, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
     Button(0.7, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
+    Image(0.3, 0.26, images.ARMOUR_ICON, scale=6),
     Image(0.7, 0.28, images.WEAPON_ICON, scale=6),
     Image(0.3, 0.635, images.ENGINE_ICON, scale=6),
     Image(0.7, 0.62, images.RADAR_ICON, scale=6),
@@ -753,6 +754,7 @@ engine = Page(
 radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
+    UpgradeBar(0.19, 0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
