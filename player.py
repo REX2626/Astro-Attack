@@ -1,5 +1,6 @@
 from objects import Vector
 from entities import Ship
+import entities
 import images
 import particles
 import game
@@ -14,7 +15,7 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=game.MAX_PLAYER_SPEED,
         rotation=0, max_rotation_speed=3,
-        fire_rate=10, health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
+        fire_rate=game.PLAYER_FIRE_RATE, health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
         boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
         image=images.RED_SHIP
 
@@ -41,6 +42,27 @@ class Player_Ship(Ship):
             self.track_enemy()
         else:
             self.tracked_enemy = None
+
+    def shoot(self):
+        # Check if reloaded
+        if self.time_reloading >= 1 / game.PLAYER_FIRE_RATE:
+            
+            bullet_position = self.position + Vector(0, -self.image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
+            bullet_position.rotate_about(self.rotation, self.position)
+            bullet_velocity = Vector(0, -game.PLAYER_BULLET_SPEED)
+            bullet_velocity.rotate(self.rotation)
+            bullet = entities.Bullet(
+
+                position=bullet_position,
+                velocity=bullet_velocity + self.velocity,
+                rotation=self.rotation,
+                ship=self,
+                damage=game.PLAYER_DAMAGE,
+                lifetime=3,
+                )
+
+            game.CHUNKS.add_entity(bullet)
+            self.time_reloading = 0
 
     def accelerate_relative(self, acceleration: Vector):
         acceleration.rotate(self.rotation)

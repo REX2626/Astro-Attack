@@ -14,7 +14,6 @@ pygame.init()
 
 import sys
 from objects import Vector
-import _chunks
 
 
 WIDTH, HEIGHT = pygame.display.get_window_size()
@@ -44,6 +43,9 @@ MAX_BOOST_AMOUNT = 20
 MIN_PLAYER_SPEED = 500
 MAX_PLAYER_SPEED = MIN_PLAYER_SPEED
 PLAYER_ACCELERATION = 700
+PLAYER_FIRE_RATE = 8
+PLAYER_DAMAGE = 1
+PLAYER_BULLET_SPEED = 750
 
 SCORE = 0
 HIGHSCORE = 0
@@ -63,6 +65,7 @@ CPU_BAR = ""
 MEMORY_BAR = ""
 
 
+import _chunks
 def init_chunks():
     global CHUNKS
     CHUNKS = _chunks.Chunks()

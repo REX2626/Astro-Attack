@@ -201,7 +201,7 @@ class Widget():
         if type(self.y) == float:
             self.get_position_y = lambda self: self.y * game.HEIGHT
 
-        if type(self.y) == int:
+        elif type(self.y) == int:
             if self.y < 0:
                 self.get_position_y = lambda self: game.HEIGHT + self.y
             else:
@@ -246,7 +246,7 @@ class Text(Widget):
         if type(self.y) == float:
             self.get_position_y = lambda self, label: self.y * game.HEIGHT - label.get_height()/2
 
-        if type(self.y) == int:
+        elif type(self.y) == int:
             if self.y < 0:
                 self.get_position_y = lambda self, label: game.HEIGHT + self.y - label.get_height()/2
             else:
@@ -475,7 +475,8 @@ class SettingButton(Button):
 
 class Rectangle(Widget):
     """A rectangular object of given width, height and colour
-       x, y can be ints (percentage) or floats (pixel)"""
+       x, y can be ints (percentage) or floats (pixel)
+       width, height can be int or float, int for pixel, float for ratio of screen size"""
     def __init__(self, x, y, width, height, colour, curve=0) -> None:
         super().__init__(x, y)
         self.width = width
@@ -483,8 +484,27 @@ class Rectangle(Widget):
         self.colour = colour
         self.curve = curve
 
+        if abs(width) <= 1:
+            self.get_width = lambda self: self.width * game.WIDTH
+
+        else:
+            if width < 0:
+                self.get_width = lambda self: game.WIDTH + self.width
+            else:
+                self.get_width = lambda self: self.width
+        
+        if abs(height) <= 1:
+            self.get_height = lambda self: self.height * game.HEIGHT
+
+        else:
+            if height < 0:
+                self.get_height = lambda self: game.HEIGHT + self.height
+            else:
+                self.get_height = lambda self: self.height
+
+
     def draw(self):
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.width, self.height), border_radius=self.curve)
+        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.get_width(self), self.get_height(self)), border_radius=self.curve)
 
 
 
@@ -510,7 +530,8 @@ class UpgradeBar(Widget):
         self.bars = bars
         self.min_value = min_value
         self.max_value = max_value
-        self.step = int((max_value - min_value) / bars)
+        self.step = (max_value - min_value) / bars
+        if self.step.is_integer(): self.step = int(self.step) # if step is an integer, then remove the decimal point
         self.level = 0
         self.padlock = images.PADLOCK
 
@@ -676,7 +697,7 @@ pause = Page(
 )
 
 systems = Page(
-    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Systems"),
     Button(0.3, 0.43, "Armour", function=lambda: Menu.change_page(armour)),
     Button(0.7, 0.43, "Weapon", function=lambda: Menu.change_page(weapon)),
@@ -693,9 +714,9 @@ systems = Page(
 )
 
 armour = Page(
-    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
-    UpgradeBar(0.2, 0.3, "HEALTH", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
+    UpgradeBar(0.19, 0.3, "HEALTH", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -704,8 +725,11 @@ armour = Page(
 )
 
 weapon = Page(
-    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Weapon"),
+    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_FIRE_RATE", min_value=game.PLAYER_FIRE_RATE, max_value=20),
+    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DAMAGE", min_value=game.PLAYER_DAMAGE, max_value=2),
+    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_BULLET_SPEED", min_value=game.PLAYER_BULLET_SPEED, max_value=1000),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -714,11 +738,11 @@ weapon = Page(
 )
 
 engine = Page(
-    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Engine"),
-    UpgradeBar(0.2, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
-    UpgradeBar(0.2, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
-    UpgradeBar(0.2, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
+    UpgradeBar(0.19, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
+    UpgradeBar(0.19, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
+    UpgradeBar(0.19, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -727,7 +751,7 @@ engine = Page(
 )
 
 radar = Page(
-    Rectangle(0.05, 0.05, 0.9*game.WIDTH, 0.9*game.HEIGHT, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),

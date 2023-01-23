@@ -26,25 +26,7 @@ class AI_Ship(Ship):
                         return False
 
     def shoot(self):
-        # Check if reloaded
-        if self.time_reloading >= self.reload_time:
-            
-            bullet_position = self.position + Vector(0, -self.image.get_height()/2 - images.RED_BULLET.get_height()/2) # spawns bullet at ship's gun
-            bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -game.BULLET_SPEED)
-            bullet_velocity.rotate(self.rotation)
-            bullet = entities.Bullet(
-
-                position=bullet_position,
-                velocity=bullet_velocity + self.velocity,
-                rotation=self.rotation,
-                ship=self,
-                lifetime=3,
-                image=images.RED_BULLET
-                )
-
-            game.CHUNKS.add_entity(bullet)
-            self.time_reloading = 0
+        super().shoot(image=images.RED_BULLET)
 
     def attack_player_state(self, delta_time):
         # Set max speed to a higher value

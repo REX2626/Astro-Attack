@@ -107,7 +107,7 @@ class Ship(Entity):
         # Increase reload time
         self.time_reloading += delta_time
 
-    def shoot(self):
+    def shoot(self, damage=1, image=images.BULLET):
         # Check if reloaded
         if self.time_reloading >= self.reload_time:
             
@@ -121,7 +121,9 @@ class Ship(Entity):
                 velocity=bullet_velocity + self.velocity,
                 rotation=self.rotation,
                 ship=self,
-                lifetime=3
+                damage=damage,
+                lifetime=3,
+                image=image
                 )
 
             game.CHUNKS.add_entity(bullet)
@@ -147,15 +149,15 @@ class Ship(Entity):
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet
+import player
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, rotation=0, ship=None, lifetime=5, image=images.BULLET) -> None:
+    def __init__(self, position, velocity, rotation=0, ship=None, damage=1, lifetime=5, image=images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
         self.ship = ship
+        self.damage = damage
         self.lifetime = lifetime
         self.start_time = 0
-        global player
-        import player
         
     def update(self, delta_time):
         super().update(delta_time)
@@ -169,7 +171,7 @@ class Bullet(Entity):
             # If it is, then destroy alien and bullet
             for entity in game.CHUNKS.get_chunk(self).entities:
                 if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
-                    entity.damage(1)
+                    entity.damage(self.damage)
                     if isinstance(self.ship, player.Player_Ship):
                         entity.enemy_spotted()
                     game.CHUNKS.remove_entity(self)
@@ -177,12 +179,12 @@ class Bullet(Entity):
 
 
                 elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
-                    entity.damage(1)
+                    entity.damage(self.damage)
                     game.CHUNKS.remove_entity(self)
                     break
 
                 elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
-                    entity.damage(1)
+                    entity.damage(self.damage)
                     if isinstance(self.ship, player.Player_Ship):
                         entity.state = 1
                     elif isinstance(self.ship, Enemy_Ship):

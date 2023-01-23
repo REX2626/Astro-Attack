@@ -7,13 +7,9 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.1.0 (upgrades and f3)
-Add weapon upgrades: fire rate, damage, speed, range?
-
 Add radar upgrades: max zoom out
 
-Add shield image to systems menu
-
-Remove settings that are now changed with upgrades (e.g. health)
+Add armour image to systems menu
 
 ### a1.2.0 (enemy improvements and player improvements)
 Add new enemy types: missile, different fighter ship variants
@@ -68,15 +64,15 @@ Improve particle system
 
 Make ships have a thruster animation
 
-Add ammo system
-
-Enemies drop ammo
-
 Check / improve graphics.get_entities_to_draw performance
 
 Fix first full_screen click not moving the mouse properly
 
 ### POTENTIAL
+
+Add ammo system
+
+Enemies drop ammo
 
 At some point, lower the initial upgrade values (high atm so testing is easier)
 
@@ -259,3 +255,7 @@ Level up, the ability to upgrade weapons, armour, engine etc
 Add continue button to pause menu
 
 Add "e" control to info menu (for systems)
+
+Remove settings that are now changed with upgrades (e.g. health)
+
+Add weapon upgrades: fire rate, damage, speed, range?
