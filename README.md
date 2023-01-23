@@ -13,11 +13,13 @@ Add radar upgrades: max zoom out
 
 Add shield image to systems menu
 
-Add "e" control to info menu (for systems)
-
-Add continue button to pause menu
+Remove settings that are now changed with upgrades (e.g. health)
 
 ### a1.2.0 (enemy improvements and player improvements)
+Add new enemy types: missile, different fighter ship variants
+
+POSSIBLE: neutral ship grouping
+
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
@@ -31,6 +33,8 @@ New neutral ship image, cargo vessel
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
 Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
+
+Add Enemy weapons - shoot normally but might have small missiles to launch aswell
 
 Change weapon system so that each weapon can be individually upgraded
 
@@ -251,3 +255,7 @@ Add targeting icon (space engineers)
 Enemy tracking for player
 
 Level up, the ability to upgrade weapons, armour, engine etc
+
+Add continue button to pause menu
+
+Add "e" control to info menu (for systems)

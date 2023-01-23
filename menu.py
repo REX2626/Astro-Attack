@@ -276,8 +276,10 @@ class Text(Widget):
 
     def draw(self):
         labels = self.get_labels()
-        for idx, label in enumerate(labels):
-            position = self.get_position_x(self, label), self.get_position_y(self, label) + idx * label.get_height() # Adjust coordinates to be centre of Widget
+        cum_height = 0 # cumulative height of all the labels above a certain label
+        for label in labels:
+            position = self.get_position_x(self, label), self.get_position_y(self, label) + cum_height # Adjust coordinates to be centre of Widget
+            cum_height += label.get_height()
             game.WIN.blit(label, position)
 
 
@@ -642,6 +644,7 @@ info = Page(
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
+                        Systems: E
                         Look: Mouse
                         Zoom: Scroll
                         Shoot: Left Click
