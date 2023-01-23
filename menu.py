@@ -668,7 +668,8 @@ settings = Page(
 
 pause = Page(
     Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO, scale=0.6),
-    Button(0.5, 0.345, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 0.345, "Continue", font_size=40, function=lambda: setattr(Menu, "running", False)),
+    Button(0.5, 0.46, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True,
 )
