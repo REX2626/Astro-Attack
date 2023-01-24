@@ -6,9 +6,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.1.1 (bug fixes and F3 improvements)
-Add 1% lows to F3 screen
-
 ### a1.2.0 (enemy improvements and player improvements)
 Add new enemy types: missile, different fighter ship variants
 
@@ -265,3 +262,5 @@ Add armour image to systems menu
 
 ### a1.1.1 (bug fixes and F3 improvements)
 Fix menu image scaling (so it is based on height and width)
+
+Add 1% lows to F3 screen

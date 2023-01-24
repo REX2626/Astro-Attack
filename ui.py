@@ -118,6 +118,25 @@ def get_usage(delta_time):
     return cpu_percent, mem_percent, cpu_bar, mem_bar
 
 
+min_fps_elapsed_time = 0
+min_fps = math.inf
+showing_min_fps = 0
+def get_minimum_fps(delta_time):
+
+    global min_fps_elapsed_time, min_fps, showing_min_fps
+    min_fps_elapsed_time += delta_time
+    if min_fps_elapsed_time > 1:
+
+        min_fps_elapsed_time = 0
+        showing_min_fps = min_fps
+        min_fps = math.inf
+
+    if 1/delta_time < min_fps:
+        min_fps = 1/delta_time
+
+    return showing_min_fps
+
+
 def draw(delta_time):
     pygame.mouse.set_visible(False)
 
@@ -142,27 +161,32 @@ def draw(delta_time):
 
     if game.DEBUG_SCREEN:
         label = font3.render(f"Position: {round(game.LAST_PLAYER_POS)}", True, (255, 255, 255))
-        WIN.blit(label, (0, 8))
+        WIN.blit(label, (8, 8))
 
         label = font3.render(f"Chunk Position: {game.LAST_PLAYER_POS // game.CHUNK_SIZE}", True, (255, 255, 255))
-        WIN.blit(label, (0, 38))
+        WIN.blit(label, (8, 38))
 
         label = font3.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
-        WIN.blit(label, (0, 68))
+        WIN.blit(label, (8, 68))
 
         label = font3.render(f"Zoom: {round(game.ZOOM, 3)}", True, (255, 255, 255))
-        WIN.blit(label, (0, 98))
+        WIN.blit(label, (8, 98))
 
         label = font3.render(f"Mouse Pos: {pygame.mouse.get_pos()}", True, (255, 255, 255))
-        WIN.blit(label, (0, 128))
+        WIN.blit(label, (8, 128))
 
         cpu_usage, memory_usage, cpu_bar, memory_bar = get_usage(delta_time)
 
         label = font3.render(f"CPU Usage: |{cpu_bar}| {cpu_usage:.1f}%", True, (255, 255, 255))
-        WIN.blit(label, (0, 158))
+        WIN.blit(label, (8, 158))
 
         label = font3.render(f"Memory Usage: |{memory_bar}| {memory_usage:.1f}%", True, (255, 255, 255))
-        WIN.blit(label, (0, 188))
+        WIN.blit(label, (8, 188))
+
+        minimum = get_minimum_fps(delta_time)
+
+        label = font3.render(f"Minimum FPS: {round(minimum)}", True, (255, 255, 255))
+        WIN.blit(label, (8, 218))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))
