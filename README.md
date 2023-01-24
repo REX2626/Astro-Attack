@@ -6,10 +6,8 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.1.1 (bug fixes and a few upgrades added)
-Fix menu image scaling (so it is based on height and width)
-
-Add another upgrade to armour and radar
+### a1.1.1 (bug fixes and F3 improvements)
+Add 1% lows to F3 screen
 
 ### a1.2.0 (enemy improvements and player improvements)
 Add new enemy types: missile, different fighter ship variants
@@ -264,3 +262,6 @@ Add weapon upgrades: fire rate, damage, speed, range?
 Add radar upgrades: max zoom out
 
 Add armour image to systems menu
+
+### a1.1.1 (bug fixes and F3 improvements)
+Fix menu image scaling (so it is based on height and width)

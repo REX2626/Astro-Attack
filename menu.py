@@ -218,7 +218,8 @@ class Image(Widget):
         self.image = pygame.transform.scale_by(image, scale)
 
     def draw(self):
-        ratio = game.WIDTH * self.image.get_width() / 1_000_000 # Ratio of image width to game width
+        ratio = min(game.WIDTH * self.image.get_width() / 1_000_000, # Ratio of image width to game width
+                    game.HEIGHT * self.image.get_width() / 625_000)
         image = pygame.transform.scale_by(self.image, ratio)
         game.WIN.blit(image, (self.get_position_x(self) - image.get_width()/2, self.get_position_y(self) - image.get_height()/2))
 
