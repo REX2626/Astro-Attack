@@ -7,7 +7,6 @@ from player import add_player
 import ui
 import menu
 import graphics
-from system_performance import get_usage
 import math
 from time import perf_counter
 
@@ -148,8 +147,6 @@ def main():
     running = True
     while running:
         time1 = perf_counter()
-
-        game.CPU_USAGE, game.MEMORY_USAGE, game.CPU_BAR, game.MEMORY_BAR = get_usage(20)
 
         keys_pressed = pygame.key.get_pressed()
 

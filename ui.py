@@ -4,6 +4,7 @@ from objects import Vector
 from aiship import AI_Ship
 import math
 import pygame
+import psutil
 
 
 
@@ -73,16 +74,33 @@ font3 = pygame.font.SysFont("consolas", 20)
 
 
 def cursor_highlighting():
-        x, y = pygame.mouse.get_pos()
-        cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
-        canvas.cursor_image.image = images.CURSOR
-        game.player.cursor_highlighted = False
-        for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
-            if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
-                canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
-                game.player.cursor_highlighted = True
-                game.player.aiming_enemy = entity
-                break
+    x, y = pygame.mouse.get_pos()
+    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
+    canvas.cursor_image.image = images.CURSOR
+    game.player.cursor_highlighted = False
+    for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
+        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
+            canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
+            game.player.cursor_highlighted = True
+            game.player.aiming_enemy = entity
+            break
+
+
+bars = 20
+last_cpu_usage = 0
+def get_usage():
+    global last_cpu_usage
+    cpu_percent = psutil.cpu_percent()
+    if cpu_percent == 0:
+        cpu_percent = last_cpu_usage
+    else:
+        last_cpu_usage = cpu_percent
+    cpu_bar = "█" * int((cpu_percent/100) * bars) + "-" * (bars - int((cpu_percent/100) * bars)) # Turns percent into bar visual
+    
+    mem_percent = psutil.virtual_memory().percent
+    mem_bar = "█" * int((mem_percent/100) * bars) + "-" * (bars - int((mem_percent/100) * bars))
+
+    return cpu_percent, mem_percent, cpu_bar, mem_bar
 
 
 def draw(delta_time):
@@ -123,10 +141,12 @@ def draw(delta_time):
         label = font3.render(f"Mouse Pos: {pygame.mouse.get_pos()}", True, (255, 255, 255))
         WIN.blit(label, (0, 128))
 
-        label = font3.render(f"CPU Usage: |{game.CPU_BAR}| {game.CPU_USAGE:.2f}%", True, (255, 255, 255))
+        cpu_usage, memory_usage, cpu_bar, memory_bar = get_usage()
+
+        label = font3.render(f"CPU Usage: |{cpu_bar}| {cpu_usage:.1f}%", True, (255, 255, 255))
         WIN.blit(label, (0, 158))
 
-        label = font3.render(f"Memory Usage: |{game.MEMORY_BAR}| {game.MEMORY_USAGE:.2f}%", True, (255, 255, 255))
+        label = font3.render(f"Memory Usage: |{memory_bar}| {memory_usage:.1f}%", True, (255, 255, 255))
         WIN.blit(label, (0, 188))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
