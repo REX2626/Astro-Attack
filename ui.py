@@ -87,18 +87,33 @@ def cursor_highlighting():
 
 
 bars = 20
-last_cpu_usage = 0
-def get_usage():
-    global last_cpu_usage
-    cpu_percent = psutil.cpu_percent()
-    if cpu_percent == 0:
-        cpu_percent = last_cpu_usage
+time_elapsed = 0
+last_cpu_percent = 0
+last_mem_percent = 0
+last_cpu_bar = ""
+last_mem_bar = ""
+def get_usage(delta_time):
+
+    global time_elapsed
+    time_elapsed += delta_time
+    if time_elapsed > 0.1: # updates 10 times a second
+
+        global last_cpu_percent, last_mem_percent, last_cpu_bar, last_mem_bar
+        cpu_percent = psutil.cpu_percent()
+        if cpu_percent == 0:
+            cpu_percent = last_cpu_percent
+        else:
+            last_cpu_percent = cpu_percent
+        cpu_bar = "█" * int((cpu_percent/100) * bars) + "-" * (bars - int((cpu_percent/100) * bars)) # Turns percent into bar visual
+        
+        mem_percent = psutil.virtual_memory().percent
+        mem_bar = "█" * int((mem_percent/100) * bars) + "-" * (bars - int((mem_percent/100) * bars))
+
+        time_elapsed = 0
+        last_cpu_percent, last_mem_percent, last_cpu_bar, last_mem_bar = cpu_percent, mem_percent, cpu_bar, mem_bar
+
     else:
-        last_cpu_usage = cpu_percent
-    cpu_bar = "█" * int((cpu_percent/100) * bars) + "-" * (bars - int((cpu_percent/100) * bars)) # Turns percent into bar visual
-    
-    mem_percent = psutil.virtual_memory().percent
-    mem_bar = "█" * int((mem_percent/100) * bars) + "-" * (bars - int((mem_percent/100) * bars))
+        cpu_percent, mem_percent, cpu_bar, mem_bar = last_cpu_percent, last_mem_percent, last_cpu_bar, last_mem_bar
 
     return cpu_percent, mem_percent, cpu_bar, mem_bar
 
@@ -141,7 +156,7 @@ def draw(delta_time):
         label = font3.render(f"Mouse Pos: {pygame.mouse.get_pos()}", True, (255, 255, 255))
         WIN.blit(label, (0, 128))
 
-        cpu_usage, memory_usage, cpu_bar, memory_bar = get_usage()
+        cpu_usage, memory_usage, cpu_bar, memory_bar = get_usage(delta_time)
 
         label = font3.render(f"CPU Usage: |{cpu_bar}| {cpu_usage:.1f}%", True, (255, 255, 255))
         WIN.blit(label, (0, 158))
