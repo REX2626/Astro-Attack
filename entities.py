@@ -68,7 +68,7 @@ class Asteroid(Object):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, shield=0, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, shield=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
@@ -76,9 +76,13 @@ class Ship(Entity):
         self.reload_time = 1 / fire_rate
         self.max_speed = max_speed
         self.health = health
+        self.max_shield = shield
         self.shield = shield
+        self.shield_delay = shield_delay
+        self.shield_recharge = shield_recharge
         
         self.time_reloading = 0
+        self.shield_delay_elapsed = 0
         self.rotation_speed = Vector1D(0)
 
     def update(self, delta_time):
@@ -107,6 +111,16 @@ class Ship(Entity):
 
         # Increase reload time
         self.time_reloading += delta_time
+
+        # Increase shield delay time elapsed
+        self.shield_delay_elapsed += delta_time
+
+        # Check if shield should be increased
+        if self.shield_delay_elapsed > self.shield_delay:
+            self.shield += self.shield_recharge * delta_time
+
+            if self.shield > self.max_shield:
+                self.shield = self.max_shield
 
     def shoot(self, damage=1, image=images.BULLET):
         # Check if reloaded
@@ -138,10 +152,19 @@ class Ship(Entity):
         self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + self.position
     
     def damage(self, damage):
-        self.health -= damage
-        particles.ParticleSystem(self.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=30, speed=120, speed_variance=40)
-        if self.health <= 0:
-            self.destroy()
+        self.shield_delay_elapsed = 0
+
+        # Shield takes damage, and if shield is now 0 then damage to ship is reduced
+        new_shield = max(0, self.shield - damage)
+        damage -= self.shield - new_shield
+        self.shield = new_shield
+
+        # If no shield, then damage ship
+        if self.shield == 0:
+            self.health -= damage
+            particles.ParticleSystem(self.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=30, speed=120, speed_variance=40)
+            if self.health <= 0:
+                self.destroy()
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)
@@ -151,9 +174,10 @@ class Ship(Entity):
     def draw(self, win, focus_point):
         super().draw(win, focus_point)
 
+        # Draw shield around ship
         if self.shield:
             centre = (self.position - focus_point) * game.ZOOM + game.CENTRE_POINT
-            pygame.draw.circle(win, (0, 0, 255), centre.to_tuple(), 30 * game.ZOOM, width=2)
+            pygame.draw.circle(win, (34, 130, 240), centre.to_tuple(), 30*game.ZOOM, width=round(2*game.ZOOM))
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet

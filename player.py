@@ -15,13 +15,15 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=game.MAX_PLAYER_SPEED,
         rotation=0, max_rotation_speed=3,
-        fire_rate=game.PLAYER_FIRE_RATE, health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
+        fire_rate=game.PLAYER_FIRE_RATE, 
+        health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
+        shield=5, shield_delay=3, shield_recharge=1,
         boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
         image=images.RED_SHIP
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), 1, image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), shield, shield_delay, shield_recharge, image)
 
         self.max_rotation_speed = max_rotation_speed
         self.boost_amount = boost_amount()
@@ -99,7 +101,7 @@ class Player_Ship(Ship):
             boost_distance = 20
             boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(20, 100, 255), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
+            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
         else:
             self.max_speed = game.MAX_PLAYER_SPEED # Resets max speed once you run out of boost
 
