@@ -4,6 +4,7 @@ from aiship import Mother_Ship, Neutral_Ship
 import random
 import game
 
+import map_generation
 
 
 class Chunks():
@@ -121,20 +122,20 @@ class Chunk():
                 Neutral_Ship(self.random_position(), Vector(0, 0))
             )
 
-        # Asteroid
-        elif random.random() < 0.1 and self.adjoining_empty_chunks():
-
-            self.entities.add(
-
-                Asteroid(self.random_position())
-            )
-
         # Health Pickup
         elif random.random() < 0.1:
 
             self.entities.add(
                 HealthPickup(self.random_position())
             )
+
+        # Asteroid
+        elif map_generation.retrieve_chunk_value((self.position.x), (self.position.y)) < 0.1 and self.adjoining_empty_chunks():
+            self.entities.add(
+
+                Asteroid(self.random_position())
+            )
+
 
     def adjoining_asteroid_chunk(self):
 
