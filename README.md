@@ -33,6 +33,8 @@ Add player shield, can recharge
 
 Add shield upgrades to armour
 
+Add bullet damage effect, when bullets hits something, blue sparks explode
+
 Add seed system
 
 Add mini map

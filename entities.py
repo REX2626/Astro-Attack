@@ -176,8 +176,12 @@ class Ship(Entity):
 
         # Draw shield around ship
         if self.shield:
-            centre = (self.position - focus_point) * game.ZOOM + game.CENTRE_POINT
-            pygame.draw.circle(win, (34, 130, 240), centre.to_tuple(), 30*game.ZOOM, width=round(2*game.ZOOM))
+            surf = pygame.Surface((60*game.ZOOM, 60*game.ZOOM), flags=pygame.SRCALPHA)
+            alpha = (self.shield / self.max_shield) * 255 # alpha value depends on current shield percentage
+            pygame.draw.circle(surf, (34, 130, 240, alpha), (30*game.ZOOM, 30*game.ZOOM), 30*game.ZOOM, width=round(2*game.ZOOM))
+            pos = ((self.position - focus_point) * game.ZOOM + game.CENTRE_POINT) - 30*game.ZOOM
+            win.blit(surf, pos.to_tuple())
+
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet
@@ -228,6 +232,8 @@ class Bullet(Entity):
     def unload(self):
         game.CHUNKS.remove_entity(self)
 
+
+
 class Pickup(Entity):
     def __init__(self, position, velocity=Vector(0, 0), max_speed=200, rotation=0, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
@@ -236,7 +242,7 @@ class Pickup(Entity):
     def update(self, delta_time):
         super().update(delta_time)
 
-        # Dear rex, This is Inertial Dampening!
+        # Inertial Dampening
         self.velocity -= self.velocity.get_clamp(1500 * delta_time)
 
         if game.player.distance_to(self) < game.PICKUP_DISTANCE:
@@ -256,6 +262,8 @@ class Pickup(Entity):
         # Have set function for each pickup
         return
 
+
+
 class HealthPickup(Pickup):
     def __init__(self, position, velocity=Vector(0, 0), max_speed=700, rotation=0, image=images.HEALTH_PICKUP) -> None:
         super().__init__(position, velocity, max_speed, rotation, image)
@@ -272,6 +280,8 @@ class HealthPickup(Pickup):
             game.player.health = game.MAX_PLAYER_HEALTH
 
         game.CHUNKS.remove_entity(self)
+
+
 
 class Scrap(Pickup):
     def __init__(self, position, velocity=Vector(0, 0), max_speed=600, rotation=0, image=images.SCRAP) -> None:

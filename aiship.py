@@ -73,6 +73,7 @@ class AI_Ship(Ship):
         self.accelerate_in_direction(game.player.position, 400 * -delta_time)
 
 
+
 class Enemy_Ship(AI_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield, shield_delay, shield_recharge, image)
@@ -144,7 +145,7 @@ class Enemy_Ship(AI_Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, shield=0, shield_delay=1, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
