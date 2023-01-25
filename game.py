@@ -62,6 +62,9 @@ MEMORY_USAGE = 0
 CPU_BAR = ""
 MEMORY_BAR = ""
 
+SEED1 = 0
+SEED2 = 0
+
 
 def init_chunks():
     global CHUNKS
