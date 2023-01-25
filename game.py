@@ -60,6 +60,9 @@ SCRAP_COUNT = 0
 
 DEBUG_SCREEN = False
 
+SEED1 = 0
+SEED2 = 0
+
 
 import _chunks
 def init_chunks():
