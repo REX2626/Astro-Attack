@@ -68,7 +68,7 @@ class Asteroid(Object):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, shield=0, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
@@ -76,6 +76,7 @@ class Ship(Entity):
         self.reload_time = 1 / fire_rate
         self.max_speed = max_speed
         self.health = health
+        self.shield = shield
         
         self.time_reloading = 0
         self.rotation_speed = Vector1D(0)
@@ -146,6 +147,13 @@ class Ship(Entity):
         game.CHUNKS.remove_entity(self)
         particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
         particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
+
+    def draw(self, win, focus_point):
+        super().draw(win, focus_point)
+
+        if self.shield:
+            centre = (self.position - focus_point) * game.ZOOM + game.CENTRE_POINT
+            pygame.draw.circle(win, (0, 0, 255), centre.to_tuple(), 30 * game.ZOOM, width=2)
 
 
 from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet
