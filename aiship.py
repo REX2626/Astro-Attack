@@ -10,8 +10,8 @@ import pygame # rex keep this here for debugging reasons
 
 
 class AI_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, image=images.DEFAULT) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, shield=0, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield=shield, image=image)
 
     def check_for_asteroid(self, chunk_pos):
         for y in range(chunk_pos.y-1, chunk_pos.y+2):
@@ -74,8 +74,8 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, fire_rate=1, health=3, shield=0, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield, image)
         self.state = state
         self.mother_ship = mother_ship
         self.patrol_point = random_vector(random.randint(100, 400)) + self.mother_ship.position
@@ -144,8 +144,8 @@ class Enemy_Ship(AI_Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, state, self, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=10, shield=0, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
@@ -211,8 +211,8 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, fire_rate=1, health=5, shield=0, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health, shield, image)
         self.state = state
         self.recent_enemy = recent_enemy
         self.make_new_patrol_point(1000, 4000)

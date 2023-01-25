@@ -21,7 +21,7 @@ class Player_Ship(Ship):
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), image)
+        super().__init__(position, velocity, max_speed, rotation, fire_rate, health(), 1, image)
 
         self.max_rotation_speed = max_rotation_speed
         self.boost_amount = boost_amount()
