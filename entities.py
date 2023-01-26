@@ -185,9 +185,6 @@ class Ship(Entity):
 
 
 
-from aiship import Enemy_Ship, Neutral_Ship # Has to be done after defining Ship, used for Bullet
-import player
-
 class Bullet(Entity):
     def __init__(self, position, velocity, rotation=0, ship=None, damage=1, lifetime=5, image=images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
@@ -210,7 +207,7 @@ class Bullet(Entity):
 
                 if isinstance(entity, Ship):
 
-                    if entity.shield and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
+                    if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
                         entity.damage(self.damage, self)
                         game.CHUNKS.remove_entity(self)
                         break

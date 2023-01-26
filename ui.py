@@ -104,18 +104,18 @@ class MiniMap():
 
 class Canvas():
     def __init__(self) -> None:
-        self.elements = set()
+        self.elements = []
 
         self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-200, width=200, height=40, colour=(255, 0, 0)))
         self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-150 , width=200, height=40, colour=(34, 130, 240)))
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-50, width=200, height=40, colour=(30, 190, 190)))
-        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
         self.add("mini_map", MiniMap((0, 0), width=350, height=350))
+        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
 
     def add(self, name, element):
         self.__setattr__(name, element)
-        self.elements.add(element)
+        self.elements.append(element)
 
     def draw(self):
         for element in self.elements:
