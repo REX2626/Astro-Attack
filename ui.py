@@ -1,7 +1,9 @@
 import game
 import images
 from objects import Vector
-from aiship import AI_Ship
+import aiship
+from entities import Asteroid
+from player import Player_Ship
 import math
 import pygame
 import psutil
@@ -47,6 +49,59 @@ class Image():
 
 
 
+class MiniMap():
+    def __init__(self, position, width, height) -> None:
+        self.position = position
+        self.x, self.y = self.position
+        self.width = width
+        self.height = height
+        self.enemy_colour = (255, 0, 0)
+        self.asteroid_colour = game.LIGHT_GREY
+        self.player_colour = (255, 255, 255)
+        self.neutral_colour = (0, 255, 0)
+        self.entity_size = 3
+        self.player_image = images.PLAYER_MINIMAP_IMAGE
+
+    def draw_entity(self, colour, entity):
+        if colour:
+            pygame.draw.circle(game.WIN, colour, (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.WIDTH * self.width * 1.3) + (self.width / 2),
+                ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.WIDTH * self.height * 1.3) + (self.height / 2)), self.entity_size)
+
+    def get_entity_colour(self, entity):
+
+        # Changes colour based on type of 
+        if isinstance(entity, aiship.Enemy_Ship):
+            self.entity_size = 3
+            return self.enemy_colour
+        elif isinstance(entity, aiship.Neutral_Ship):
+            self.entity_size = 3
+            return self.neutral_colour
+        elif isinstance(entity, Asteroid):
+            self.entity_size = 7
+            return self.asteroid_colour
+
+    def draw(self):
+        # Draws black background
+        pygame.draw.rect(game.WIN, color=game.BLACK, rect=(
+            self.x, self.y, self.width, self.height
+        ), border_radius=5)
+
+        # Draws enemies in chunks
+        for entity in game.CHUNKS.entities:
+
+            self.draw_entity(self.get_entity_colour(entity), entity)
+
+        # Draws border
+        pygame.draw.rect(game.WIN, color=game.DARK_GREY, rect=(
+            self.x, self.y, self.width, self.height
+        ), width=7, border_radius=5)
+
+        # Draws player image
+        image = pygame.transform.rotate(self.player_image, game.player.rotation / math.pi * 180)
+        game.WIN.blit(image, ((self.width / 2) - (image.get_width() / 2), (self.height / 2) - (image.get_height() / 2)))
+
+
+
 class Canvas():
     def __init__(self) -> None:
         self.elements = set()
@@ -56,6 +111,7 @@ class Canvas():
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-50, width=200, height=40, colour=(30, 190, 190)))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
+        self.add("mini_map", MiniMap((0, 0), width=350, height=350))
 
     def add(self, name, element):
         self.__setattr__(name, element)
@@ -80,7 +136,7 @@ def cursor_highlighting():
     canvas.cursor_image.image = images.CURSOR
     game.player.cursor_highlighted = False
     for entity in game.CHUNKS.get_chunk((cursor_pos // game.CHUNK_SIZE).to_tuple()).entities:
-        if isinstance(entity, AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
+        if isinstance(entity, aiship.AI_Ship) and (cursor_pos - entity.position).magnitude() < 32:
             canvas.cursor_image.image = images.CURSOR_HIGHLIGHTED
             game.player.cursor_highlighted = True
             game.player.aiming_enemy = entity
