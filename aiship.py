@@ -105,10 +105,12 @@ class Enemy_Ship(AI_Ship):
 
     # DEBUG DRAW PATROL POINTS
 
-    def draw(self, win: pygame.Surface, focus_point):
-        super().draw(win, focus_point)
-        if game.DEBUG_SCREEN:
-            pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    def damage(self, damage, entity=None):
+
+        if entity and isinstance(entity, entities.Bullet):
+            self.enemy_spotted()
+
+        super().damage(damage)
 
     def destroy(self):
         super().destroy()
@@ -141,6 +143,11 @@ class Enemy_Ship(AI_Ship):
 
     def enemy_spotted(self):
         self.mother_ship.alert_group()
+
+    def draw(self, win: pygame.Surface, focus_point):
+        super().draw(win, focus_point)
+        if game.DEBUG_SCREEN:
+            pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
 
 
 
@@ -236,11 +243,15 @@ class Neutral_Ship(AI_Ship):
 
     # DEBUG DRAW PATROL POINTS
 
-    def draw(self, win: pygame.Surface, focus_point):
-        super().draw(win, focus_point)
-        if game.DEBUG_SCREEN:
-            pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+    def damage(self, damage, entity=None):
+        if entity and isinstance(entity, entities.Bullet):
+            if type(entity.ship).__name__ == "Player_Ship":
+                self.state = 1
+            elif isinstance(entity.ship, Enemy_Ship):
+                self.state = 2
+                self.recent_enemy = entity.ship
         
+        super().damage(damage)
         
     def patrol_state(self, delta_time):
         self.max_speed = 100
@@ -280,3 +291,8 @@ class Neutral_Ship(AI_Ship):
         else:
             self.recent_enemy = None
             self.state = 0
+
+    def draw(self, win: pygame.Surface, focus_point):
+        super().draw(win, focus_point)
+        if game.DEBUG_SCREEN:
+            pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)

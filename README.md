@@ -29,8 +29,6 @@ Add Enemy weapons - shoot normally but might have small missiles to launch aswel
 
 Change weapon system so that each weapon can be individually upgraded
 
-Add player shield, can recharge
-
 Add shield upgrades to armour
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
@@ -266,3 +264,6 @@ Add armour image to systems menu
 Fix menu image scaling (so it is based on height and width)
 
 Add 1% lows to F3 screen
+
+
+Add player shield, can recharge
