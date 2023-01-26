@@ -33,10 +33,6 @@ Add shield upgrades to armour
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
-Add seed system
-
-Add mini map
-
 Add radar upgrades so that mini map can be improved
 
 ### a1.3.0 (station)
@@ -267,3 +263,9 @@ Add 1% lows to F3 screen
 
 
 Add player shield, can recharge
+
+### a1.2.0 (enemy improvements and player improvements)
+
+Added seed map generation
+
+Added minimap
