@@ -1,4 +1,4 @@
-import pygame                
+import pygame
 
 from game import *
 import game

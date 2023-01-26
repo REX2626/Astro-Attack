@@ -151,7 +151,8 @@ class Ship(Entity):
     def make_new_patrol_point(self, min_dist, max_dist):
         self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + self.position
     
-    def damage(self, damage):
+    def damage(self, damage, entity=None):
+        """entity is the object which is damaging this ship, DON'T REMOVE"""
         self.shield_delay_elapsed = 0
 
         # Shield takes damage, and if shield is now 0 then damage to ship is reduced
@@ -206,28 +207,13 @@ class Bullet(Entity):
             # Check if bullet is near to any aliens in it's chunk
             # If it is, then destroy alien and bullet
             for entity in game.CHUNKS.get_chunk(self).entities:
-                if isinstance(entity, Enemy_Ship) and self.distance_to(entity) < 30:
-                    entity.damage(self.damage)
-                    if isinstance(self.ship, player.Player_Ship):
-                        entity.enemy_spotted()
-                    game.CHUNKS.remove_entity(self)
-                    break
 
+                if isinstance(entity, Ship):
 
-                elif type(entity) == player.Player_Ship and self.distance_to(entity) < 30:
-                    entity.damage(self.damage)
-                    game.CHUNKS.remove_entity(self)
-                    break
-
-                elif type(entity) == Neutral_Ship and self.distance_to(entity) < 30:
-                    entity.damage(self.damage)
-                    if isinstance(self.ship, player.Player_Ship):
-                        entity.state = 1
-                    elif isinstance(self.ship, Enemy_Ship):
-                        entity.state = 2
-                        entity.recent_enemy = self.ship
-                    game.CHUNKS.remove_entity(self)
-                    break
+                    if entity.shield and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
+                        entity.damage(self.damage, self)
+                        game.CHUNKS.remove_entity(self)
+                        break
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
