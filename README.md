@@ -29,8 +29,6 @@ Add Enemy weapons - shoot normally but might have small missiles to launch aswel
 
 Change weapon system so that each weapon can be individually upgraded
 
-Add shield upgrades to armour
-
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
 Add radar upgrades so that mini map can be improved
@@ -265,7 +263,8 @@ Add 1% lows to F3 screen
 Add player shield, can recharge
 
 ### a1.2.0 (enemy improvements and player improvements)
-
 Added seed map generation
 
 Added minimap
+
+Add shield upgrades to armour

@@ -718,7 +718,9 @@ systems = Page(
 armour = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
-    UpgradeBar(0.19, 0.3, "HEALTH", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
+    UpgradeBar(0.19, 0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
+    UpgradeBar(0.19, 0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=20),
+    UpgradeBar(0.19, 0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,

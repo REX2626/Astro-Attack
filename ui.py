@@ -62,10 +62,12 @@ class MiniMap():
         self.entity_size = 3
         self.player_image = images.PLAYER_MINIMAP_IMAGE
 
-    def draw_entity(self, colour, entity):
+    def draw_entity(self, colour, entity, surf):
         if colour:
-            pygame.draw.circle(game.WIN, colour, (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.WIDTH * self.width * 1.3) + (self.width / 2),
-                ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.WIDTH * self.height * 1.3) + (self.height / 2)), self.entity_size)
+            pos = (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
+                   ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2))
+            
+            pygame.draw.circle(surf, colour, pos, self.entity_size)
 
     def get_entity_colour(self, entity):
 
@@ -87,9 +89,10 @@ class MiniMap():
         ), border_radius=5)
 
         # Draws enemies in chunks
+        surf = pygame.Surface((self.width, self.height))
         for entity in game.CHUNKS.entities:
-
-            self.draw_entity(self.get_entity_colour(entity), entity)
+            self.draw_entity(self.get_entity_colour(entity), entity, surf)
+        game.WIN.blit(surf, (0, 0))
 
         # Draws border
         pygame.draw.rect(game.WIN, color=game.DARK_GREY, rect=(
@@ -249,7 +252,7 @@ def draw(delta_time):
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))
 
-    label = font.render(f"{round(game.player.shield)} | {game.player.max_shield}", True, (255, 255, 255))
+    label = font.render(f"{round(game.player.shield)} | {round(game.player.max_shield)}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-164))
 
     label = font.render(f"{round(game.player.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))

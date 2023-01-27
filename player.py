@@ -17,7 +17,7 @@ class Player_Ship(Ship):
         rotation=0, max_rotation_speed=3,
         fire_rate=game.PLAYER_FIRE_RATE, 
         health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
-        shield=5, shield_delay=3, shield_recharge=1,
+        shield=game.MAX_PLAYER_SHIELD, shield_delay=3, shield_recharge=game.PLAYER_SHIELD_RECHARGE,
         boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
         image=images.RED_SHIP
 
@@ -44,6 +44,9 @@ class Player_Ship(Ship):
             self.track_enemy()
         else:
             self.tracked_enemy = None
+
+        self.max_shield = game.MAX_PLAYER_SHIELD
+        self.shield_recharge = game.PLAYER_SHIELD_RECHARGE
 
     def shoot(self):
         # Check if reloaded
