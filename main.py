@@ -4,6 +4,7 @@ from game import *
 import game
 from entities import Bullet, Asteroid
 from player import add_player
+from weapons import PlayerGun, GatlingGun, Sniper
 import ui
 import menu
 import graphics
@@ -87,6 +88,15 @@ def handle_player_input(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_DOWN]:
         game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
+
+    if keys_pressed[pygame.K_1]:
+        game.player.weapon = PlayerGun(game.player)
+
+    if keys_pressed[pygame.K_2]:
+        game.player.weapon = GatlingGun(game.player)
+
+    if keys_pressed[pygame.K_3]:
+        game.player.weapon = Sniper(game.player)
 
 
     # Mouse

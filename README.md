@@ -29,6 +29,12 @@ Add Enemy weapons - shoot normally but might have small missiles to launch aswel
 
 Change weapon system so that each weapon can be individually upgraded
 
+Add spread range to weapons
+
+Make bullets do less damage the further away they go (mainly for gatling gun)
+
+Fix the targeting, so that it works off current player bullet speed
+
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
 Add radar upgrades so that mini map can be improved

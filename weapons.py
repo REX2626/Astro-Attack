@@ -56,3 +56,15 @@ class PlayerGun(DefaultGun):
         self.damage = game.PLAYER_DAMAGE
         self.speed = game.PLAYER_BULLET_SPEED
         super().shoot()
+
+
+
+class GatlingGun(DefaultGun):
+    def __init__(self, ship) -> None:
+        super().__init__(ship, damage=0.5, fire_rate=20, speed=1000)
+
+
+
+class Sniper(DefaultGun):
+    def __init__(self, ship) -> None:
+        super().__init__(ship, damage=2, fire_rate=3, speed=1500)
