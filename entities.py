@@ -1,4 +1,5 @@
 from objects import Vector1D, Vector, Object, Entity, random_vector
+from weapons import DefaultGun
 import particles
 import images
 import game
@@ -68,12 +69,12 @@ class Asteroid(Object):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, fire_rate=1, health=1, shield=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, weapon=DefaultGun, health=1, shield=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
-        self.reload_time = 1 / fire_rate
+        self.weapon = weapon(self)
         self.max_speed = max_speed
         self.health = health
         self.max_shield = shield
@@ -81,7 +82,6 @@ class Ship(Entity):
         self.shield_delay = shield_delay
         self.shield_recharge = shield_recharge
         
-        self.time_reloading = 0
         self.shield_delay_elapsed = 0
         self.rotation_speed = Vector1D(0)
 
@@ -109,8 +109,8 @@ class Ship(Entity):
         # Change rotation by rotation speed
         self.set_rotation(self.rotation + self.rotation_speed * delta_time)
 
-        # Increase reload time
-        self.time_reloading += delta_time
+        # Update weapon
+        self.weapon.update(delta_time)
 
         # Increase shield delay time elapsed
         self.shield_delay_elapsed += delta_time
@@ -122,27 +122,8 @@ class Ship(Entity):
             if self.shield > self.max_shield:
                 self.shield = self.max_shield
 
-    def shoot(self, damage=1, image=images.BULLET):
-        # Check if reloaded
-        if self.time_reloading >= self.reload_time:
-            
-            bullet_position = self.position + Vector(0, -self.image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
-            bullet_position.rotate_about(self.rotation, self.position)
-            bullet_velocity = Vector(0, -game.BULLET_SPEED)
-            bullet_velocity.rotate(self.rotation)
-            bullet = Bullet(
-
-                position=bullet_position,
-                velocity=bullet_velocity + self.velocity,
-                rotation=self.rotation,
-                ship=self,
-                damage=damage,
-                lifetime=3,
-                image=image
-                )
-
-            game.CHUNKS.add_entity(bullet)
-            self.time_reloading = 0
+    def shoot(self):
+        self.weapon.shoot()
 
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)

@@ -249,6 +249,7 @@ Remove settings that are now changed with upgrades (e.g. health)
 
 Add weapon upgrades: fire rate, damage, speed, range?
 
+
 ### a1.1.0 (upgrades and f3)
 Add radar upgrades: max zoom out
 
@@ -260,11 +261,11 @@ Fix menu image scaling (so it is based on height and width)
 Add 1% lows to F3 screen
 
 
-Add player shield, can recharge
-
 ### a1.2.0 (enemy improvements and player improvements)
 Added seed map generation
 
 Added minimap
+
+Add player shield, can recharge
 
 Add shield upgrades to armour

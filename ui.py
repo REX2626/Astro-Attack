@@ -3,7 +3,6 @@ import images
 from objects import Vector
 import aiship
 from entities import Asteroid
-from player import Player_Ship
 import math
 import pygame
 import psutil
