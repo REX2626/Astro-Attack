@@ -731,9 +731,9 @@ armour = Page(
 weapon = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Weapon"),
-    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_FIRE_RATE", min_value=game.PLAYER_FIRE_RATE, max_value=20),
-    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DAMAGE", min_value=game.PLAYER_DAMAGE, max_value=2),
-    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_BULLET_SPEED", min_value=game.PLAYER_BULLET_SPEED, max_value=1000),
+    Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
+    Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
+    Button(0.3, 0.7, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -762,6 +762,45 @@ radar = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(systems),
+    e_press=lambda: True
+)
+
+default_gun = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.12, "Default"),
+    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
+    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
+    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: Menu.change_page(weapon),
+    e_press=lambda: True
+)
+
+gatling_gun = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.12, "Gatling"),
+    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
+    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
+    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: Menu.change_page(weapon),
+    e_press=lambda: True
+)
+
+sniper_gun = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.12, "Sniper"),
+    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
+    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
+    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
 )
 

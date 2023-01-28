@@ -95,7 +95,7 @@ class Player_Ship(Ship):
 
     def track_enemy(self):
         enemy = self.tracked_enemy
-        time_to_enemy = self.distance_to(enemy) / game.BULLET_SPEED
+        time_to_enemy = self.distance_to(enemy) / self.weapon.speed
         self.aim_pos = ((enemy.velocity - self.velocity) * time_to_enemy) + enemy.position
 
     def draw(self, win: pygame.Surface, focus_point):
