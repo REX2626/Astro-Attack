@@ -53,7 +53,7 @@ class Asteroid(Object):
                             entity.damage(entity.velocity.magnitude()**2/100_000)
 
                             if hasattr(entity, "make_new_patrol_point"):
-                                entity.make_new_patrol_point(400, 500)
+                                entity.make_new_patrol_point(400, 500, self.position)
 
                             particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
 
@@ -129,8 +129,8 @@ class Ship(Entity):
         super().accelerate(acceleration)
         self.velocity.clamp(self.max_speed)
 
-    def make_new_patrol_point(self, min_dist, max_dist):
-        self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + self.position
+    def make_new_patrol_point(self, min_dist, max_dist, relative_pos):
+        self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + relative_pos
     
     def damage(self, damage, entity=None):
         """entity is the object which is damaging this ship, DON'T REMOVE"""
