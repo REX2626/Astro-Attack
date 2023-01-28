@@ -101,6 +101,9 @@ class Player_Ship(Ship):
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
 
+        if hasattr(self.weapon, "draw"):
+            self.weapon.draw(win, focus_point)
+
         if self.tracked_enemy:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.aim_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.aim_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20*game.ZOOM, width=round(2*game.ZOOM))
      

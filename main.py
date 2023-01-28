@@ -4,7 +4,7 @@ from game import *
 import game
 from entities import Bullet, Asteroid
 from player import add_player
-from weapons import PlayerGun, GatlingGun, Sniper
+from weapons import PlayerGun, GatlingGun, Sniper, Laser
 import ui
 import menu
 import graphics
@@ -97,6 +97,9 @@ def handle_player_input(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_3]:
         game.player.weapon = Sniper(game.player)
+
+    if keys_pressed[pygame.K_4]:
+        game.player.weapon = Laser(game.player)
 
 
     # Mouse

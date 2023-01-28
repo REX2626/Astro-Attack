@@ -3,6 +3,8 @@ import entities
 import images
 import game
 import random
+import math
+import pygame
 
 
 class DefaultGun():
@@ -73,6 +75,7 @@ class GatlingGun(DefaultGun):
         super().shoot()
 
 
+
 class Sniper(DefaultGun):
     def __init__(self, ship) -> None:
         super().__init__(ship, damage=game.PLAYER_SNIPER_DAMAGE, fire_rate=game.PLAYER_SNIPER_FIRE_RATE, speed=game.PLAYER_SNIPER_FIRE_RATE, image=images.SNIPER_BULLET)
@@ -82,3 +85,66 @@ class Sniper(DefaultGun):
         self.damage = game.PLAYER_SNIPER_DAMAGE
         self.speed = game.PLAYER_SNIPER_BULLET_SPEED
         super().shoot()
+
+
+
+class Laser():
+    def __init__(self, ship: "entities.Ship", damage=1, charge=10, recharge=1, range=500) -> None:
+        self.ship = ship
+        self.damage = damage
+        self.charge = charge
+        self.recharge = recharge
+        self.max_range = range
+
+        self.range = self.max_range
+        self.shooting = False
+        self.delta_time = 0 # used for shoot
+
+    def update(self, delta_time):
+        self.charge += self.recharge * delta_time
+        self.delta_time = delta_time
+
+    def shoot(self):
+        self.shooting = True
+        self.range, entity = self.raycast()
+
+        if isinstance(entity, entities.Ship):
+            entity.damage(3*self.delta_time, self.ship)
+
+    def raycast(self):
+        start = self.ship.position + Vector(0, -self.ship.image.get_height()).get_rotate(self.ship.rotation) # start position of the laser, height is not /2, so laser doesn't hit self.ship
+
+        entity_hit = None
+        for step in range(self.max_range):
+            pos = start + Vector(0, -step).get_rotate(self.ship.rotation)
+            chunk = game.CHUNKS.get_chunk((pos//game.CHUNK_SIZE).to_tuple())
+
+            for entity in chunk.entities:
+                if not hasattr(entity, "image"): continue
+                image = entity.image
+                width, height = image.get_width(), image.get_height()
+                entity_rect = pygame.Rect(entity.position.x-width/2, entity.position.y-height/2, width, height)
+
+                if entity_rect.collidepoint(pos.x, pos.y):
+                    entity_hit = entity
+                    break
+            
+            if entity_hit:
+                break
+
+        return step, entity_hit
+
+    def draw(self, win: pygame.Surface, focus_point):
+        if not self.shooting:
+            return
+        self.shooting = False
+
+        ship = self.ship
+        centre = ship.position + Vector(0, -ship.image.get_height()/2 - self.range/2) # centre of laser
+        centre.rotate_about(ship.rotation, ship.position)
+
+        surf = pygame.Surface((10*game.ZOOM, self.range*game.ZOOM), flags=pygame.SRCALPHA)
+        surf.fill((255, 0, 0))
+        surf = pygame.transform.rotate(surf, self.ship.rotation / math.pi * 180)
+
+        win.blit(surf, ((centre - focus_point) * game.ZOOM + game.CENTRE_POINT - Vector(surf.get_width()/2, surf.get_height()/2)).to_tuple())

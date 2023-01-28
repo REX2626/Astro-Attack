@@ -33,6 +33,8 @@ Make bullets do less damage the further away they go (mainly for gatling gun)
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
+Make damage effect proportional to damage taken
+
 Add radar upgrades so that mini map can be improved
 
 Add screen shake
