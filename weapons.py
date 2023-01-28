@@ -52,22 +52,33 @@ class EnemyGun(DefaultGun):
 
 class PlayerGun(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=game.PLAYER_DAMAGE, fire_rate=game.PLAYER_FIRE_RATE, spread=0.05)
+        super().__init__(ship, damage=game.PLAYER_DEFAULT_DAMAGE, fire_rate=game.PLAYER_DEFAULT_FIRE_RATE, speed=game.PLAYER_DEFAULT_BULLET_SPEED, spread=0.05)
 
     def shoot(self):
-        self.reload_time = 1 / game.PLAYER_FIRE_RATE
-        self.damage = game.PLAYER_DAMAGE
-        self.speed = game.PLAYER_BULLET_SPEED
+        self.reload_time = 1 / game.PLAYER_DEFAULT_FIRE_RATE
+        self.damage = game.PLAYER_DEFAULT_DAMAGE
+        self.speed = game.PLAYER_DEFAULT_BULLET_SPEED
         super().shoot()
 
 
 
 class GatlingGun(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=images.GATLING_BULLET)
+        super().__init__(ship, damage=game.PLAYER_GATLING_DAMAGE, fire_rate=game.PLAYER_GATLING_FIRE_RATE, speed=game.PLAYER_GATLING_BULLET_SPEED, spread=0.2, image=images.GATLING_BULLET)
 
+    def shoot(self):
+        self.reload_time = 1 / game.PLAYER_GATLING_FIRE_RATE
+        self.damage = game.PLAYER_GATLING_DAMAGE
+        self.speed = game.PLAYER_GATLING_BULLET_SPEED
+        super().shoot()
 
 
 class Sniper(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=2, fire_rate=3, speed=1500, image=images.SNIPER_BULLET)
+        super().__init__(ship, damage=game.PLAYER_SNIPER_DAMAGE, fire_rate=game.PLAYER_SNIPER_FIRE_RATE, speed=game.PLAYER_SNIPER_FIRE_RATE, image=images.SNIPER_BULLET)
+    
+    def shoot(self):
+        self.reload_time = 1 / game.PLAYER_SNIPER_FIRE_RATE
+        self.damage = game.PLAYER_SNIPER_DAMAGE
+        self.speed = game.PLAYER_SNIPER_BULLET_SPEED
+        super().shoot()
