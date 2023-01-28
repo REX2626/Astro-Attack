@@ -64,10 +64,10 @@ class PlayerGun(DefaultGun):
 
 class GatlingGun(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=0.5, fire_rate=20, speed=800, spread=0.2)
+        super().__init__(ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=images.GATLING_BULLET)
 
 
 
 class Sniper(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=2, fire_rate=3, speed=1500)
+        super().__init__(ship, damage=2, fire_rate=3, speed=1500, image=images.SNIPER_BULLET)
