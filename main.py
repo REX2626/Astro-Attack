@@ -22,6 +22,9 @@ def update_playing_screen_size():
 
     game.update_screen_size()
 
+    graphics.WIDTH = game.WIDTH
+    graphics.HEIGHT = game.HEIGHT
+
     "Set the x and y of objects based on new width and height, with ratios"
 
     "Clip the coords of any object out of bounds"

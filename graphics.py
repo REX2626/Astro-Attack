@@ -47,7 +47,7 @@ def draw_chunks():
             chunk_pos = (x, y)
             chunk = game.CHUNKS.get_chunk(chunk_pos)
 
-            pos = Vector(chunk_pos[0], chunk_pos[1]) * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + CENTRE_POINT
+            pos = Vector(chunk_pos[0], chunk_pos[1]) * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + game.CENTRE_POINT
             rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
 
             if len(chunk.entities.intersection(game.CHUNKS.entities)):
