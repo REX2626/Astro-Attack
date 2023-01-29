@@ -17,9 +17,9 @@ Neutral ship when attacking, will only become passive again once the whole group
 
 Improve enemy AI, so they don't shoot at each other
 
-New mothership image, large and powerful
+Improve enemy retreat state
 
-New neutral ship image, cargo vessel
+Add images for drone and missile ship
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
@@ -27,7 +27,9 @@ Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missil
 
 Add Enemy weapons - shoot normally but might have small missiles to launch aswell
 
-Change weapon system so that each weapon can be individually upgraded
+Make default weapons, and weapons for player and enemy
+
+Add a weapon hotbar, so you can see which weapon is selected
 
 Make bullets do less damage the further away they go (mainly for gatling gun)
 
@@ -50,6 +52,10 @@ Neutral ships travel between neutral stations
 
 Neutral stations can be traded with
 
+New mothership image, large and powerful
+
+New neutral ship image, cargo vessel
+
 ### Other
 Give boost particles a velocity
 
@@ -64,6 +70,10 @@ Check / improve graphics.get_entities_to_draw performance
 Fix first full_screen click not moving the mouse properly
 
 ### POTENTIAL
+
+Strict Rendering (only rendering objects which will defo be on screen)
+
+Think about doing rotozoom as it filters the image (AA), can be costly tho
 
 Add ammo system
 
@@ -104,9 +114,6 @@ Example weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, 
 ---
 
 Have a massive asteroid or moon, with tunnels that you can go through
-
-Strict Rendering (only rendering objects which will defo be on screen)
-
 
 ## DONE:
 Make Enemy ships move around
@@ -279,3 +286,5 @@ Add shield upgrades to armour
 Fix the targeting, so that it works off current player bullet speed
 
 Add spread range to weapons
+
+Change weapon system so that each weapon can be individually upgraded

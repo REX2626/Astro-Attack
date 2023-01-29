@@ -112,12 +112,15 @@ class Laser():
             entity.damage(self.damage*self.delta_time, self.ship)
 
     def raycast(self):
-        start = self.ship.position + Vector(0, -self.ship.image.get_height()).get_rotate(self.ship.rotation) # start position of the laser, height is not /2, so laser doesn't hit self.ship
 
         entity_hit = None
+        sin_rotation = math.sin(self.ship.rotation)
+        cos_rotation = math.cos(self.ship.rotation)
+        x = self.ship.position.x - self.ship.image.get_height() * sin_rotation
+        y = self.ship.position.y - self.ship.image.get_height() * cos_rotation
         for step in range(self.max_range):
-            pos = start + Vector(0, -step).get_rotate(self.ship.rotation)
-            chunk = game.CHUNKS.get_chunk((pos//game.CHUNK_SIZE).to_tuple())
+            x, y = x - sin_rotation, y - cos_rotation
+            chunk = game.CHUNKS.get_chunk((int(x//game.CHUNK_SIZE), int(y//game.CHUNK_SIZE)))
 
             for entity in chunk.entities:
                 if not hasattr(entity, "image"): continue
@@ -125,7 +128,7 @@ class Laser():
                 width, height = image.get_width(), image.get_height()
                 entity_rect = pygame.Rect(entity.position.x-width/2, entity.position.y-height/2, width, height)
 
-                if entity_rect.collidepoint(pos.x, pos.y):
+                if entity_rect.collidepoint(x, y):
                     entity_hit = entity
                     break
             
