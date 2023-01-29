@@ -52,6 +52,12 @@ class EnemyGun(DefaultGun):
 
 
 
+class MotherShipGun(DefaultGun):
+    def __init__(self, ship) -> None:
+        super().__init__(ship, damage=3, fire_rate=0.5, speed=1000, image=images.RED_BULLET)
+
+
+
 class PlayerGun(DefaultGun):
     def __init__(self, ship) -> None:
         super().__init__(ship, damage=game.PLAYER_DEFAULT_DAMAGE, fire_rate=game.PLAYER_DEFAULT_FIRE_RATE, speed=game.PLAYER_DEFAULT_BULLET_SPEED, spread=0.05)

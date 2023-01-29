@@ -7,16 +7,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Add new enemy types: missile, different fighter ship variants
-
-POSSIBLE: neutral ship grouping
-
-Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
-
-Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
-
-Improve enemy AI, so they don't shoot at each other
-
 Improve enemy retreat state
 
 Add images for drone and missile ship
@@ -43,6 +33,12 @@ Add screen shake
 
 ### a1.3.0 (station)
 Add space stations
+
+POSSIBLE: neutral ship grouping
+
+Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
+
+Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
 
 Enemies spawn from enemy stations
 
@@ -286,5 +282,9 @@ Add shield upgrades to armour
 Fix the targeting, so that it works off current player bullet speed
 
 Add spread range to weapons
+
+Add new enemy types: missile, different fighter ship variants
+
+Enemy Ships dont shoot each other
 
 Change weapon system so that each weapon can be individually upgraded
