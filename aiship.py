@@ -178,7 +178,6 @@ class Enemy_Ship(AI_Ship):
 class Missile_Ship(Enemy_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.RADAR_ICON) -> None:
         super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
-        self.mother_ship = mother_ship
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
@@ -228,6 +227,12 @@ class Missile_Ship(Enemy_Ship):
 
 
 
+class Drone_Enemy(Enemy_Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
+        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
+
+
+
 class Mother_Ship(Enemy_Ship):
     def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, weapon=EnemyGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
@@ -260,10 +265,13 @@ class Mother_Ship(Enemy_Ship):
 
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
-            if random.random() > 0.3:
-                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
-            else:
+            if random.random() < 0.2:
                 enemy = Missile_Ship(random_position, Vector(0, 0), mother_ship=self)
+            elif random.random() < 0.4:
+                enemy = Drone_Enemy(random_position, Vector(0, 0), mother_ship=self)
+            else:
+                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
+            
             self.enemy_list.append(enemy)
             
             game.CHUNKS.add_entity(enemy)
@@ -282,7 +290,7 @@ class Mother_Ship(Enemy_Ship):
             else:
                 self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist)
 
-            if self.state == 1 and distance_to_player > 1000:
+            if self.state == 1 and distance_to_player > 1500:
                 self.state = 0
 
     # DEBUG DRAW PATROL POINTS
@@ -316,7 +324,7 @@ class Neutral_Ship(AI_Ship):
         elif self.state == 2:
             self.attack_enemy_state(delta_time)
 
-        if self.state == 1 and self.distance_to(game.player) > 1000:
+        if self.state == 1 and self.distance_to(game.player) > 1500:
             self.state = 0
 
     # DEBUG DRAW PATROL POINTS

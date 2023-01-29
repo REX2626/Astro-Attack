@@ -7,13 +7,11 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Add new enemy types: missile, different fighter ship variants
-
 POSSIBLE: neutral ship grouping
 
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
-Neutral ship when attacking, will only become passive again once the whole group of enemies or defeated
+Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
 
 Improve enemy AI, so they don't shoot at each other
 
@@ -279,3 +277,5 @@ Add shield upgrades to armour
 Fix the targeting, so that it works off current player bullet speed
 
 Add spread range to weapons
+
+Add new enemy types: missile, different fighter ship variants
