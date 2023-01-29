@@ -89,7 +89,7 @@ class Sniper(DefaultGun):
 
 
 class Laser():
-    def __init__(self, ship: "entities.Ship", damage=1, charge=10, recharge=1, range=500) -> None:
+    def __init__(self, ship: "entities.Ship", damage=10, charge=10, recharge=1, range=500) -> None:
         self.ship = ship
         self.damage = damage
         self.charge = charge
@@ -109,7 +109,7 @@ class Laser():
         self.range, entity = self.raycast()
 
         if isinstance(entity, entities.Ship):
-            entity.damage(3*self.delta_time, self.ship)
+            entity.damage(self.damage*self.delta_time, self.ship)
 
     def raycast(self):
         start = self.ship.position + Vector(0, -self.ship.image.get_height()).get_rotate(self.ship.rotation) # start position of the laser, height is not /2, so laser doesn't hit self.ship
@@ -134,6 +134,24 @@ class Laser():
 
         return step, entity_hit
 
+    def draw_beam(self):
+        
+        beam_width = 10*game.ZOOM
+        glow_radius = 100*game.ZOOM
+        width, height = beam_width+glow_radius, self.range*game.ZOOM+glow_radius
+        surf = pygame.Surface((width, height), flags=pygame.SRCALPHA)
+
+        # Draw beam glow
+        for step in range(int(glow_radius/4)+1):
+            step=step*2
+            pygame.draw.rect(surf, (40, 100, 150, (step/width)**1.3*510), (step, step, width-step*2, height-step*2), border_radius=round(width-step), width=3)
+
+        # Draw light beam
+        pygame.draw.rect(surf, (81, 200, 252), (glow_radius/2, glow_radius/2, beam_width, self.range*game.ZOOM), border_radius=round(beam_width))
+
+        surf = pygame.transform.rotozoom(surf, self.ship.rotation / math.pi * 180, 1)
+        return surf
+
     def draw(self, win: pygame.Surface, focus_point):
         if not self.shooting:
             return
@@ -143,8 +161,6 @@ class Laser():
         centre = ship.position + Vector(0, -ship.image.get_height()/2 - self.range/2) # centre of laser
         centre.rotate_about(ship.rotation, ship.position)
 
-        surf = pygame.Surface((10*game.ZOOM, self.range*game.ZOOM), flags=pygame.SRCALPHA)
-        surf.fill((255, 0, 0))
-        surf = pygame.transform.rotate(surf, self.ship.rotation / math.pi * 180)
+        surf = self.draw_beam()
 
         win.blit(surf, ((centre - focus_point) * game.ZOOM + game.CENTRE_POINT - Vector(surf.get_width()/2, surf.get_height()/2)).to_tuple())
