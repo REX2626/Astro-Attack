@@ -2,7 +2,7 @@ from objects import Vector
 import entities
 from entities import Ship, Asteroid
 from objects import random_vector
-from weapons import EnemyGun
+from weapons import EnemyGun, MotherShipGun
 import images
 import game
 import random
@@ -84,7 +84,7 @@ class AI_Ship(Ship):
         ship_pos = game.player.position
         ship_vel = game.player.velocity
         current_vel = self.velocity
-        bullet_speed = game.BULLET_SPEED
+        bullet_speed = self.weapon.speed
 
         # Calculates basic time to reach player and the next position of the player ship
         time_to_player = self.distance_to(game.player) / bullet_speed
@@ -234,7 +234,7 @@ class Drone_Enemy(Enemy_Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, weapon=EnemyGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, weapon=MotherShipGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []

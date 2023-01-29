@@ -166,6 +166,10 @@ class Ship(Entity):
 
 
 
+from aiship import Enemy_Ship, Mother_Ship
+
+
+
 class Bullet(Entity):
     def __init__(self, position, velocity, rotation=0, ship=None, damage=1, lifetime=5, image=images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
@@ -187,11 +191,11 @@ class Bullet(Entity):
             for entity in game.CHUNKS.get_chunk(self).entities:
 
                 if isinstance(entity, Ship):
-
-                    if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
-                        entity.damage(self.damage, self)
-                        game.CHUNKS.remove_entity(self)
-                        break
+                    if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
+                        if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
+                            entity.damage(self.damage, self)
+                            game.CHUNKS.remove_entity(self)
+                            break
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
