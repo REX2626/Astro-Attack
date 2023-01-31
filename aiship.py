@@ -2,7 +2,7 @@ from objects import Vector
 import entities
 from entities import Ship, Asteroid, HealthPickup
 from objects import random_vector
-from weapons import EnemyGun, MotherShipGun
+from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 import images
 import game
 import random
@@ -259,13 +259,13 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGatlingGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=3, weapon=MotherShipGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=3, weapon=EnemySniper, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
