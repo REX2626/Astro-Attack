@@ -1,6 +1,6 @@
 from objects import Vector
 import entities
-from entities import Ship, Asteroid
+from entities import Ship, Asteroid, HealthPickup
 from objects import random_vector
 from weapons import EnemyGun, MotherShipGun
 import images
@@ -11,8 +11,8 @@ import pygame
 
 
 class AI_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, image=images.DEFAULT) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, image)
         
         self.state = state
         # Initialises start patrol point
@@ -36,15 +36,15 @@ class AI_Ship(Ship):
                         # No Asteroid
                         return False
 
-    def patrol_state(self, delta_time, min_dist, max_dist, max_speed=50, mother_ship_pos=None):
+    def patrol_state(self, delta_time, min_dist, max_dist, max_speed=50, mother_ship=None):
         self.max_speed = max_speed
 
         target_position = self.patrol_point
         direction_vector = target_position - self.position
         distance = (direction_vector).magnitude()
 
-        if mother_ship_pos:
-            target_to_mothership_distance = (target_position - mother_ship_pos).magnitude()
+        if mother_ship:
+            target_to_mothership_distance = (target_position - mother_ship.position).magnitude()
         else:
             target_to_mothership_distance = 0
 
@@ -114,18 +114,37 @@ class AI_Ship(Ship):
         self.set_rotation(self.position.get_angle_to(game.player.position) + math.pi)
         self.accelerate_in_direction(game.player.position, 400 * -delta_time)
 
+    def find_nearest_health_pickup(self):
+        health_pickups = []
+        for entity in game.CHUNKS.entities:
+            if isinstance(entity, HealthPickup):
+                health_pickups.append(entity)
+
+        dist_to_health = math.inf
+        index = 0
+
+        for i, health_pickup in enumerate(health_pickups):
+            dist = (health_pickup.position - self.position).magnitude()
+            if dist < dist_to_health:
+                dist_to_health = dist
+                index = i
+
+        return health_pickups[index]
+
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, weapon=EnemyGun, health=3, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=3, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.GREEN_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
         self.mother_ship = mother_ship
+        self.mother_ship_patrol = mother_ship
         self.new_ship_pos = Vector(0, 0)
         self.attack_min_dist = 100
         self.attack_max_dist = 400
         self.attack_max_speed = 300
         self.patrol_min_dist = 100
         self.patrol_max_dist = 400
+        self.hp = None
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -133,18 +152,29 @@ class Enemy_Ship(AI_Ship):
         distance_to_player = self.distance_to(game.player)
 
         if self.health == 1 and distance_to_player < 2000 and game.player.health > 5 and len(self.mother_ship.enemy_list) <= 2:
+            self.state = 2
             self.retreat_state(delta_time)
         else:
-            if distance_to_player < 600 or self.state == 1:
+            if (distance_to_player < 600 or self.state == 1) and self.state != 2:
                 self.attack_player_state(delta_time, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
                 self.enemy_spotted()
-            else:
-                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship_pos=self.mother_ship.position)
+            elif self.state != 2:
+                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
 
             if self.state == 1 and distance_to_player > 1000:
                 self.state = 0
+            
+            if self.state == 2 and self.health > 1:
+                self.state = 0
+            elif self.state == 2 and self.health == 1 and distance_to_player > 1500:
+                self.hp = self.find_nearest_health_pickup()
+                self.set_rotation(self.position.get_angle_to(self.hp.position) + math.pi)
+                self.accelerate_in_direction(self.hp.position, 400 * delta_time)
 
-    # DEBUG DRAW PATROL POINTS
+                if (self.hp.position - self.position).magnitude() < 50:
+                    self.hp.destroy()
+                    self.health += 5
+
 
     def damage(self, damage, entity=None):
 
@@ -172,12 +202,13 @@ class Enemy_Ship(AI_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+            pygame.draw.circle(game.WIN, (255, 255, 255), ((self.hp.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.hp.position.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 50 * game.ZOOM)
 
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.RADAR_ICON) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.RADAR_ICON) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
@@ -228,17 +259,19 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, weapon=MotherShipGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=3, weapon=MotherShipGun, health=10, shield=3, shield_delay=5, shield_recharge=1, state=0, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
+
+        self.mother_ship_patrol = None
 
         self.attack_min_dist = 300
         self.attack_max_dist = 600
@@ -266,9 +299,9 @@ class Mother_Ship(Enemy_Ship):
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
             if random.random() < 0.2:
-                enemy = Missile_Ship(random_position, Vector(0, 0), mother_ship=self)
+                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
             elif random.random() < 0.4:
-                enemy = Drone_Enemy(random_position, Vector(0, 0), mother_ship=self)
+                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
             else:
                 enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
             
@@ -276,24 +309,6 @@ class Mother_Ship(Enemy_Ship):
             
             game.CHUNKS.add_entity(enemy)
 
-    def update(self, delta_time):
-        super(AI_Ship, self).update(delta_time)
-
-        distance_to_player = self.distance_to(game.player)
-
-        if self.health == 1 and distance_to_player < 2000 and game.player.health > 5 and len(self.mother_ship.enemy_list) <= 2:
-            self.retreat_state(delta_time)
-        else:
-            if distance_to_player < 600 or self.state == 1:
-                self.attack_player_state(delta_time, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
-                self.enemy_spotted()
-            else:
-                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist)
-
-            if self.state == 1 and distance_to_player > 1500:
-                self.state = 0
-
-    # DEBUG DRAW PATROL POINTS
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
@@ -303,15 +318,16 @@ class Mother_Ship(Enemy_Ship):
 
     def alert_group(self):
         for enemy in self.enemy_list:
-            enemy.state = 1
+            if enemy.state != 2:
+                enemy.state = 1
         
         self.state = 1
 
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=0, recent_enemy=None, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
         self.recent_enemy = recent_enemy
 
     def update(self, delta_time):
@@ -327,7 +343,6 @@ class Neutral_Ship(AI_Ship):
         if self.state == 1 and self.distance_to(game.player) > 1500:
             self.state = 0
 
-    # DEBUG DRAW PATROL POINTS
 
     def damage(self, damage, entity=None):
         if entity and isinstance(entity, entities.Bullet):

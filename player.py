@@ -23,7 +23,7 @@ class Player_Ship(Ship):
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, weapon, health(), shield, shield_delay, shield_recharge, image)
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health(), shield, shield_delay, shield_recharge, image)
 
         self.max_rotation_speed = max_rotation_speed
         self.boost_amount = boost_amount()
@@ -57,10 +57,6 @@ class Player_Ship(Ship):
                         - self.velocity) # velocity + acceleration that is the same speed as current velocity
 
         self.velocity += acceleration
-
-    def accelerate_rotation(self, acceleration):
-        self.rotation_speed += acceleration
-        self.rotation_speed.clamp(self.max_rotation_speed)
 
     def move_forward(self, delta_time):
         self.accelerate_relative(delta_time * Vector(0, -game.PLAYER_ACCELERATION))
