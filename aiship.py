@@ -161,7 +161,7 @@ class Enemy_Ship(AI_Ship):
             elif self.state != 2:
                 self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
 
-            if self.state == 1 and distance_to_player > 1000:
+            if self.state == 1 and distance_to_player > 1500:
                 self.state = 0
             
             if self.state == 2 and self.health > 1:
@@ -202,7 +202,6 @@ class Enemy_Ship(AI_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-            pygame.draw.circle(game.WIN, (255, 255, 255), ((self.hp.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.hp.position.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 50 * game.ZOOM)
 
 
 
@@ -213,19 +212,6 @@ class Missile_Ship(Enemy_Ship):
         self.explode_radius = 100
         self.explode_damage = 10
     
-    def update(self, delta_time):
-        super(AI_Ship, self).update(delta_time)
-        
-        distance_to_player = self.distance_to(game.player)
-
-        if distance_to_player < 600 or self.state == 1:
-            self.attack_player_state(delta_time, distance_to_player, self.attack_max_speed)
-            self.enemy_spotted()
-        else:
-            self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship_pos=self.mother_ship.position)
-
-        if self.state == 1 and distance_to_player > 1000:
-            self.state = 0
 
     def attack_player_state(self, delta_time, distance_to_player, max_speed=300):
         # Set max speed to a higher value
@@ -279,6 +265,10 @@ class Mother_Ship(Enemy_Ship):
         self.patrol_min_dist = 1000
         self.patrol_max_dist = 1500
 
+        self.missile_fire_rate = 0.2
+        self.reload_time = 1 / self.missile_fire_rate
+        self.time_reloading = 0
+
         # Make start patrol point
         while True:
             self.make_new_patrol_point(self.patrol_min_dist, self.patrol_max_dist, self.position)
@@ -299,15 +289,40 @@ class Mother_Ship(Enemy_Ship):
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
             if random.random() < 0.2:
-                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
+                enemy = Missile_Ship(random_position, Vector(0, 0), mother_ship=self)
             elif random.random() < 0.4:
-                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
+                enemy = Drone_Enemy(random_position, Vector(0, 0), mother_ship=self)
             else:
                 enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
             
             self.enemy_list.append(enemy)
             
             game.CHUNKS.add_entity(enemy)
+
+    
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        self.time_reloading += delta_time
+
+    
+    def attack_player_state(self, delta_time, min_dist=300, max_dist=600, max_speed=100):
+        super().attack_player_state(delta_time, min_dist, max_dist, max_speed)
+
+        # Fire Missiles
+
+        if self.time_reloading >= self.reload_time:
+
+            # Get vector 90 degrees from player
+            direction_vector = game.player.position - self.position
+            rotated_vector = direction_vector.get_rotate(math.pi / 2)
+            final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
+
+            # Fire 2 missiles, one on eather side of the ship
+            self.weapon.fire_missile(self.position, final_vector * 100 * delta_time, 1000, 100, 150, 5)
+            self.weapon.fire_missile(self.position, final_vector * 100 * -delta_time, 1000, 100, 150, 5)
+
+            self.time_reloading = 0
 
 
     def draw(self, win: pygame.Surface, focus_point):

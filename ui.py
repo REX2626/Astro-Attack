@@ -2,7 +2,7 @@ import game
 import images
 from objects import Vector
 import aiship
-from entities import Asteroid
+from entities import Asteroid, HealthPickup
 import math
 import pygame
 import psutil
@@ -58,6 +58,7 @@ class MiniMap():
         self.asteroid_colour = game.LIGHT_GREY
         self.player_colour = (255, 255, 255)
         self.neutral_colour = (0, 255, 0)
+        self.health_pickup_colour = (0, 0, 255)
         self.entity_size = 3
         self.player_image = images.PLAYER_MINIMAP_IMAGE
 
@@ -78,8 +79,11 @@ class MiniMap():
             self.entity_size = 3
             return self.neutral_colour
         elif isinstance(entity, Asteroid):
-            self.entity_size = 7
+            self.entity_size = 10
             return self.asteroid_colour
+        elif isinstance(entity, HealthPickup):
+            self.entity_size = 2
+            return self.health_pickup_colour
 
     def draw(self):
         # Draws black background

@@ -264,6 +264,65 @@ class Bullet(Entity):
                             entity.damage(self.damage, self)
                             game.CHUNKS.remove_entity(self)
                             break
+                elif isinstance(entity, Missile):
+                    if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
+                        if self.distance_to(entity) < 20:
+                            entity.explode(entity.explode_radius)
+                            entity.destroy()
+                            game.CHUNKS.remove_entity(self)
+                            break
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
+
+
+
+class Missile(Entity):
+    def __init__(self, position, velocity, max_speed, rotation=0, explode_distance=100, explode_radius=150, explode_damage=5, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, rotation, image)
+        
+        self.max_speed = max_speed
+        self.explode_distance = explode_distance
+        self.explode_radius = explode_radius
+        self.explode_damage = explode_damage
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        # Inertial Dampening
+        self.velocity -= self.velocity.get_clamp(1500 * delta_time)
+
+        # Rotation
+        self.set_rotation(self.position.get_angle_to(game.player.position))
+
+        # Movement
+        self.accelerate_in_direction(game.player.position, 2000 * delta_time)
+
+        if self.distance_to(game.player) < self.explode_distance:
+            self.explode(self.explode_radius)
+            self.destroy()
+
+    def accelerate(self, acceleration: Vector):
+        super().accelerate(acceleration)
+        self.velocity.clamp(self.max_speed)
+
+    def explode(self, radius):
+        entity_list = game.CHUNKS.entities
+        entity_list.remove(self)
+
+        # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
+        entities_to_damage = []
+
+        for entity in entity_list:
+            if isinstance(entity, Ship):
+                if entity.distance_to(self) < radius:
+                    entities_to_damage.append(entity)
+        
+        for entity in entities_to_damage:
+            entity.damage(self.explode_damage)
+
+
+    def destroy(self):
+        game.CHUNKS.remove_entity(self)
+        particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
+        particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
