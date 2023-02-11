@@ -8,6 +8,7 @@ import game
 import random
 import math
 import pygame
+import particles
 
 
 class AI_Ship(Ship):
@@ -206,16 +207,16 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.RADAR_ICON) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
     
 
-    def attack_player_state(self, delta_time, attack_min_dist, attack_max_dist, max_speed=300):
+    def attack_player_state(self, delta_time, attack_min_dist, attack_max_dist, attack_max_speed):
         # Set max speed to a higher value
-        self.max_speed = max_speed
+        self.max_speed = attack_max_speed
 
         distance_to_player = self.distance_to(game.player)
 
@@ -224,6 +225,12 @@ class Missile_Ship(Enemy_Ship):
 
         # Movement
         self.accelerate_in_direction(game.player.position, 2000 * delta_time)
+
+        # Boost particle effect
+        boost_distance = 20
+        boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
+
+        particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
 
         if distance_to_player < 60:
             self.explode(self.explode_radius)
