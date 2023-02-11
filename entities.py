@@ -278,7 +278,7 @@ class Bullet(Entity):
 
 
 class Missile(Entity):
-    def __init__(self, position, velocity, max_speed, rotation=0, explode_distance=100, explode_radius=150, explode_damage=5, image=images.DEFAULT) -> None:
+    def __init__(self, position, velocity, max_speed, rotation=0, explode_distance=100, explode_radius=150, explode_damage=5, image=images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
         
         self.max_speed = max_speed
@@ -297,6 +297,12 @@ class Missile(Entity):
 
         # Movement
         self.accelerate_in_direction(game.player.position, 2000 * delta_time)
+
+        # Boost particle effect
+        boost_distance = 5
+        boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
+
+        particles.ParticleSystem(self.position + boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=1.5, duration=None, lifetime=0.3, frequency=1)
 
         if self.distance_to(game.player) < self.explode_distance:
             self.explode(self.explode_radius)

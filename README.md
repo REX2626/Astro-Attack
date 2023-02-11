@@ -7,15 +7,11 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Improve enemy retreat state
-
-Add images for drone and missile ship
+Add images for drone, missile ship and missile
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
 Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
-
-Add Enemy weapons - shoot normally but might have small missiles to launch aswell
 
 Make default weapons, and weapons for player and enemy
 
@@ -288,3 +284,7 @@ Enemy Ships dont shoot each other
 Change weapon system so that each weapon can be individually upgraded
 
 Make damage effect proportional to damage taken
+
+Improve enemy retreat state
+
+Add Enemy weapons - shoot normally but might have small missiles to launch aswell
