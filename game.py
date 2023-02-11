@@ -13,6 +13,7 @@ pygame.display.set_icon(images.RED_SHIP)
 pygame.init()
 
 import sys
+import random
 from objects import Vector
 
 
@@ -71,7 +72,7 @@ SCRAP_COUNT = 0
 
 DEBUG_SCREEN = False
 
-SEED = 69
+SEED = random.randint(0, 100000)
 
 
 import _chunks

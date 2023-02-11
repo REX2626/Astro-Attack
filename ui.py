@@ -252,6 +252,9 @@ def draw(delta_time):
         label = font3.render(f"Minimum FPS: {round(minimum)}", True, (255, 255, 255))
         WIN.blit(label, (8, 218))
 
+        label = font3.render(f"Seed: {game.SEED}", True, (255, 255, 255))
+        WIN.blit(label, (8, 248))
+
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))
 

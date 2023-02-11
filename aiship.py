@@ -213,9 +213,11 @@ class Missile_Ship(Enemy_Ship):
         self.explode_damage = 10
     
 
-    def attack_player_state(self, delta_time, distance_to_player, max_speed=300):
+    def attack_player_state(self, delta_time, attack_min_dist, attack_max_dist, max_speed=300):
         # Set max speed to a higher value
         self.max_speed = max_speed
+
+        distance_to_player = self.distance_to(game.player)
 
         # Rotation
         self.set_rotation(self.position.get_angle_to(game.player.position))

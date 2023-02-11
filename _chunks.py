@@ -107,7 +107,7 @@ class Chunk():
             return
         
         # Mother Ship
-        if random.random() < 0.09:
+        if random.random() < 0.05:
 
             self.entities.add(
 
