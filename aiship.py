@@ -254,7 +254,7 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGatlingGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.WEAPON_ICON) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGatlingGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.DRONE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
