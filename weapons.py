@@ -138,7 +138,7 @@ class Laser():
         self.shooting = True
         self.range, entity = self.raycast()
 
-        if isinstance(entity, entities.Ship):
+        if hasattr(entity, "damage") and callable(entity.damage):
             entity.damage(self.damage*self.delta_time, self.ship)
 
     def raycast(self):

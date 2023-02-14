@@ -264,11 +264,11 @@ class Bullet(Entity):
                             entity.damage(self.damage, self)
                             game.CHUNKS.remove_entity(self)
                             break
+
                 elif isinstance(entity, Missile):
                     if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
                         if self.distance_to(entity) < 20:
                             entity.explode(entity.explode_radius)
-                            entity.destroy()
                             game.CHUNKS.remove_entity(self)
                             break
 
@@ -306,11 +306,13 @@ class Missile(Entity):
 
         if self.distance_to(game.player) < self.explode_distance:
             self.explode(self.explode_radius)
-            self.destroy()
 
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)
         self.velocity.clamp(self.max_speed)
+
+    def damage(self, damage, entity=None):
+        self.explode(self.explode_radius)
 
     def explode(self, radius):
         entity_list = game.CHUNKS.entities
@@ -326,6 +328,8 @@ class Missile(Entity):
         
         for entity in entities_to_damage:
             entity.damage(self.explode_damage)
+
+        self.destroy()
 
 
     def destroy(self):
