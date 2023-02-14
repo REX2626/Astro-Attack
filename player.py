@@ -94,6 +94,11 @@ class Player_Ship(Ship):
         time_to_enemy = self.distance_to(enemy) / self.weapon.speed
         self.aim_pos = ((enemy.velocity - self.velocity) * time_to_enemy) + enemy.position
 
+    def damage(self, damage, entity=None):
+        super().damage(damage, entity)
+
+        game.SCREEN_SHAKE += damage
+
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
 

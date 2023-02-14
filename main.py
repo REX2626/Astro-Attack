@@ -30,9 +30,34 @@ def update_playing_screen_size():
     "Clip the coords of any object out of bounds"
 
 
+rand_x = 0
+rand_y = 0
+delay = 0
+def screen_shake(delta_time):
+    global delay, rand_x, rand_y
+    width, height = pygame.display.get_window_size()
+
+    delay -= delta_time
+    if delay < 0:
+        delay = 0.1
+
+        if abs(math.sin(perf_counter()*2*rand_x)) < 0.03:
+            rand_x = random.random() * 20
+
+        if abs(math.sin(perf_counter()*2*rand_y)) < 0.03:
+            rand_y = random.random() * 20
+
+    game.CENTRE_POINT.x = width /2 + math.sin(perf_counter()*rand_x) * math.log2(game.SCREEN_SHAKE+1) * 5
+    game.CENTRE_POINT.y = height/2 + math.sin(perf_counter()*rand_y) * math.log2(game.SCREEN_SHAKE+1) * 5
+
+    game.SCREEN_SHAKE = max(0, game.SCREEN_SHAKE - delta_time * (game.SCREEN_SHAKE + 7))
+
+
 def draw_window(delta_time):
     """Draw window"""
     WIN.fill(BLACK)
+
+    screen_shake(delta_time)
 
     graphics.draw_stars()
 

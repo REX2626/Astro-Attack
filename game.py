@@ -26,6 +26,8 @@ SIZE_LINK = True
 # CENTRE_POINT is the position of player on screen
 CENTRE_POINT = Vector(WIDTH/2, HEIGHT/2)
 
+SCREEN_SHAKE = 0
+
 WHITE = (255, 255, 255)
 LIGHT_GREY = (120, 120, 120)
 MEDIUM_GREY = (60, 60, 60)

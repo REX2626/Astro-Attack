@@ -7,21 +7,13 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
-
 Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
 
-Make default weapons, and weapons for player and enemy
-
 Add a weapon hotbar, so you can see which weapon is selected
-
-Make bullets do less damage the further away they go (mainly for gatling gun)
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
 Add radar upgrades so that mini map can be improved
-
-Add screen shake
 
 ### a1.3.0 (station)
 Add space stations
@@ -44,7 +36,11 @@ New mothership image, large and powerful
 
 New neutral ship image, cargo vessel
 
+Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
+
 ### Other
+Make bullets do less damage the further away they go (mainly for gatling gun)
+
 Give boost particles a velocity
 
 Change colour of enemy bullets
@@ -288,3 +284,7 @@ Improve enemy retreat state
 Add Enemy weapons - shoot normally but might have small missiles to launch aswell
 
 Add images for drone, missile ship and missile
+
+Add screen shake
+
+Make default weapons, and weapons for player and enemy
