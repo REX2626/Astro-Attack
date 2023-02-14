@@ -153,7 +153,7 @@ class Laser():
             chunk = game.CHUNKS.get_chunk((int(x//game.CHUNK_SIZE), int(y//game.CHUNK_SIZE)))
 
             for entity in chunk.entities:
-                if not hasattr(entity, "image") or isinstance(entity, entities.Pickup): continue
+                if not hasattr(entity, "image") or isinstance(entity, entities.Pickup) or isinstance(entity, entities.Bullet): continue
                 image = entity.image
                 width, height = image.get_width(), image.get_height()
                 entity_rect = pygame.Rect(entity.position.x-width/2, entity.position.y-height/2, width, height)

@@ -116,6 +116,8 @@ class Hotbar():
         self.size = size
         self.gap = gap
 
+        self.images = [pygame.transform.scale_by(images.BULLET, 2), pygame.transform.scale_by(images.GATLING_BULLET, 2), pygame.transform.scale_by(images.SNIPER_BULLET, 2), images.MISSILE]
+
     def draw(self):
         for i in range(self.number):
 
@@ -125,7 +127,12 @@ class Hotbar():
             else:
                 colour = (30, 30, 30)
 
-            pygame.draw.rect(game.WIN, colour, (game.CENTRE_POINT.x + self.gap/2 + (i-self.number/2)*(self.size+self.gap), self.height*game.HEIGHT, self.size, self.size), width=6, border_radius=7)
+            x = game.CENTRE_POINT.x + self.gap/2 + (i-self.number/2)*(self.size+self.gap)
+            y = self.height*game.HEIGHT
+            pygame.draw.rect(game.WIN, colour, (x, y, self.size, self.size), width=6, border_radius=7)
+            
+            image = self.images[i]
+            game.WIN.blit(image, (x+self.size/2-image.get_width()/2, y+self.size/2-image.get_height()/2))
 
 
 
