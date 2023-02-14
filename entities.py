@@ -261,7 +261,7 @@ class Bullet(Entity):
                 if isinstance(entity, Ship):
                     if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
                         if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
-                            entity.damage(self.damage, self)
+                            entity.damage(self.damage, self.ship)
                             game.CHUNKS.remove_entity(self)
                             break
 

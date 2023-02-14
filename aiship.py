@@ -2,7 +2,7 @@ from objects import Vector
 import entities
 from entities import Ship, Asteroid, HealthPickup
 from objects import random_vector
-from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
+from weapons import EnemyGun, EnemyGatlingGun, EnemySniper, Laser
 import images
 import game
 import random
@@ -369,12 +369,14 @@ class Neutral_Ship(AI_Ship):
 
 
     def damage(self, damage, entity=None):
-        if entity and isinstance(entity, entities.Bullet):
-            if type(entity.ship).__name__ == "Player_Ship":
+        if entity and isinstance(entity, Ship):
+
+            if type(entity).__name__ == "Player_Ship":
                 self.state = 1
-            elif isinstance(entity.ship, Enemy_Ship):
+
+            elif isinstance(entity, Enemy_Ship):
                 self.state = 2
-                self.recent_enemy = entity.ship
+                self.recent_enemy = entity
         
         super().damage(damage)
 
