@@ -53,6 +53,8 @@ Check / improve graphics.get_entities_to_draw performance
 
 Fix first full_screen click not moving the mouse properly
 
+If neutral ship cannot find patrol point - do something
+
 ### POTENTIAL
 
 Strict Rendering (only rendering objects which will defo be on screen)

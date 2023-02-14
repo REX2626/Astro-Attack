@@ -50,7 +50,7 @@ class AI_Ship(Ship):
             target_to_mothership_distance = 0
 
         if distance < 50 or target_to_mothership_distance > 500:
-            while True:
+            for _ in range(100): # try to find new patrol point, if none have been found after 100 iterations then cry
                 self.make_new_patrol_point(min_dist, max_dist, self.position)
                 target_position = self.patrol_point
 
@@ -58,8 +58,6 @@ class AI_Ship(Ship):
 
                 if self.check_for_asteroid(chunk_pos) == False:
                     break
-                else:
-                    continue
 
         self.accelerate_in_direction(target_position, 300 * delta_time)
         self.set_rotation(self.position.get_angle_to(target_position))
@@ -234,16 +232,14 @@ class Missile_Ship(Enemy_Ship):
 
         if distance_to_player < 60:
             self.explode(self.explode_radius)
-            self.destroy()
 
     def explode(self, radius):
-        entity_list = game.CHUNKS.entities
-        entity_list.remove(self)
+        self.destroy()
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
 
-        for entity in entity_list:
+        for entity in game.CHUNKS.entities:
             if isinstance(entity, Ship):
                 if entity.distance_to(self) < radius:
                     entities_to_damage.append(entity)
@@ -279,7 +275,7 @@ class Mother_Ship(Enemy_Ship):
         self.time_reloading = 0
 
         # Make start patrol point
-        while True:
+        for _ in range(100): # try to find new patrol point, if none have been found after 100 iterations then cry
             self.make_new_patrol_point(self.patrol_min_dist, self.patrol_max_dist, self.position)
             target_position = self.patrol_point
 
@@ -287,8 +283,6 @@ class Mother_Ship(Enemy_Ship):
 
             if self.check_for_asteroid(chunk_pos) == False:
                 break
-            else:
-                continue
         
         # Spawn in enemies
         enemy_spawn_number = random.randint(3, 6)
