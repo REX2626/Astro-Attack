@@ -108,6 +108,27 @@ class MiniMap():
 
 
 
+weapon_selected = 0
+class Hotbar():
+    def __init__(self, height, number, size, gap) -> None:
+        self.height = height
+        self.number = number
+        self.size = size
+        self.gap = gap
+
+    def draw(self):
+        for i in range(self.number):
+
+            if i == weapon_selected:
+                colour = (255, 125, 0)
+
+            else:
+                colour = (30, 30, 30)
+
+            pygame.draw.rect(game.WIN, colour, (game.CENTRE_POINT.x + self.gap/2 + (i-self.number/2)*(self.size+self.gap), self.height*game.HEIGHT, self.size, self.size), width=6, border_radius=7)
+
+
+
 class Canvas():
     def __init__(self) -> None:
         self.elements = []
@@ -116,8 +137,9 @@ class Canvas():
         self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-150 , width=200, height=40, colour=(34, 130, 240)))
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-50, width=200, height=40, colour=(30, 190, 190)))
-        self.add("mini_map", MiniMap((0, 0), width=350, height=350))
+        self.add("mini_map"  , MiniMap((0, 0), width=350, height=350))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
+        self.add("hotbar"    , Hotbar(height=0.9, number=4, size=52, gap=26))
 
     def add(self, name, element):
         self.__setattr__(name, element)

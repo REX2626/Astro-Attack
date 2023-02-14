@@ -7,9 +7,9 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
+Add weapon hotbar images
 
-Add a weapon hotbar, so you can see which weapon is selected
+Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
@@ -288,3 +288,5 @@ Add images for drone, missile ship and missile
 Add screen shake
 
 Make default weapons, and weapons for player and enemy
+
+Add a weapon hotbar, so you can see which weapon is selected
