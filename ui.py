@@ -116,7 +116,14 @@ class Hotbar():
         self.size = size
         self.gap = gap
 
-        self.images = [pygame.transform.scale_by(images.BULLET, 2), pygame.transform.scale_by(images.GATLING_BULLET, 2), pygame.transform.scale_by(images.SNIPER_BULLET, 2), images.MISSILE]
+        self.images = [pygame.transform.scale_by(images.BULLET, 2), pygame.transform.scale_by(images.GATLING_BULLET, 2), pygame.transform.scale_by(images.SNIPER_BULLET, 2), self.get_laser_image()]
+
+    def get_laser_image(self):
+        image = pygame.Surface((20, 36), flags=pygame.SRCALPHA)
+        for step in range(6):
+            pygame.draw.rect(image, (40, 100, 150, (step+1)/6*255), (step, step, 20-step*2, 36-step*2), border_radius=round(20-step))
+        pygame.draw.rect(image, (81, 200, 252), (6, 5, 8, 26), border_radius=4)
+        return image
 
     def draw(self):
         for i in range(self.number):

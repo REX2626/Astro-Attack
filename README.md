@@ -7,13 +7,9 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.2.0 (enemy improvements and player improvements)
-Add weapon hotbar images
+Add zoom upgrade (and decrease max zoom)
 
-Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
-
-Add bullet damage effect, when bullets hits something, blue sparks explode
-
-Add radar upgrades so that mini map can be improved
+Add laser upgrades
 
 ### a1.3.0 (station)
 Add space stations
@@ -36,10 +32,14 @@ New mothership image, large and powerful
 
 New neutral ship image, cargo vessel
 
+Add missile and autoturret weapons
+
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
 ### Other
 Make bullets do less damage the further away they go (mainly for gatling gun)
+
+Add bullet damage effect, when bullets hits something, blue sparks explode
 
 Give boost particles a velocity
 
@@ -64,6 +64,8 @@ Think about doing rotozoom as it filters the image (AA), can be costly tho
 Add ammo system
 
 Enemies drop ammo
+
+Add radar upgrades so that mini map can be improved
 
 At some point, lower the initial upgrade values (high atm so testing is easier)
 
@@ -292,3 +294,7 @@ Add screen shake
 Make default weapons, and weapons for player and enemy
 
 Add a weapon hotbar, so you can see which weapon is selected
+
+Add weapon hotbar images
+
+Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
