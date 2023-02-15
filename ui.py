@@ -147,10 +147,10 @@ class Canvas():
     def __init__(self) -> None:
         self.elements = []
 
-        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-200, width=200, height=40, colour=(255, 0, 0)))
-        self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-150 , width=200, height=40, colour=(34, 130, 240)))
-        self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(207, 77, 17)))
-        self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-50, width=200, height=40, colour=(30, 190, 190)))
+        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-250, width=200, height=40, colour=(255, 0, 0)))
+        self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-200 , width=200, height=40, colour=(34, 130, 240)))
+        self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-150, width=200, height=40, colour=(207, 77, 17)))
+        self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(30, 190, 190)))
         self.add("mini_map"  , MiniMap((0, 0), width=350, height=350))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
         self.add("hotbar"    , Hotbar(height=0.9, number=4, size=52, gap=26))
@@ -292,13 +292,13 @@ def draw(delta_time):
         WIN.blit(label, (8, 248))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-214))
+    WIN.blit(label, (108, game.HEIGHT-264))
 
     label = font.render(f"{round(game.player.shield)} | {round(game.player.max_shield)}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-164))
+    WIN.blit(label, (108, game.HEIGHT-214))
 
     label = font.render(f"{round(game.player.boost_amount)} | {game.MAX_BOOST_AMOUNT}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-114))
+    WIN.blit(label, (108, game.HEIGHT-164))
 
     label = font.render(f"{round(game.player.velocity.magnitude())}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-64))
+    WIN.blit(label, (108, game.HEIGHT-114))
