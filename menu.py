@@ -670,7 +670,8 @@ info = Page(
                         Look: Mouse
                         Zoom: Scroll
                         Shoot: Left Click
-                        Target: Right Click""", font_size=20),
+                        Target: Right Click
+                        Change Weapon: 1, 2, 3, 4""", font_size=20),
     Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )
@@ -680,8 +681,8 @@ settings = Page(
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"        , font_size=40, value="SIZE_LINK"    , function_action=None),
-    SettingButton(0.25, 3/6, lambda: f"BULLET SPEED: {game.BULLET_SPEED}"  , font_size=40, value="BULLET_SPEED" , function_action=None, max=1000),
-    SettingButton(0.75, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, max=26),
+    SettingButton(0.25, 3/6, lambda: f"BULLET SPEED: {game.BULLET_SPEED}"  , font_size=40, value="BULLET_SPEED" , function_action=None, min=10, max=1000),
+    SettingButton(0.75, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, min=4, max=26),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: settings_click(),
     escape=lambda: Menu.change_page(main_menu),
@@ -759,6 +760,7 @@ radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
     UpgradeBar(0.19, 0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
+    UpgradeBar(0.19, 0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,

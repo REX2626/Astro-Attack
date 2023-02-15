@@ -6,9 +6,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.2.0 (enemy improvements and player improvements)
-Add zoom upgrade (and decrease max zoom)
-
 ### a1.3.0 (station)
 Add space stations
 
@@ -298,3 +295,5 @@ Add weapon hotbar images
 Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missile launcher, autoturrets
 
 Add laser upgrades
+
+Add zoom upgrade (and decrease max zoom)

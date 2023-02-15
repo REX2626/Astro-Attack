@@ -150,10 +150,10 @@ def handle_player_input(keys_pressed, delta_time):
 def scroll(scroll_amount: int):
 
     if scroll_amount > 0:
-        game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, 20)
+        game.ZOOM = min(game.ZOOM + game.ZOOM * scroll_amount * 0.2, game.MAX_ZOOM)
 
     else:
-        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE))
+        game.ZOOM = max(game.ZOOM + game.ZOOM * scroll_amount * 0.2, game.CURRENT_MIN_ZOOM) # automatic min zoom: (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE)
 
 
 def update_objects(delta_time):
