@@ -91,7 +91,10 @@ class Player_Ship(Ship):
 
     def track_enemy(self):
         enemy = self.tracked_enemy
-        time_to_enemy = self.distance_to(enemy) / self.weapon.speed
+        if hasattr(self.weapon, "speed"):
+            time_to_enemy = self.distance_to(enemy) / self.weapon.speed
+        else:
+            time_to_enemy = 0
         self.aim_pos = ((enemy.velocity - self.velocity) * time_to_enemy) + enemy.position
 
     def damage(self, damage, entity=None):
