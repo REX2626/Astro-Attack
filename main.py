@@ -133,6 +133,9 @@ def handle_player_input(keys_pressed, delta_time):
         game.player.weapon = Laser(game.player)
         ui.weapon_selected = 3
 
+    if keys_pressed[pygame.K_n]:
+        game.SCREEN_SHAKE += 10*delta_time
+
 
     # Mouse
     mouse_position = pygame.mouse.get_pos()

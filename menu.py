@@ -734,6 +734,7 @@ weapon = Page(
     Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.3, 0.7, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
+    Button(0.7, 0.3, "Laser"  , function=lambda: Menu.change_page(laser)),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -797,6 +798,18 @@ sniper_gun = Page(
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: Menu.change_page(weapon),
+    e_press=lambda: True
+)
+
+laser = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.12, "Laser"),
+    UpgradeBar(0.19, 0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
+    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,

@@ -119,7 +119,7 @@ class EnemySniper(Sniper):
 
 
 class Laser():
-    def __init__(self, ship: "entities.Ship", damage=10, charge=10, recharge=1, range=500) -> None:
+    def __init__(self, ship: "entities.Ship", damage=game.PLAYER_LASER_DAMAGE, charge=10, recharge=1, range=game.PLAYER_LASER_RANGE) -> None:
         self.ship = ship
         self.damage = damage
         self.charge = charge
@@ -137,6 +137,7 @@ class Laser():
     def shoot(self):
         self.shooting = True
         self.range, entity = self.raycast()
+        self.damage = game.PLAYER_LASER_DAMAGE # assuming only player has a laser
 
         if hasattr(entity, "damage") and callable(entity.damage):
             entity.damage(self.damage*self.delta_time, self.ship)
@@ -144,6 +145,7 @@ class Laser():
     def raycast(self):
 
         entity_hit = None
+        self.max_range = game.PLAYER_LASER_RANGE # assuming only player has a laser
         sin_rotation = math.sin(self.ship.rotation)
         cos_rotation = math.cos(self.ship.rotation)
         x = self.ship.position.x - self.ship.image.get_height() * sin_rotation
