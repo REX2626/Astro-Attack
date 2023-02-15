@@ -205,7 +205,7 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=1, shield=5, shield_delay=5, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
@@ -250,7 +250,7 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGatlingGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.DRONE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=3, weapon=EnemyGatlingGun, health=1, shield=2, shield_delay=2, shield_recharge=4, state=0, mother_ship=None, image=images.DRONE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
