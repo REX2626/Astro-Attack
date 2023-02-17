@@ -299,10 +299,10 @@ class Missile(Entity):
         self.accelerate_in_direction(game.player.position, 2000 * delta_time)
 
         # Boost particle effect
-        boost_distance = 5
+        boost_distance = 10
         boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-        particles.ParticleSystem(self.position + boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=1.5, duration=None, lifetime=0.3, frequency=1)
+        particles.ParticleSystem(self.position + boost_position + Vector(0, 0.5).get_rotate(random.random()*2*math.pi), start_size=2, end_size=0, colour=(207, 207, 220), bloom=3, duration=None, lifetime=0.3, frequency=1, speed_variance=50, initial_velocity=Vector(0, 600).get_rotate(self.rotation))
 
         if self.distance_to(game.player) < self.explode_distance:
             self.explode(self.explode_radius)

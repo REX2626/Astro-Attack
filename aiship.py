@@ -228,7 +228,7 @@ class Missile_Ship(Enemy_Ship):
         boost_distance = 20
         boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-        particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
+        particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=1, initial_velocity=Vector(0, 300).get_rotate(self.rotation))
 
         if distance_to_player < 60:
             self.explode(self.explode_radius)

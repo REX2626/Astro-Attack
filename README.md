@@ -20,10 +20,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ### a1.2.1 (bug fixes and particle improvements)
 Fix a crash when missile explodes in same frame as it is destroyed by player
 
-Fix smoke particles coming from centre of missiles
-
-Add initial velocity to particles
-
 ### a1.3.0 (station)
 Add space stations
 
@@ -73,6 +69,9 @@ If neutral ship cannot find patrol point - do something
 Strict Rendering (only rendering objects which will defo be on screen)
 
 Think about doing rotozoom as it filters the image (AA), can be costly tho
+
+Add friendly AI ship
+Add some basic coding interface 
 
 Add ammo system
 
@@ -315,3 +314,8 @@ Add multiple player weapons: gatling gun, laser beam, normal gun, sniper, missil
 Add laser upgrades
 
 Add zoom upgrade (and decrease max zoom)
+
+### a1.2.1 (bug fixes and particle improvements)
+Fix smoke particles coming from centre of missiles
+
+Add initial velocity to particles

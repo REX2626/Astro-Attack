@@ -52,7 +52,7 @@ class Particle():
 
 
 class ParticleSystem():
-    def __init__(self, position, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None) -> None:
+    def __init__(self, position, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
         self.position = position
         if not max_start_size: max_start_size = start_size
         self.start_size = start_size
@@ -69,6 +69,7 @@ class ParticleSystem():
         self.speed = speed
         self.delay = 0
         self.speed_variance = speed_variance
+        self.initial_velocity = initial_velocity
 
         self.particles: list[Particle] = []
 
@@ -129,5 +130,5 @@ class ParticleSystem():
         colour = (random.randint(r1, r2), random.randint(g1, g2), random.randint(b1, b2))
 
         self.particles.append(
-            Particle(self.position, random_vector(speed), start_size=start_size, end_size=self.end_size, colour=colour, bloom=self.bloom, lifetime=self.lifetime)
+            Particle(self.position, random_vector(speed) + self.initial_velocity, start_size=start_size, end_size=self.end_size, colour=colour, bloom=self.bloom, lifetime=self.lifetime)
             )

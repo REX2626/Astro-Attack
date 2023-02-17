@@ -5,6 +5,7 @@ import images
 import particles
 import game
 import math
+import random
 import pygame
 
 
@@ -79,7 +80,9 @@ class Player_Ship(Ship):
             boost_distance = 20
             boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
 
-            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=1.5, duration=None, lifetime=0.5, frequency=1)
+            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=1, initial_velocity=Vector(0, 500).get_rotate(self.rotation))
+            particles.ParticleSystem(self.position + boost_position + Vector(0, 1).get_rotate(random.random()*2*math.pi), start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=1, speed_variance=50, initial_velocity=Vector(0, 600).get_rotate(self.rotation))
+            particles.ParticleSystem(self.position + boost_position + Vector(0, 1).get_rotate(random.random()*2*math.pi), start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=1, speed_variance=50, initial_velocity=Vector(0, 600).get_rotate(self.rotation))
         else:
             self.max_speed = game.MAX_PLAYER_SPEED # Resets max speed once you run out of boost
 
