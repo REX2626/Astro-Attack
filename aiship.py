@@ -2,13 +2,15 @@ from objects import Vector
 import entities
 from entities import Ship, Asteroid, HealthPickup
 from objects import random_vector
-from weapons import EnemyGun, EnemyGatlingGun, EnemySniper, Laser
+from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
+from player import Player_Ship
 import images
 import game
 import random
 import math
 import pygame
 import particles
+
 
 
 class AI_Ship(Ship):
@@ -177,7 +179,7 @@ class Enemy_Ship(AI_Ship):
 
     def damage(self, damage, entity=None):
 
-        if entity and isinstance(entity, entities.Bullet):
+        if entity and isinstance(entity, Player_Ship):
             self.enemy_spotted()
 
         super().damage(damage)
@@ -365,7 +367,7 @@ class Neutral_Ship(AI_Ship):
     def damage(self, damage, entity=None):
         if entity and isinstance(entity, Ship):
 
-            if type(entity).__name__ == "Player_Ship":
+            if isinstance(entity, Player_Ship):
                 self.state = 1
 
             elif isinstance(entity, Enemy_Ship):
