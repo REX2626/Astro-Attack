@@ -156,26 +156,34 @@ class Enemy_Ship(AI_Ship):
 
         distance_to_player = self.distance_to(game.player)
 
-        if self.health == 1 and distance_to_player < 2000 and game.player.health > 5 and len(self.mother_ship.enemy_list) <= 2:
+        # Initially check if it should be retreating
+        if self.health == 1 and distance_to_player < 1500 and game.player.health > 5 and len(self.mother_ship.enemy_list) <= 2:
             self.state = RETREAT
             self.retreat_state(delta_time)
         else:
+            # Check if it should be attacking
             if (distance_to_player < 600 or self.state == ATTACK) and self.state != RETREAT:
                 self.attack_player_state(delta_time, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
                 self.enemy_spotted()
+            # Check if it should be patroling
             elif self.state != RETREAT:
                 self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
 
+            # Enemy ships will go into patrol state if the player gets too far while attacking
             if self.state == ATTACK and distance_to_player > 1500:
                 self.state = PATROL
             
+            # Enemy will stop retreating if its health goes above 1
             if self.state == RETREAT and self.health > 1:
                 self.state = PATROL
+
+            # Check to see if the retreating enemy if far enough from the player to then collect health
             elif self.state == RETREAT and self.health == 1 and distance_to_player > 1500:
                 self.hp = self.find_nearest_health_pickup()
                 self.set_rotation(self.position.get_angle_to(self.hp.position) + math.pi)
                 self.accelerate_in_direction(self.hp.position, 400 * delta_time)
 
+                # Add health if close to a health pickup
                 if (self.hp.position - self.position).magnitude() < 50:
                     self.hp.destroy()
                     self.health += 5
