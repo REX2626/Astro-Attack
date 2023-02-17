@@ -235,6 +235,7 @@ class Scrap(Pickup):
 
 
 from aiship import Enemy_Ship
+from player import Player_Ship
 
 
 
@@ -263,6 +264,8 @@ class Bullet(Entity):
                         if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
                             entity.damage(self.damage, self.ship)
                             game.CHUNKS.remove_entity(self)
+                            if isinstance(entity, Enemy_Ship) and isinstance(self.ship, Player_Ship):
+                                entity.enemy_spotted()
                             break
 
                 elif isinstance(entity, Missile):
@@ -316,7 +319,8 @@ class Missile(Entity):
 
     def explode(self, radius):
         entity_list = game.CHUNKS.entities
-        entity_list.remove(self)
+        if self in entity_list:
+            entity_list.remove(self)
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []

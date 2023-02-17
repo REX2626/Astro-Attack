@@ -17,9 +17,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.2.1 (bug fixes and particle improvements)
-Fix a crash when missile explodes in same frame as it is destroyed by player
-
 ### a1.3.0 (station)
 Add space stations
 
@@ -316,6 +313,8 @@ Add laser upgrades
 Add zoom upgrade (and decrease max zoom)
 
 ### a1.2.1 (bug fixes and particle improvements)
+Fix crash where missiles explode in the same frame that they were removed in
+
 Fix smoke particles coming from centre of missiles
 
 Add initial velocity to particles
