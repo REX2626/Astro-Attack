@@ -319,7 +319,8 @@ class Missile(Entity):
 
     def explode(self, radius):
         entity_list = game.CHUNKS.entities
-        entity_list.remove(self)
+        if self in entity_list:
+            entity_list.remove(self)
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
