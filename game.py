@@ -80,7 +80,7 @@ SCRAP_COUNT = 0
 
 DEBUG_SCREEN = False
 
-SEED = random.randint(0, 100000)
+SEED = random.randint(0, 100_000)
 
 
 import _chunks

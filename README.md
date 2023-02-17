@@ -26,6 +26,8 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
 
+Add speed to ship rotation (ships don't rotate instantly)
+
 Enemies spawn from enemy stations
 
 Enemy stations have weapons, can be destroyed for loot
@@ -42,12 +44,23 @@ Add missile and autoturret weapons
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
+### a1.4.0 (gameplay loop - difficulty, missions and saving)
+Enemies become more difficult
+
+Missions (stations will give a reward for completing a mission)
+
+Saving and loading
+
+### a1.5.0 (sound)
+
+### a1.6.0 (bosses, ship customization, friendly ships)
+
+### a1.7.0 (multiplayer)
+
 ### Other
 Make bullets do less damage the further away they go (mainly for gatling gun)
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
-
-Give boost particles a velocity
 
 Change colour of enemy bullets
 
@@ -79,6 +92,8 @@ Add radar upgrades so that mini map can be improved
 At some point, lower the initial upgrade values (high atm so testing is easier)
 
 Have different shoot speed for enemy and player
+
+Add text interface (commands)
 
 Add space stations
 Enemy ships can spawn at enemy stations
