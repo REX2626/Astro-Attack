@@ -226,6 +226,12 @@ class Missile_Ship(Enemy_Ship):
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
+        
+        # Boost particle effect
+        boost_distance = 20
+        boost_position = lambda ship: Vector(boost_distance * math.sin(ship.rotation), boost_distance * math.cos(ship.rotation))
+
+        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=200, initial_velocity=lambda ship: Vector(0, 400).get_rotate(ship.rotation)+ship.velocity)
     
 
     def attack_player_state(self, delta_time, attack_min_dist, attack_max_dist, attack_max_speed):
@@ -240,11 +246,7 @@ class Missile_Ship(Enemy_Ship):
         # Movement
         self.accelerate_in_direction(game.player.position, 2000 * delta_time)
 
-        # Boost particle effect
-        boost_distance = 20
-        boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
-
-        particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=1, initial_velocity=Vector(0, 300).get_rotate(self.rotation))
+        self.particles.active = True
 
         if distance_to_player < 60:
             self.explode(self.explode_radius)
