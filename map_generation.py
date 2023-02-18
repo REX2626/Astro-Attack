@@ -2,7 +2,7 @@ import random
 import game
 import math
 
-def retrieve_chunk_value(x, y):
+def set_seed(x, y):
     f = math.floor
     frac = lambda x: x - f(x)
     random.seed(
@@ -17,4 +17,3 @@ def retrieve_chunk_value(x, y):
         )
         )
     )
-    return random.random()

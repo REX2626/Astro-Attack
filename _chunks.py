@@ -1,10 +1,10 @@
 from objects import Vector, Object, Entity
 from entities import Asteroid, HealthPickup
 from aiship import Mother_Ship, Neutral_Ship
+from station import Station
+import math
 import random
 import game
-
-import map_generation
 
 
 class Chunks():
@@ -130,10 +130,16 @@ class Chunk():
             )
 
         # Asteroid
-        elif map_generation.retrieve_chunk_value((self.position.x), (self.position.y)) < 0.1 and self.adjoining_empty_chunks():
+        elif random.random() < 0.1 and self.adjoining_empty_chunks():
             self.entities.add(
 
                 Asteroid(self.random_position())
+            )
+
+        elif random.random() < 0.2 and self.adjoining_empty_chunks():
+            self.entities.add(
+
+                Station(self.random_position(), random.random() * 2 *math.pi)
             )
 
 
