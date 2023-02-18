@@ -289,6 +289,25 @@ class Entity(MoveableObject):
     def set_rotation(self, rotation):
         self.rotation = rotation
 
+    def rotate_to(self, delta_time, rotation, speed):
+        rotation_precision = 0.1
+
+        delta_rotation = rotation - self.rotation
+
+        # Chooses shortest angle to rotate
+        if delta_rotation > math.pi:
+            delta_rotation -= 2 * math.pi
+        elif delta_rotation < -math.pi:
+            delta_rotation += 2 * math.pi
+
+        # Keeps rotating until the angle between entity and the target rotation is within +- of the rotation_precision
+        if delta_rotation > rotation_precision:
+            self.rotation += speed * delta_time
+        elif delta_rotation < -rotation_precision:
+            self.rotation -= speed * delta_time
+        else:
+            self.rotation = rotation
+
     def accelerate(self, acceleration: Vector):
         self.velocity += acceleration
 
