@@ -34,6 +34,14 @@ class Player_Ship(Ship):
         self.cursor_highlighted = False
         self.tracked_enemy: Ship = None
 
+        boost_distance = 20
+
+        boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation))
+        self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=200, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
+        
+        boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation)) + Vector(0, 1).get_rotate(random.random()*2*math.pi)
+        self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=400, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
+
     def update(self, delta_time):
 
         super().update(delta_time)
@@ -77,14 +85,12 @@ class Player_Ship(Ship):
             self.accelerate_relative(delta_time * Vector(0, -1000))
             self.boost_amount -= self.boost_change * delta_time # Decrease the amount of boost you have while boosting over time
 
-            boost_distance = 20
-            boost_position = Vector(boost_distance * math.sin(self.rotation), boost_distance * math.cos(self.rotation))
-
-            particles.ParticleSystem(self.position + boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=1, initial_velocity=Vector(0, 500).get_rotate(self.rotation))
-            particles.ParticleSystem(self.position + boost_position + Vector(0, 1).get_rotate(random.random()*2*math.pi), start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=1, speed_variance=50, initial_velocity=Vector(0, 600).get_rotate(self.rotation))
-            particles.ParticleSystem(self.position + boost_position + Vector(0, 1).get_rotate(random.random()*2*math.pi), start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=1, speed_variance=50, initial_velocity=Vector(0, 600).get_rotate(self.rotation))
+            self.boost_particles1.active = True
+            self.boost_particles2.active = True
         else:
             self.max_speed = game.MAX_PLAYER_SPEED # Resets max speed once you run out of boost
+            self.boost_particles1.active = False
+            self.boost_particles2.active = False
 
     def turn_left(self, delta_time):
         self.accelerate_rotation(delta_time * 8)

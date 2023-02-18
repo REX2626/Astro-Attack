@@ -99,6 +99,8 @@ def handle_player_input(keys_pressed, delta_time):
         player.boost(delta_time)
     else:
         player.max_speed = game.MAX_PLAYER_SPEED # Reset max speed so that the high velocity is not maintained after a boost
+        player.boost_particles1.active = False
+        player.boost_particles2.active = False
 
         # Increase player.boost_amount
         player.boost_amount = min(game.MAX_BOOST_AMOUNT,

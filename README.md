@@ -44,6 +44,10 @@ Add missile and autoturret weapons
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
+Change scrap drop to be proportional to enemy difficulty
+
+Improve rendering images on top of each other (boost particles rendering order), possibly add z-layer
+
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Enemies become more difficult
 
@@ -63,8 +67,6 @@ Make bullets do less damage the further away they go (mainly for gatling gun)
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
 Change colour of enemy bullets
-
-Improve particle system
 
 Make ships have a thruster animation
 
@@ -333,3 +335,5 @@ Fix crash where missiles explode in the same frame that they were removed in
 Fix smoke particles coming from centre of missiles
 
 Add initial velocity to particles
+
+Improve particle system
