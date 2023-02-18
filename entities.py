@@ -193,7 +193,7 @@ class Pickup(Entity):
         self.velocity.clamp(self.max_speed)
 
     def move_to_player(self, delta_time):
-        self.accelerate_in_direction(game.player.position, 3000 * delta_time)
+        self.accelerate_to(game.player.position, 3000 * delta_time)
 
     def activate(self):
         # Have set function for each pickup
@@ -278,10 +278,11 @@ class Bullet(Entity):
 
 
 class Missile(Entity):
-    def __init__(self, position, velocity, max_speed, rotation=0, explode_distance=100, explode_radius=150, explode_damage=5, image=images.MISSILE) -> None:
+    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, image=images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
         
         self.max_speed = max_speed
+        self.max_rotation_speed = max_rotation_speed
         self.explode_distance = explode_distance
         self.explode_radius = explode_radius
         self.explode_damage = explode_damage
@@ -300,10 +301,10 @@ class Missile(Entity):
         self.velocity -= self.velocity.get_clamp(1500 * delta_time)
 
         # Rotation
-        self.set_rotation(self.position.get_angle_to(game.player.position))
+        self.rotate_to(delta_time, self.position.get_angle_to(game.player.position), self.max_rotation_speed)
 
         # Movement
-        self.accelerate_in_direction(game.player.position, 2000 * delta_time)
+        self.accelerate_in_direction(self.rotation, 2000 * delta_time)
 
         if self.distance_to(game.player) < self.explode_distance:
             self.explode(self.explode_radius)

@@ -289,32 +289,32 @@ class Entity(MoveableObject):
     def set_rotation(self, rotation):
         self.rotation = rotation
 
-    def rotate_to(self, delta_time, rotation, speed):
-        rotation_precision = 0.1
+    def rotate_to(self, delta_time, rotation, speed):   
+        # Simplify rotation (if self.rotation < -math.pi or self.rotation > math.pi)
+        self.rotation = (self.rotation - math.pi) % (2*math.pi) - math.pi
 
-        delta_rotation = rotation - self.rotation
+        # Choose shortest angle to rotate
+        if self.rotation + math.pi < rotation:
+            self.rotation += 2 * math.pi
+        elif self.rotation - math.pi > rotation:
+            self.rotation -= 2 * math.pi
 
-        # Chooses shortest angle to rotate
-        if delta_rotation > math.pi:
-            delta_rotation -= 2 * math.pi
-        elif delta_rotation < -math.pi:
-            delta_rotation += 2 * math.pi
-
-        # Keeps rotating until the angle between entity and the target rotation is within +- of the rotation_precision
-        if delta_rotation > rotation_precision:
-            self.rotation += speed * delta_time
-        elif delta_rotation < -rotation_precision:
-            self.rotation -= speed * delta_time
+        # Change rotation (set to wanted to rotation when reached)
+        if rotation < self.rotation:
+            self.rotation = max(rotation, self.rotation - speed * delta_time)
         else:
-            self.rotation = rotation
+            self.rotation = min(rotation, self.rotation + speed * delta_time)
 
     def accelerate(self, acceleration: Vector):
         self.velocity += acceleration
 
-    def accelerate_in_direction(self, target_position: Vector, magnitude: float):
+    def accelerate_to(self, target_position: Vector, magnitude: float):
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
+
+    def accelerate_in_direction(self, angle: float, magnitude: float):
+        self.accelerate(Vector(-math.sin(angle)*magnitude, -math.cos(angle)*magnitude))
 
     def get_image(self):
         if self.scale != game.ZOOM:

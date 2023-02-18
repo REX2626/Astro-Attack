@@ -67,23 +67,23 @@ class AI_Ship(Ship):
 
                 if self.check_for_asteroid(chunk_pos) == False:
                     break
-
-        self.accelerate_in_direction(target_position, 300 * delta_time)
+        
         self.rotate_to(delta_time, self.position.get_angle_to(target_position), self.max_rotation_speed)
+        self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
     def attack_player_state(self, delta_time, min_dist=100, max_dist=400, max_speed=300):
         # Set max speed to a higher value
         self.max_speed = max_speed
 
         # Aiming and shooting functionality
-        self.set_rotation(self.position.get_angle_to(self.predicted_player_position()))
+        self.rotate_to(delta_time, self.position.get_angle_to(self.predicted_player_position()), self.max_rotation_speed)
         self.shoot()
 
         # Movement
         if self.distance_to(game.player) < min_dist:
-            self.accelerate_in_direction(game.player.position, 400 * -delta_time)
+            self.accelerate_in_direction(self.rotation, 400 * -delta_time)
         elif self.distance_to(game.player) > max_dist:
-            self.accelerate_in_direction(game.player.position, 400 * delta_time)
+            self.accelerate_in_direction(self.rotation, 400 * delta_time)
         else:
             # Strafing
             self.strafe(delta_time)
@@ -113,14 +113,14 @@ class AI_Ship(Ship):
             self.time_to_stop_strafing += random.randint(2, 5)
         
         # Accelerate in that direction
-        self.accelerate_in_direction(final_vector, self.acceleration_constant * delta_time)
+        self.accelerate_to(final_vector, self.acceleration_constant * delta_time)
 
     def retreat_state(self, delta_time):
 
         # Ship retreats in opposite direction to player
         self.max_speed = 500
-        self.set_rotation(self.position.get_angle_to(game.player.position) + math.pi)
-        self.accelerate_in_direction(game.player.position, 400 * -delta_time)
+        self.rotate_to(delta_time, self.position.get_angle_to(game.player.position) + math.pi, self.max_rotation_speed)
+        self.accelerate_in_direction(self.rotation, 400 * delta_time)
 
     def find_nearest_health_pickup(self):
         health_pickups = []
@@ -183,8 +183,8 @@ class Enemy_Ship(AI_Ship):
             # Check to see if the retreating enemy if far enough from the player to then collect health
             elif self.state == RETREAT and self.health == 1 and distance_to_player > 1500:
                 self.hp = self.find_nearest_health_pickup()
-                self.set_rotation(self.position.get_angle_to(self.hp.position) + math.pi)
-                self.accelerate_in_direction(self.hp.position, 400 * delta_time)
+                self.rotate_to(delta_time, self.position.get_angle_to(self.hp.position) + math.pi, self.max_rotation_speed)
+                self.accelerate_in_direction(self.rotation, 400 * delta_time)
 
                 # Add health if close to a health pickup
                 if (self.hp.position - self.position).magnitude() < 50:
@@ -242,10 +242,10 @@ class Missile_Ship(Enemy_Ship):
         distance_to_player = self.distance_to(game.player)
 
         # Rotation
-        self.set_rotation(self.position.get_angle_to(game.player.position))
+        self.rotate_to(delta_time, self.position.get_angle_to(game.player.position), self.max_rotation_speed)
 
         # Movement
-        self.accelerate_in_direction(game.player.position, 2000 * delta_time)
+        self.accelerate_in_direction(self.rotation, 2000 * delta_time)
 
         self.particles.active = True
 
@@ -397,9 +397,9 @@ class Neutral_Ship(AI_Ship):
     def attack_enemy_state(self, delta_time):
         if self.recent_enemy.health > 0:
             self.max_speed = 300
-            self.set_rotation(self.position.get_angle_to(self.recent_enemy.position))
+            self.rotate_to(delta_time, self.position.get_angle_to(self.recent_enemy.position), self.max_rotation_speed)
             self.shoot()
-            self.accelerate_in_direction(self.recent_enemy.position, 400 * delta_time)
+            self.accelerate_in_direction(self.rotation, 400 * delta_time)
         else:
             self.recent_enemy = None
             self.state = PATROL
