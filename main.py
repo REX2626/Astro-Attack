@@ -160,6 +160,10 @@ def scroll(scroll_amount: int):
 
 def update_objects(delta_time):
     """Updates all objects, e.g. adjusts positions based on velocity"""
+
+    # Update particles
+    for particle_system in game.PARTICLES.copy():
+        particle_system.update(delta_time)
     
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set

@@ -83,11 +83,13 @@ DEBUG_SCREEN = False
 SEED = random.randint(0, 100_000)
 random.seed(SEED)
 
+PARTICLES = set()
 
-import _chunks
+
+import chunks
 def init_chunks():
     global CHUNKS
-    CHUNKS = _chunks.Chunks()
+    CHUNKS = chunks.Chunks()
     return CHUNKS
 
 

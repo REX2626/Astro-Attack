@@ -28,8 +28,6 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
 
-Add speed to ship rotation (ships don't rotate instantly)
-
 Enemies spawn from enemy stations
 
 Enemy stations have weapons, can be destroyed for loot
@@ -47,8 +45,6 @@ Add missile and autoturret weapons
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
 Change scrap drop to be proportional to enemy difficulty
-
-Improve rendering images on top of each other (boost particles rendering order), possibly add z-layer
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Enemies become more difficult
@@ -339,3 +335,9 @@ Fix smoke particles coming from centre of missiles
 Add initial velocity to particles
 
 Improve particle system
+
+Add speed to ship rotation (ships don't rotate instantly)
+
+### a1.3.0 (station)
+
+Improve rendering images on top of each other (boost particles rendering order), possibly add z-layer

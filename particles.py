@@ -61,8 +61,9 @@ class ParticleSystem():
     entity_offset is a function that takes in the Entity and returns a Vector
     if entity: initial_velocity is a function that is called with the entity as an input
     """
-    def __init__(self, position, entity_offset=lambda x: Vector(0, 0), start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
+    def __init__(self, position, entity_offset=lambda x: Vector(0, 0), z=1, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
         self.entity_offset = entity_offset
+        self.z = z
         if not max_start_size: max_start_size = start_size
         self.start_size = start_size
         self.max_start_size = max_start_size
@@ -90,7 +91,7 @@ class ParticleSystem():
 
         self.particles: list[Particle] = []
 
-        game.CHUNKS.add_entity(self)
+        game.PARTICLES.add(self)
 
         if not duration:
             self.duration = 0
@@ -105,18 +106,16 @@ class ParticleSystem():
             particle.update(delta_time, self)
         
         if self.entity:
-            if self.entity not in game.CHUNKS.entities:
-                self.entity = None
-            else:
+            if self.entity in game.CHUNKS.entities:
                 self.previous_position = self.position
-                game.CHUNKS.remove_entity(self)
                 self.position = self.entity.position + self.entity_offset(self.entity)
-                game.CHUNKS.add_entity(self)
+            else:
+                self.entity = None
 
         if not self.entity and self.time_alive > self.duration: # check if the System's life time is over
 
             if not self.particles: # if there are no more particles, then the System can be destroyed
-                game.CHUNKS.remove_entity(self)
+                game.PARTICLES.remove(self)
             return
         
         if self.entity and not self.active: # if not active: don't spawn particles

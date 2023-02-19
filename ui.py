@@ -98,8 +98,8 @@ class MiniMap():
             if isinstance(entity, Station):
                 # Blits station image
                 station_image = images.STATION_ICON
-                surf.blit(station_image, (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
-                                          ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
+                surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
+                                          ((entity.position.y - entity.height/2 - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
             else:
                 self.draw_entity(self.get_entity_colour(entity), entity, surf)
 
@@ -211,7 +211,7 @@ def highlight_station():
                                 outline[i] = outline[i][0] - game.player.position.x, outline[i][1] - game.player.position.y
                                 outline[i] = outline[i][0] * game.ZOOM, outline[i][1] * game.ZOOM
                                 outline[i] = outline[i][0] + game.CENTRE_POINT.x, outline[i][1] + game.CENTRE_POINT.y
-                            pygame.draw.polygon(game.WIN, (255, 0, 0), outline, width=3)
+                            pygame.draw.polygon(game.WIN, (255, 0, 0), outline, width=round(3*game.ZOOM))
                             return
     game.player.station_highlighted = None
 
