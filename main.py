@@ -222,7 +222,11 @@ def main():
 
                 start = perf_counter()
 
-                menu.Menu.systems()
+                if player.station_highlighted:
+                    menu.Menu.station()
+
+                else:
+                    menu.Menu.systems()
 
                 time1 = perf_counter() - start + time1
 

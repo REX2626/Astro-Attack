@@ -135,6 +135,9 @@ class Menu():
     def systems():
         Menu.change_page(systems)
 
+    def station():
+        Menu.change_page(station)
+
     def death_screen():
         Menu.change_page(death_screen)
 
@@ -816,6 +819,14 @@ laser = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
+    e_press=lambda: True
+)
+
+station = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.12, "Station"),
+    background_colour=None,
+    escape=lambda: True,
     e_press=lambda: True
 )
 

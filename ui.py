@@ -193,6 +193,28 @@ def cursor_highlighting():
             break
 
 
+def highlight_station():
+    x, y = pygame.mouse.get_pos()
+    cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
+    chunk_pos = cursor_pos // game.CHUNK_SIZE
+    for cy in range(chunk_pos.y-1, chunk_pos.y+2):
+        for cx in range(chunk_pos.x-1, chunk_pos.x+2):
+            for entity in game.CHUNKS.get_chunk((cx, cy)).entities:
+                if isinstance(entity, Station):
+                    x, y = cursor_pos.x, cursor_pos.y
+                    if entity.position.x - entity.width/2 <= x <= entity.position.x + entity.width/2 and entity.position.y - entity.height/2 <= y <= entity.position.y + entity.height/2:
+                        if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):
+                            game.player.station_highlighted = entity
+                            outline = entity.mask.outline()
+                            for i in range(len(outline)):
+                                outline[i] = outline[i][0] + entity.position.x - entity.width/2, outline[i][1] + entity.position.y - entity.height/2
+                                outline[i] = outline[i][0] - game.player.position.x, outline[i][1] - game.player.position.y
+                                outline[i] = outline[i][0] * game.ZOOM, outline[i][1] * game.ZOOM
+                                outline[i] = outline[i][0] + game.CENTRE_POINT.x, outline[i][1] + game.CENTRE_POINT.y
+                            pygame.draw.polygon(game.WIN, (255, 0, 0), outline, width=3)
+                            return
+    game.player.station_highlighted = None
+
 bars = 20
 time_elapsed = 0
 last_cpu_percent = 0
@@ -256,6 +278,8 @@ def draw(delta_time):
     canvas.cursor_image.update(pygame.mouse.get_pos())
 
     cursor_highlighting()
+
+    highlight_station()
     
     canvas.draw()
 

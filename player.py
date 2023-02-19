@@ -33,6 +33,7 @@ class Player_Ship(Ship):
         self.aim_pos = Vector(0, 0)
         self.cursor_highlighted = False
         self.tracked_enemy: Ship = None
+        self.station_highlighted = None
 
         boost_distance = 20
 
