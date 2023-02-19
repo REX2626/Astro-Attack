@@ -1,10 +1,13 @@
 from objects import Object
 from entities import Ship, Bullet, entity_collision
+from objects import random_vector, Vector
+from aiship import Mother_Ship, Neutral_Ship
 import images
 import particles
 import game
 import math
 import pygame
+import random
 
 
 
@@ -46,8 +49,30 @@ class FriendlyStation(Station):
     def __init__(self, position, rotation, image=images.STATION) -> None:
         super().__init__(position, rotation, image)
 
+        # Spawn in neutral ships
+        enemy_spawn_number = random.randint(1, 3)
+
+        for _ in range(enemy_spawn_number):
+
+            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
+
+            neutral = Neutral_Ship(random_position, Vector(0, 0))
+            
+            game.CHUNKS.add_entity(neutral)
+
 
 
 class EnemyStation(Station):
     def __init__(self, position, rotation, image=images.STATION) -> None:
         super().__init__(position, rotation, image)
+
+        # Spawn in enemies
+        enemy_spawn_number = random.randint(1, 2)
+
+        for _ in range(enemy_spawn_number):
+
+            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
+
+            enemy = Mother_Ship(random_position, Vector(0, 0))
+            
+            game.CHUNKS.add_entity(enemy)

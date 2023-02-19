@@ -1,7 +1,7 @@
 from objects import Vector, Object, Entity
 from entities import Asteroid, HealthPickup
 from aiship import Mother_Ship, Neutral_Ship
-from station import Station
+from station import FriendlyStation, EnemyStation
 import math
 import random
 import game
@@ -106,21 +106,21 @@ class Chunk():
         if self.adjoining_asteroid_chunk():
             return
         
-        # Mother Ship
-        if random.random() < 0.05:
+        # # Mother Ship
+        # if random.random() < 0.05:
 
-            self.entities.add(
+        #     self.entities.add(
 
-                Mother_Ship(self.random_position(), Vector(0, 0))
-            )
+        #         Mother_Ship(self.random_position(), Vector(0, 0))
+        #     )
 
-        # Neutral Ship
-        elif random.random() < 0.1:
+        # # Neutral Ship
+        # elif random.random() < 0.1:
 
-            self.entities.add(
+        #     self.entities.add(
 
-                Neutral_Ship(self.random_position(), Vector(0, 0))
-            )
+        #         Neutral_Ship(self.random_position(), Vector(0, 0))
+        #     )
 
         # Health Pickup
         elif random.random() < 0.1:
@@ -136,10 +136,18 @@ class Chunk():
                 Asteroid(self.random_position())
             )
 
-        elif random.random() < 0.2 and self.adjoining_empty_chunks():
+        # Friendly Station
+        elif random.random() < 0.05 and self.adjoining_empty_chunks():
             self.entities.add(
 
-                Station(self.random_position(), random.random() * 2 *math.pi)
+                FriendlyStation(self.random_position(), random.random() * 2 *math.pi)
+            )
+
+        # Enemy Station
+        elif random.random() < 0.05 and self.adjoining_empty_chunks():
+            self.entities.add(
+
+                EnemyStation(self.random_position(), random.random() * 2 *math.pi)
             )
 
 
