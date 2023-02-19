@@ -363,15 +363,16 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
         self.recent_enemy = recent_enemy
+        self.current_station = current_station
 
     def update(self, delta_time):
         super().update(delta_time)
 
         if self.state == PATROL:
-            self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
+            self.patrol_to_station(delta_time, current_station=self.current_station)
         elif self.state == ATTACK:
             self.attack_player_state(delta_time)
         elif self.state == ATTACK_ENEMY:
@@ -379,6 +380,40 @@ class Neutral_Ship(AI_Ship):
 
         if self.state == ATTACK and self.distance_to(game.player) > 1500:
             self.state = PATROL
+
+        
+    def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
+        self.max_speed = max_speed
+
+        # Find closest station
+        stations = []
+        for entity in game.CHUNKS.entities:
+            if type(entity).__name__ == "FriendlyStation":
+                stations.append(entity)
+        
+        if current_station in stations:
+            stations.remove(current_station)
+
+        if len(stations) > 0:
+            dist_to_station = math.inf
+            index = 0
+
+            for i, station in enumerate(stations):
+                dist = (station.position - self.position).magnitude()
+                if dist < dist_to_station:
+                    dist_to_station = dist
+                    index = i
+
+            closest_station = stations[index]
+
+            self.rotate_to(delta_time, self.position.get_angle_to(closest_station.position), self.max_rotation_speed)
+            self.accelerate_in_direction(self.rotation, 300 * delta_time)
+
+            if dist_to_station < 300:
+                self.current_station = closest_station
+            
+        else:
+            self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
 
 
     def damage(self, damage, entity=None):

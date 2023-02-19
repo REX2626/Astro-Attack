@@ -31,7 +31,8 @@ class Station(Object):
 
                     if isinstance(entity, Ship):
 
-                        entity_collision(self, entity, delta_time)
+                        #entity_collision(self, entity, delta_time)
+                        return
 
                     elif isinstance(entity, Bullet):
                         entity_mask = pygame.mask.from_surface(entity.image)
@@ -56,7 +57,7 @@ class FriendlyStation(Station):
 
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
-            neutral = Neutral_Ship(random_position, Vector(0, 0))
+            neutral = Neutral_Ship(random_position, Vector(0, 0), current_station=self)
             
             game.CHUNKS.add_entity(neutral)
 

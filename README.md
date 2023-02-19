@@ -22,6 +22,8 @@ Add space stations
 
 POSSIBLE: neutral ship grouping
 
+Better choosing of which station to go to for neutral ships
+
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
