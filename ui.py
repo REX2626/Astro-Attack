@@ -3,6 +3,7 @@ import images
 from objects import Vector
 import aiship
 from entities import Asteroid, HealthPickup
+from station import Station
 import math
 import pygame
 import psutil
@@ -94,7 +95,14 @@ class MiniMap():
         # Draws enemies in chunks
         surf = pygame.Surface((self.width, self.height))
         for entity in game.CHUNKS.entities:
-            self.draw_entity(self.get_entity_colour(entity), entity, surf)
+            if isinstance(entity, Station):
+                # Blits station image
+                station_image = images.STATION_ICON
+                surf.blit(station_image, (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
+                                          ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
+            else:
+                self.draw_entity(self.get_entity_colour(entity), entity, surf)
+
         game.WIN.blit(surf, (0, 0))
 
         # Draws border
