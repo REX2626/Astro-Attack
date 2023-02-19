@@ -340,6 +340,5 @@ class Missile(Entity):
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)
-        game.CHUNKS.remove_entity(self.particles)
         particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
         particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)

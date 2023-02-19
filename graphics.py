@@ -12,22 +12,31 @@ import game
 
 
 def get_entities_to_draw():
-    """Returns the entities that are visible on the screen"""
+    """Returns the entities that are visible on the screen
+    \nSorts the order to draw entities based on their 'z value'"""
 
     # Get number of chunks until going off the screen
     radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
 
     centre: Vector = game.CHUNKS.get_chunk(game.player).position
 
-    entities: set[Object] = set()
+    entities: list[Object] = []
 
     for y in range(centre.y - radius, centre.y + radius + 1):
         for x in range(centre.x - radius, centre.x + radius + 1):
 
             chunk = game.CHUNKS.get_chunk((x, y))
-            entities.update(chunk.entities)
+            entities.extend(chunk.entities)
 
-    return entities
+    entities.extend(game.PARTICLES)
+
+    return sorted(entities, key=z_sort)
+
+
+def z_sort(entity):
+    if hasattr(entity, "z"):
+        return entity.z
+    return 0
 
 
 
