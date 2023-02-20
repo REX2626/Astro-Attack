@@ -113,6 +113,11 @@ class Player_Ship(Ship):
 
         game.SCREEN_SHAKE += damage
 
+    def destroy(self):
+        super().destroy()
+        self.boost_particles1.entity = None
+        self.boost_particles2.entity = None
+
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
 

@@ -60,6 +60,7 @@ class ParticleSystem():
     if entity: the ParticleSystem can be turned on and off by setting the active attribute to True or False
     entity_offset is a function that takes in the Entity and returns a Vector
     if entity: initial_velocity is a function that is called with the entity as an input
+    NOTE: if entity: when entity is destroyed - set ParticleSystem.entity = None
     """
     def __init__(self, position, entity_offset=lambda x: Vector(0, 0), z=1, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
         self.entity_offset = entity_offset
@@ -105,14 +106,11 @@ class ParticleSystem():
         for particle in self.particles:
             particle.update(delta_time, self)
         
-        if self.entity:
-            if self.entity in game.CHUNKS.entities:
-                self.previous_position = self.position
-                game.CHUNKS.remove_entity(self)
-                self.position = self.entity.position + self.entity_offset(self.entity)
-                game.CHUNKS.add_entity(self)
-            else:
-                self.entity = None
+        if self.entity and self.entity in game.CHUNKS.entities:
+            self.previous_position = self.position
+            game.CHUNKS.remove_entity(self)
+            self.position = self.entity.position + self.entity_offset(self.entity)
+            game.CHUNKS.add_entity(self)
 
         if not self.entity and self.time_alive > self.duration: # check if the System's life time is over
 

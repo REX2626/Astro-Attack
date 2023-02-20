@@ -254,6 +254,7 @@ class Missile_Ship(Enemy_Ship):
 
     def explode(self, radius):
         self.destroy()
+        self.particles.entity = None
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
