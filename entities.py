@@ -294,9 +294,9 @@ class Missile(Entity):
         
         # Boost particle effect
         boost_distance = 10
-        boost_position = lambda missile: Vector(boost_distance * math.sin(missile.rotation), boost_distance * math.cos(missile.rotation))# + Vector(0, 0.5).get_rotate(random.random()*2*math.pi)
+        boost_position = lambda missile: Vector(boost_distance * math.sin(missile.rotation), boost_distance * math.cos(missile.rotation))
 
-        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=3, duration=None, lifetime=0.3, frequency=200, speed_variance=50, initial_velocity=lambda missile: Vector(0, 700).get_rotate(self.rotation)+missile.velocity)
+        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=3, duration=None, lifetime=0.4, frequency=150, speed_variance=50, initial_velocity=lambda missile: Vector(0, 700).get_rotate(self.rotation)+missile.velocity)
         self.particles.active = True
 
     def update(self, delta_time):

@@ -39,10 +39,10 @@ class Player_Ship(Ship):
         boost_distance = 20
 
         boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation))
-        self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=200, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
+        self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=180, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
         
         boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation)) + Vector(0, 1).get_rotate(random.random()*2*math.pi)
-        self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=400, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
+        self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=360, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
 
     def update(self, delta_time):
 

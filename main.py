@@ -146,9 +146,6 @@ def handle_player_input(keys_pressed, delta_time):
     game.LAST_PLAYER_POS = player.position
 
 
-    CHUNKS.update(player)
-
-
 def scroll(scroll_amount: int):
 
     if scroll_amount > 0:
@@ -161,10 +158,6 @@ def scroll(scroll_amount: int):
 def update_objects(delta_time):
     """Updates all objects, e.g. adjusts positions based on velocity"""
 
-    # Update particles
-    for particle_system in game.PARTICLES.copy():
-        particle_system.update(delta_time)
-    
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set
     for object in filter(lambda object: type(object) != Bullet and type(object) != Asteroid, CHUNKS.entities.copy()):
@@ -178,6 +171,13 @@ def update_objects(delta_time):
 
     for object in filter(lambda object: type(object) == Bullet, CHUNKS.entities.copy()):
         object.update(delta_time)
+
+    # Unload all chunks and load chunks around player
+    CHUNKS.update(player)
+        
+    # Update particles
+    for particle_system in game.PARTICLES.copy():
+        particle_system.update(delta_time)
 
 
 def main():
