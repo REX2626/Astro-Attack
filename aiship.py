@@ -363,10 +363,11 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
         self.recent_enemy = recent_enemy
         self.current_station = current_station
+        self.target_station = target_station
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -385,33 +386,45 @@ class Neutral_Ship(AI_Ship):
     def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
         self.max_speed = max_speed
 
-        # Find closest station
+        # Loop through entities to find friendly station entities
         stations = []
         for entity in game.CHUNKS.entities:
             if type(entity).__name__ == "FriendlyStation":
                 stations.append(entity)
         
+        # Remove current station so it is not an option to travel to
         if current_station in stations:
             stations.remove(current_station)
 
+        # If there is another station(s) to travel to
         if len(stations) > 0:
-            dist_to_station = math.inf
+            weights = []
+
+            # appends values to weights with 1 / dist so that the smaller distances have higher weighting
+            for station in stations:
+                dist = (station.position - self.position).magnitude()
+                weights.append(1 / dist)
+
+            # Randomly choose one of the available stations based on the weighting
+            if self.target_station == None:
+                random_station = random.choices(stations, weights=weights, k=1)
+                self.target_station = random_station[0]
+            
             index = 0
 
-            for i, station in enumerate(stations):
-                dist = (station.position - self.position).magnitude()
-                if dist < dist_to_station:
-                    dist_to_station = dist
-                    index = i
+            if self.target_station in stations:
+                index = stations.index(self.target_station)
 
-            closest_station = stations[index]
-
-            self.rotate_to(delta_time, self.position.get_angle_to(closest_station.position), self.max_rotation_speed)
+            # Move and rotate towards target station
+            self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
             self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
-            if dist_to_station < 300:
-                self.current_station = closest_station
-            
+            # Checks to see if the distance between itself and the target station is less to then make a new target station
+            if (1 / weights[index]) < 300:
+                self.current_station = self.target_station
+                self.target_station = None
+        
+        # If there are no other stations available, just patrol around the current one
         else:
             self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
 
