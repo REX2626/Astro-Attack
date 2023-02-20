@@ -28,8 +28,6 @@ def get_entities_to_draw():
             chunk = game.CHUNKS.get_chunk((x, y))
             entities.extend(chunk.entities)
 
-    entities.extend(game.PARTICLES)
-
     return sorted(entities, key=z_sort)
 
 

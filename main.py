@@ -5,6 +5,7 @@ import game
 from entities import Bullet, Asteroid
 from player import add_player
 from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
+from particles import ParticleSystem
 import ui
 import menu
 import graphics
@@ -176,7 +177,7 @@ def update_objects(delta_time):
     CHUNKS.update(player)
         
     # Update particles
-    for particle_system in game.PARTICLES.copy():
+    for particle_system in filter(lambda object: type(object) == ParticleSystem, CHUNKS.entities.copy()):
         particle_system.update(delta_time)
 
 

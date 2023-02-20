@@ -91,7 +91,7 @@ class ParticleSystem():
 
         self.particles: list[Particle] = []
 
-        game.PARTICLES.add(self)
+        game.CHUNKS.add_entity(self)
 
         if not duration:
             self.duration = 0
@@ -108,14 +108,16 @@ class ParticleSystem():
         if self.entity:
             if self.entity in game.CHUNKS.entities:
                 self.previous_position = self.position
+                game.CHUNKS.remove_entity(self)
                 self.position = self.entity.position + self.entity_offset(self.entity)
+                game.CHUNKS.add_entity(self)
             else:
                 self.entity = None
 
         if not self.entity and self.time_alive > self.duration: # check if the System's life time is over
 
             if not self.particles: # if there are no more particles, then the System can be destroyed
-                game.PARTICLES.remove(self)
+                game.CHUNKS.remove_entity(self)
             return
         
         if self.entity and not self.active: # if not active: don't spawn particles
