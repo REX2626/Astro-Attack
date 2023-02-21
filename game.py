@@ -84,8 +84,6 @@ CONSOLE_SCREEN = False
 SEED = random.randint(0, 100_000)
 random.seed(SEED)
 
-PARTICLES = set()
-
 
 import chunks
 def init_chunks():

@@ -232,7 +232,7 @@ class Missile_Ship(Enemy_Ship):
         boost_distance = 20
         boost_position = lambda ship: Vector(boost_distance * math.sin(ship.rotation), boost_distance * math.cos(ship.rotation))
 
-        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=200, initial_velocity=lambda ship: Vector(0, 400).get_rotate(ship.rotation)+ship.velocity)
+        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=150, initial_velocity=lambda ship: Vector(0, 400).get_rotate(ship.rotation)+ship.velocity)
     
 
     def attack_player_state(self, delta_time, attack_min_dist, attack_max_dist, attack_max_speed):
@@ -265,6 +265,10 @@ class Missile_Ship(Enemy_Ship):
         
         for entity in entities_to_damage:
             entity.damage(self.explode_damage)
+
+    def destroy(self):
+        super().destroy()
+        self.particles.entity = None
 
 
 
