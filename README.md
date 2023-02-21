@@ -46,6 +46,15 @@ Change player health to armour, top 50% can be healed but lower 50% can only be 
 
 Change scrap drop to be proportional to enemy difficulty
 
+CONSOLE FUNCTIONALITY TO ADD:
+    arguements to functions
+    up and down arrows to cycle previous functions
+    clipboard functionality
+    add transparent background
+    console printing
+    better colour coordination
+    display error message
+
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Enemies become more difficult
 
