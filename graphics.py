@@ -4,7 +4,7 @@ This includes: chunk drawer, background star layer
 """
 
 import pygame
-import random
+from random import randint
 from objects import Object
 from game import *
 import game
@@ -65,28 +65,42 @@ def draw_chunks():
         
 
 
+# Generate list of 6 layers, each layer has 100 coordinates of stars
 star_speed = 0.005
 layers = 6
-stars: list[set[Vector]] = list()
+stars: list[list[list]] = list()
 for _ in range(layers):
-    layer: set[Vector] = set()
+    layer: list[list] = list()
     for _ in range(100):
-        layer.add(Vector(random.randint(-10, WIDTH + 10), random.randint(-10, HEIGHT + 10)))
+        layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
     stars.append(layer)
 
+
+# 100 is the number of pixels a star can go outside the screen before being destroyed
 MIN_X = -100
 MAX_X = WIDTH + 100
 MIN_Y = -100
 MAX_Y = HEIGHT + 100
 
-draw_circle = pygame.draw.circle
+# Generate 6 star images, from smallest to largest
+circles = []
+for layer in range(layers):
+    diameter = layer + 2
+    radius = diameter / 2
+    surf = pygame.Surface((diameter, diameter))
+    pygame.draw.circle(surf, (200, 200, 200), (radius, radius), radius) # Colour is a light grey, so the stars are not emphasised too much
+    surf = surf.convert()
+    circles.append(surf)
+
+draw_circle = WIN.blit
+
 
 # This function has been OPTIMIZED
 def draw_stars():
     # Layered Stars
     # Bigger stars move more
 
-    player_position_difference = game.player.position - game.LAST_PLAYER_POS
+    star_velocity = (game.LAST_PLAYER_POS - game.player.position) * star_speed
 
     for layer in range(layers):
 
@@ -94,32 +108,30 @@ def draw_stars():
         # This is because the smallest layer should still have
         # a speed / size > 0
 
-        radius = int((layer+2) / 2)
-
         # Move each star opposite direction to player
-        shiftx = player_position_difference.x * star_speed * (layer+1)
-        shifty = player_position_difference.y * star_speed * (layer+1)
+        shiftx = star_velocity.x * (layer+1)
+        shifty = star_velocity.y * (layer+1)
+
         for star in stars[layer]:
-            star.x -= shiftx
-            star.y -= shifty
+            star[0] += shiftx
+            star[1] += shifty
+
             # If the star is outside of the screen, remove it
-            # 200 is the number of pixels a star can go outside the screen before being destroyed
+            if star[0] < MIN_X:
+                star[0] = WIDTH + layer
+                star[1] = randint(-layer, HEIGHT+layer)
 
-            if star.x < MIN_X:
-                star.x = WIDTH + radius
-                star.y = random.randint(-radius, HEIGHT+radius)
+            elif star[0] > MAX_X:
+                star[0] = -layer
+                star[1] = randint(-layer, HEIGHT+layer)
 
-            elif star.x > MAX_X:
-                star.x = -radius
-                star.y = random.randint(-radius, HEIGHT+radius)
+            elif star[1] < MIN_Y:
+                star[0] = randint(-layer, WIDTH+layer)
+                star[1] = HEIGHT+layer
 
-            elif star.y < MIN_Y:
-                star.x = random.randint(-radius, WIDTH+radius)
-                star.y = HEIGHT+radius
-
-            elif star.y > MAX_Y:
-                star.x = random.randint(-radius, WIDTH+radius)
-                star.y = -radius
+            elif star[1] > MAX_Y:
+                star[0] = randint(-layer, WIDTH+layer)
+                star[1] = -layer
 
             # Draw star
-            draw_circle(WIN, (200, 200, 200), (star.x, star.y), (layer+2)/2) # Colour is a light grey, so the stars are not emphasised too much
+            draw_circle(circles[layer], star)
