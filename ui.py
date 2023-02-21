@@ -175,6 +175,12 @@ class Console():
                              "/godmode - boosts stats"]
 
     def check_for_inputs(self):
+        # Take an image of the current playing screen, then darken it, and save to be used for drawing
+        surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
+        pygame.draw.rect(surf, (0, 0, 0, 120), (0, 0, game.WIDTH, game.HEIGHT))
+        game.WIN.blit(surf, (0, 0))
+        self.playing_background = game.WIN.copy()
+        
         # while loop to pause the game and check for inputs
         while game.CONSOLE_SCREEN == True:
             for event in pygame.event.get():
@@ -237,8 +243,8 @@ class Console():
             width = game.WIDTH
             height = game.HEIGHT
 
-            # Black background and white box
-            pygame.draw.rect(game.WIN, game.BLACK, (0, 0, width, height))
+            # Darkened playing background and white box
+            game.WIN.blit(self.playing_background, (0, 0))
             pygame.draw.rect(game.WIN, game.WHITE, (0, height - self.text_input_height, width, self.text_input_height))
 
             # Renders input text
