@@ -238,7 +238,7 @@ def main():
 
                 # Fix delta_time so that time paused is not included
                 start = perf_counter()
-                
+
                 # Darken the background when paused
                 surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
                 pygame.draw.rect(surf, (0, 0, 0, 120), (0, 0, game.WIDTH, game.HEIGHT))
@@ -254,6 +254,22 @@ def main():
                     game.DEBUG_SCREEN = False
                 else:
                     game.DEBUG_SCREEN = True
+
+            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_SLASH:
+                # Fix delta_time so that time paused is not included
+                start = perf_counter()
+
+                game.CONSOLE_SCREEN = True
+
+                # Runs main console loop which pauses the game
+                ui.canvas.console_panel.check_for_inputs()
+
+                # Runs all of the commands written after the console is closed since we want the commands to run in this main loop
+                ui.canvas.console_panel.run_commands()
+                ui.canvas.console_panel.commands_to_run.clear()
+
+                # Correct time1
+                time1 = perf_counter() - start + time1
                 
         time2 = perf_counter()
         delta_time = time2 - time1

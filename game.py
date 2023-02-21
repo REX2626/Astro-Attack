@@ -79,6 +79,7 @@ PICKUP_DISTANCE = 150
 SCRAP_COUNT = 0
 
 DEBUG_SCREEN = False
+CONSOLE_SCREEN = False
 
 SEED = random.randint(0, 100_000)
 random.seed(SEED)

@@ -7,6 +7,7 @@ from station import Station
 import math
 import pygame
 import psutil
+import commands
 
 
 
@@ -151,6 +152,108 @@ class Hotbar():
 
 
 
+class Console():
+    def __init__(self) -> None:
+        self.left_text_padding = 20
+        self.text_input_height = 50
+        self.previous_command_gap = 45
+
+        self.input_text = ""
+        self.previous_commands = []
+
+        self.text_input_font = pygame.font.Font(None, 64)
+        self.previous_commands_font = pygame.font.Font(None, 40)
+
+        self.commands_colour = (255, 204, 0)
+
+        self.commands = {"spawnneutral": commands.spawn_netral_ship,
+                         "godmode": commands.god_mode}
+        
+        self.commands_to_run = []
+
+        self.help_message = ["/spawnneutral - spawns in neutral ship at current location",
+                             "/godmode - boosts stats"]
+
+    def check_for_inputs(self):
+        # while loop to pause the game and check for inputs
+        while game.CONSOLE_SCREEN == True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game.quit()
+
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
+                    game.CONSOLE_SCREEN = False
+                
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RETURN:
+                    self.enter_text()
+
+                elif event.type == pygame.KEYDOWN:
+                    # removes last item from input_text string when backspace is pressed
+                    if event.key == pygame.K_BACKSPACE:
+                        self.input_text = self.input_text[:-1]
+
+                    # add pressed character to input_text
+                    else:
+                        self.input_text += event.unicode
+
+            # must draw here since this is the only game loop running
+            self.draw()
+
+    def enter_text(self):
+        if self.input_text != "":
+            
+            if self.input_text == "help":
+                # displays all of the help messages on separate lines
+                for message in self.help_message:
+                    self.previous_commands.insert(0, message)
+
+            elif self.input_text in self.commands.keys():
+                self.commands_to_run.append(self.input_text)
+
+                # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
+                self.previous_commands.insert(0, "/" + self.input_text)
+
+            else:
+                try:
+                    eval(self.input_text)
+                    self.previous_commands.insert(0, "/" + self.input_text)
+                except:
+                    # just returns what you wrote into the command history
+                    self.previous_commands.insert(0, self.input_text)
+
+        # resets the input_text
+        self.input_text = ""
+
+    def run_commands(self):
+        # loops through the dictionary
+        for command in self.commands_to_run:
+            # runs command corresponding to the key (in this case, the array of keys are in self.commands_to_run)
+            self.commands[command]()
+        
+    def draw(self):
+        # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
+        if game.CONSOLE_SCREEN:
+            # Not defined in __init__ since the game.width and game.height could change mid game
+            width = game.WIDTH
+            height = game.HEIGHT
+
+            # Black background and white box
+            pygame.draw.rect(game.WIN, game.BLACK, (0, 0, width, height))
+            pygame.draw.rect(game.WIN, game.WHITE, (0, height - self.text_input_height, width, self.text_input_height))
+
+            # Renders input text
+            text_surface = self.text_input_font.render("/ " + self.input_text, True, game.BLACK)
+            game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height))
+
+            # Loops through all previous commands and displays them above
+            for i, command in enumerate(self.previous_commands):
+                text_surface = self.previous_commands_font.render(command, True, self.commands_colour)
+                game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height - ((i + 1) * self.previous_command_gap)))
+            
+            # Needed since draw() is called in the while loop
+            pygame.display.update()
+
+
 class Canvas():
     def __init__(self) -> None:
         self.elements = []
@@ -160,8 +263,9 @@ class Canvas():
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-150, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(30, 190, 190)))
         self.add("mini_map"  , MiniMap((0, 0), width=350, height=350))
-        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
         self.add("hotbar"    , Hotbar(height=0.9, number=4, size=52, gap=26))
+        self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
+        self.add("console_panel", Console())
 
     def add(self, name, element):
         self.__setattr__(name, element)
