@@ -20,8 +20,8 @@ ATTACK_ENEMY = 3
 
 
 class AI_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=images.DEFAULT) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=images.DEFAULT) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, armour, shield_delay, shield_recharge, image)
         
         self.state = state
         # Initialises start patrol point
@@ -142,8 +142,8 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.GREEN_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.GREEN_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.mother_ship = mother_ship
         self.mother_ship_patrol = mother_ship
         self.new_ship_pos = Vector(0, 0)
@@ -222,8 +222,8 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
@@ -273,14 +273,14 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGatlingGun, health=1, shield=2, shield_delay=2, shield_recharge=4, state=PATROL, mother_ship=None, image=images.DRONE_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGatlingGun, health=1, armour=0, shield=2, shield_delay=2, shield_recharge=4, state=PATROL, mother_ship=None, image=images.DRONE_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, health=10, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, self, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
@@ -367,8 +367,8 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.recent_enemy = recent_enemy
         self.current_station = current_station
         self.target_station = target_station

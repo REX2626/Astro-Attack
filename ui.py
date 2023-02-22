@@ -13,13 +13,17 @@ import commands
 
 class Bar():
     """x, y are functions"""
-    def __init__(self, x, y, width, height, colour) -> None:
+    def __init__(self, x, y, width, height, colour, outline_width=0, outline_colour=(250, 250, 255), curve=0, flatten_left=False, flatten_right=False) -> None:
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.original_width = width
         self.colour = colour
+        self.outline_width = outline_width
+        self.outline_colour = outline_colour
+        self.left_curve = -1 if flatten_left else curve
+        self.right_curve = -1 if flatten_right else curve
 
     def update(self, new_percent):
         """Updates the percentage of the bar, NOTE: percentage is from 0 to 1"""
@@ -27,8 +31,22 @@ class Bar():
 
     def draw(self):
         pygame.draw.rect(game.WIN, self.colour,
-                        rect=(self.x(), self.y() - self.height*0.5, # bar position is middle left
-                              self.width, self.height)
+                        rect=(self.x(), self.y() - self.height/2, # bar position is middle left
+                              self.width, self.height),
+                        border_top_left_radius=self.left_curve,
+                        border_bottom_left_radius=self.left_curve,
+                        border_top_right_radius=self.right_curve,
+                        border_bottom_right_radius=self.right_curve
+                        )
+        if self.outline_width:
+            pygame.draw.rect(game.WIN, self.outline_colour,
+                        rect=(self.x(), self.y() - self.height/2, # bar position is middle left
+                              self.original_width, self.height),
+                        width=self.outline_width,
+                        border_top_left_radius=self.left_curve,
+                        border_bottom_left_radius=self.left_curve,
+                        border_top_right_radius=self.right_curve,
+                        border_bottom_right_radius=self.right_curve
                         )
 
 
@@ -46,7 +64,7 @@ class Image():
         self.x, self.y = self.position
 
     def draw(self):
-        game.WIN.blit(self.image, (self.x - self.width*0.5, self.y - self.height*0.5))
+        game.WIN.blit(self.image, (self.x - self.width/2, self.y - self.height/2))
 
 
 
@@ -144,7 +162,7 @@ class Hotbar():
                 colour = (30, 30, 30)
 
             x = game.CENTRE_POINT.x + self.gap/2 + (i-self.number/2)*(self.size+self.gap)
-            y = self.height*game.HEIGHT
+            y = game.HEIGHT - self.height
             pygame.draw.rect(game.WIN, colour, (x, y, self.size, self.size), width=6, border_radius=7)
             
             image = self.images[i]
@@ -283,12 +301,13 @@ class Canvas():
     def __init__(self) -> None:
         self.elements = []
 
-        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-250, width=200, height=40, colour=(255, 0, 0)))
+        self.add("health_bar", Bar(lambda: game.WIDTH/2-204, lambda: game.HEIGHT-100, width=206, height=46, colour=(255, 0, 0), outline_width=3, curve=7, flatten_right=True))
+        self.add("armour_bar", Bar(lambda: game.WIDTH/2-1, lambda: game.HEIGHT-100, width=206, height=46, colour=(255, 160, 30), outline_width=3, curve=7, flatten_left=True))
         self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-200 , width=200, height=40, colour=(34, 130, 240)))
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-150, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(30, 190, 190)))
         self.add("mini_map"  , MiniMap((0, 0), width=350, height=350))
-        self.add("hotbar"    , Hotbar(height=0.9, number=4, size=52, gap=26))
+        self.add("hotbar"    , Hotbar(height=195, number=4, size=52, gap=26))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
         self.add("console_panel", Console())
 
@@ -400,6 +419,7 @@ def draw(delta_time):
 
 
     canvas.health_bar.update(game.player.health/game.MAX_PLAYER_HEALTH)
+    canvas.armour_bar.update(game.player.armour/game.MAX_PLAYER_ARMOUR)
     canvas.shield_bar.update(game.player.shield/game.player.max_shield)
     canvas.boost_bar.update(game.player.boost_amount/game.MAX_BOOST_AMOUNT)
     canvas.speed_bar.update(game.player.velocity.magnitude()/(game.MAX_PLAYER_SPEED*2))
@@ -453,7 +473,10 @@ def draw(delta_time):
         WIN.blit(label, (8, 248))
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
-    WIN.blit(label, (108, game.HEIGHT-264))
+    WIN.blit(label, (game.WIDTH/2-193, game.HEIGHT-114))
+
+    label = font.render(f"{round(game.player.armour)}", True, (255, 255, 255))
+    WIN.blit(label, (game.WIDTH/2+10, game.HEIGHT-114))
 
     label = font.render(f"{round(game.player.shield)} | {round(game.player.max_shield)}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))

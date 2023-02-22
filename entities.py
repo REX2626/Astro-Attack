@@ -70,11 +70,12 @@ class Asteroid(Object):
 
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             entity.unload() # if bullet collides with asteroid then destroy bullet
+                            particles.ParticleSystem(entity.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*entity.damage+1), speed=120, speed_variance=40)
 
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
@@ -85,6 +86,7 @@ class Ship(Entity):
         self.health = health
         self.max_shield = shield
         self.shield = shield
+        self.armour = armour
         self.shield_delay = shield_delay
         self.shield_recharge = shield_recharge
         
@@ -153,8 +155,15 @@ class Ship(Entity):
 
         # If no shield, then damage ship
         if self.shield == 0:
-            self.health -= damage
             particles.ParticleSystem(self.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*damage+1), speed=120, speed_variance=40)
+
+            # Armour takes damage
+            new_armour = max(0, self.armour - damage)
+            damage -= self.armour - new_armour
+            self.armour = new_armour
+
+            # Health takes damage
+            self.health -= damage
             if self.health <= 0:
                 self.destroy()
 
@@ -214,15 +223,15 @@ class HealthPickup(Pickup):
         super().__init__(position, velocity, max_speed, rotation, image)
 
     def update(self, delta_time):
-        if game.player.health < game.MAX_PLAYER_HEALTH:
+        if game.player.armour < game.MAX_PLAYER_ARMOUR:
             super().update(delta_time)
 
     def activate(self):
         
-        game.player.health += 5
+        game.player.armour += 5
 
-        if game.player.health > game.MAX_PLAYER_HEALTH:
-            game.player.health = game.MAX_PLAYER_HEALTH
+        if game.player.armour > game.MAX_PLAYER_ARMOUR:
+            game.player.armour = game.MAX_PLAYER_ARMOUR
 
         game.CHUNKS.remove_entity(self)
 
