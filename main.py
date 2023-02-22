@@ -267,7 +267,6 @@ def main():
 
                 # Runs all of the commands written after the console is closed since we want the commands to run in this main loop
                 ui.canvas.console_panel.run_commands()
-                ui.canvas.console_panel.commands_to_run.clear()
 
                 # Correct time1
                 time1 = perf_counter() - start + time1

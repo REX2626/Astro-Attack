@@ -171,8 +171,10 @@ class Console():
         
         self.commands_to_run = []
 
-        self.help_message = ["/spawnneutral - spawns in neutral ship at current location",
-                             "/godmode - boosts stats"]
+        self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
+                             "/godmode(max_health, max_boost) - boosts stats"]
+
+        self.arguements = []
 
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
@@ -208,16 +210,24 @@ class Console():
     def enter_text(self):
         if self.input_text != "":
             
+            # Checks if this is a function which will take in arguements
+            if "(" in self.input_text:
+                # splits input into the name of the function (in input_command) and a list of the arguements (in self.arguements)
+                split_text = self.input_text.split("(")
+                input_command = split_text[0]
+                split_text[1] = split_text[1][:-1]
+                self.arguements = split_text[1].split(", ")
+            
             if self.input_text == "help":
                 # displays all of the help messages on separate lines
                 for message in self.help_message:
                     self.previous_commands.insert(0, message)
 
-            elif self.input_text in self.commands.keys():
-                self.commands_to_run.append(self.input_text)
-
+            elif input_command in self.commands.keys():
                 # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
                 self.previous_commands.insert(0, "/" + self.input_text)
+
+                self.commands_to_run.append(split_text)
 
             else:
                 try:
@@ -234,7 +244,16 @@ class Console():
         # loops through the dictionary
         for command in self.commands_to_run:
             # runs command corresponding to the key (in this case, the array of keys are in self.commands_to_run)
-            self.commands[command]()
+
+            # if there is no arguement then just run the function
+            if command[1] == "":
+                self.commands[command[0]]()
+
+            # if there are arguements input the list of arguements (they are as strings sadly)
+            else:
+                self.commands[command[0]](self.arguements)
+        
+        self.commands_to_run.clear()
         
     def draw(self):
         # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
