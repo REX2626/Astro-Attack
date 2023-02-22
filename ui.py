@@ -35,8 +35,8 @@ class Bar():
                               self.width, self.height),
                         border_top_left_radius=self.left_curve,
                         border_bottom_left_radius=self.left_curve,
-                        border_top_right_radius=self.right_curve,
-                        border_bottom_right_radius=self.right_curve
+                        border_top_right_radius=self.right_curve+self.outline_width, # + self.outline_width to be the same curve as outline
+                        border_bottom_right_radius=self.right_curve+self.outline_width
                         )
         if self.outline_width:
             pygame.draw.rect(game.WIN, self.outline_colour,
