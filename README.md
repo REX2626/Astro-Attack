@@ -44,6 +44,16 @@ Add missile and autoturret weapons
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
+Armour:
+A few armour slots (5), but is a bar
+You can repair a whole slot with some scrap, if slot is only still damaged, you still have to pay full slot price
+When health is damaged, it effects how ships work, e.g. start smoking, visual screen effects, speed reduced, shield stops working, weapon not as effective
+When bits of player ship stops working, message should come up
+Some visual to show armour, and it breaking
+Once armour is broken, all damage goes into health
+Weapons have a certain amount of penetration, more penetration, more damage to health
+Missile have low pen, sniper has high pen
+
 Change scrap drop to be proportional to enemy difficulty
 
 CONSOLE FUNCTIONALITY TO ADD:

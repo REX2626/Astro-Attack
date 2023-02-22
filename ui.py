@@ -264,7 +264,8 @@ class Canvas():
     def __init__(self) -> None:
         self.elements = []
 
-        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-250, width=200, height=40, colour=(255, 0, 0)))
+        self.add("health_bar", Bar(lambda: 100, lambda: game.HEIGHT-250, width=150, height=40, colour=(255, 0, 0)))
+        self.add("armour_bar", Bar(lambda: 250, lambda: game.HEIGHT-250, width=50, height=40, colour=(255, 160, 30)))
         self.add("shield_bar", Bar(lambda: 100, lambda: game.HEIGHT-200 , width=200, height=40, colour=(34, 130, 240)))
         self.add("boost_bar" , Bar(lambda: 100, lambda: game.HEIGHT-150, width=200, height=40, colour=(207, 77, 17)))
         self.add("speed_bar" , Bar(lambda: 100, lambda: game.HEIGHT-100, width=200, height=40, colour=(30, 190, 190)))
@@ -381,6 +382,7 @@ def draw(delta_time):
 
 
     canvas.health_bar.update(game.player.health/game.MAX_PLAYER_HEALTH)
+    canvas.armour_bar.update(game.player.armour/10)
     canvas.shield_bar.update(game.player.shield/game.player.max_shield)
     canvas.boost_bar.update(game.player.boost_amount/game.MAX_BOOST_AMOUNT)
     canvas.speed_bar.update(game.player.velocity.magnitude()/(game.MAX_PLAYER_SPEED*2))
@@ -435,6 +437,9 @@ def draw(delta_time):
 
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-264))
+
+    label = font.render(f"{round(game.player.armour)}", True, (255, 255, 255))
+    WIN.blit(label, (258, game.HEIGHT-264))
 
     label = font.render(f"{round(game.player.shield)} | {round(game.player.max_shield)}", True, (255, 255, 255))
     WIN.blit(label, (108, game.HEIGHT-214))

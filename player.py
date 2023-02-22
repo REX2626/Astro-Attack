@@ -16,7 +16,7 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=game.MAX_PLAYER_SPEED,
         rotation=0, max_rotation_speed=3,
-        weapon=PlayerGun, 
+        weapon=PlayerGun,
         health=lambda: game.MAX_PLAYER_HEALTH, # health has to be a function, in case player health is changed in settings
         shield=game.MAX_PLAYER_SHIELD, shield_delay=3, shield_recharge=game.PLAYER_SHIELD_RECHARGE,
         boost_amount=lambda: game.MAX_BOOST_AMOUNT, boost_change=5, # boost also could be changed in settings
