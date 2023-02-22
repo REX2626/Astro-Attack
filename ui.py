@@ -185,14 +185,16 @@ class Console():
         self.commands_colour = (255, 204, 0)
 
         self.commands = {"spawnneutral": commands.spawn_netral_ship,
-                         "godmode": commands.god_mode}
+                         "godmode": commands.god_mode,
+                         "zoom": commands.change_max_zoom}
         
         self.commands_to_run = []
 
         self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
-                             "/godmode(max_health, max_boost) - boosts stats"]
+                             "/godmode(max_health, max_boost) - boosts stats",
+                             "/zoom(zoom_level) - changes how far you can zoom out"]
 
-        self.arguements = []
+        self.arguments = []
 
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
@@ -234,7 +236,7 @@ class Console():
                 split_text = self.input_text.split("(")
                 input_command = split_text[0]
                 split_text[1] = split_text[1][:-1]
-                self.arguements = split_text[1].split(", ")
+                self.arguments = split_text[1].split(", ")
             
             if self.input_text == "help":
                 # displays all of the help messages on separate lines
@@ -267,9 +269,9 @@ class Console():
             if command[1] == "":
                 self.commands[command[0]]()
 
-            # if there are arguements input the list of arguements (they are as strings sadly)
+            # if there are arguements eval the list of arguements
             else:
-                self.commands[command[0]](self.arguements)
+                self.commands[command[0]](eval(", ".join(self.arguments)))
         
         self.commands_to_run.clear()
         
