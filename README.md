@@ -56,6 +56,8 @@ Missile have low pen, sniper has high pen
 
 Change scrap drop to be proportional to enemy difficulty
 
+Make scrap spawn with a random offset from dead ship
+
 CONSOLE FUNCTIONALITY TO ADD:
     arguements to functions
     up and down arrows to cycle previous functions
@@ -88,6 +90,7 @@ Change colour of enemy bullets
 Make ships have a thruster animation
 
 Check / improve graphics.get_entities_to_draw performance
+Fix issue with not rendering some objects right on edge of screen (strict rendering)
 
 Fix first full_screen click not moving the mouse properly
 
