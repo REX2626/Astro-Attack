@@ -265,7 +265,7 @@ class Console():
         for command in self.commands_to_run:
             # runs command corresponding to the key (in this case, the array of keys are in self.commands_to_run)
 
-            # if there is no arguement then just run the function
+            # if there is no argument then just run the function
             if command[1] == "":
                 self.commands[command[0]]()
 
