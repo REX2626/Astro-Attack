@@ -230,9 +230,9 @@ class Console():
     def enter_text(self):
         if self.input_text != "":
             
-            # Checks if this is a function which will take in arguements
+            # Checks if this is a function which will take in arguments
             if "(" in self.input_text:
-                # splits input into the name of the function (in input_command) and a list of the arguements (in self.arguements)
+                # splits input into the name of the function (in input_command) and a list of the arguments (in self.arguments)
                 split_text = self.input_text.split("(")
                 input_command = split_text[0]
                 split_text[1] = split_text[1][:-1]
@@ -269,7 +269,7 @@ class Console():
             if command[1] == "":
                 self.commands[command[0]]()
 
-            # if there are arguements eval the list of arguements
+            # if there are arguments eval the list of arguments
             else:
                 self.commands[command[0]](eval(", ".join(self.arguments)))
         
