@@ -188,11 +188,15 @@ class Console():
                          "godmode": commands.god_mode,
                          "zoom": commands.change_max_zoom}
         
+        # console_commands mean that the command is written in this class
+        self.console_commands = {"log": self.log}
+        
         self.commands_to_run = []
 
         self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
-                             "/zoom(zoom_level) - changes how far you can zoom out"]
+                             "/zoom(zoom_level) - changes how far you can zoom out",
+                             "/log(argument) - prints argument to console"]
         
         self.current_selected_command = 0
 
@@ -260,6 +264,12 @@ class Console():
                 for message in self.help_message:
                     self.chat_history.insert(0, message)
 
+            elif input_command in self.console_commands.keys():
+                self.chat_history.insert(0, "/" + self.input_text)
+                self.previous_commands.insert(0, self.input_text)
+
+                self.console_commands[input_command](eval(", ".join(arguments)))
+
 
             elif input_command in self.commands.keys():
                 # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
@@ -312,6 +322,9 @@ class Console():
                 self.commands[command[0]](eval(", ".join(command[1])))
         
         self.commands_to_run.clear()
+
+    def log(self, argument):
+        self.chat_history.insert(0, f"{argument}")
         
     def draw(self):
         # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
