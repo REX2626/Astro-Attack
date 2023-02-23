@@ -54,10 +54,6 @@ Once armour is broken, all damage goes into health
 Weapons have a certain amount of penetration, more penetration, more damage to health
 Missile have low pen, sniper has high pen
 
-Change scrap drop to be proportional to enemy difficulty
-
-Make scrap spawn with a random offset from dead ship
-
 CONSOLE FUNCTIONALITY TO ADD:
     arguements to functions
     up and down arrows to cycle previous functions
@@ -364,5 +360,8 @@ Improve particle system
 Add speed to ship rotation (ships don't rotate instantly)
 
 ### a1.3.0 (station)
-
 Improve rendering images on top of each other (boost particles rendering order), possibly add z-layer
+
+Change scrap drop to be proportional to enemy difficulty
+
+Make scrap spawn with a random offset from dead ship
