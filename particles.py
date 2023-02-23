@@ -129,11 +129,17 @@ class ParticleSystem():
 
             if self.entity:
                 vec = self.position - self.previous_position
-                for i in range(1, int(count)+1):
-                    position = self.previous_position + (i/count) * vec + (1-i/count) * self.initial_velocity(self.entity) * delta_time
-                    start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
-                    self.spawn(position, start_size)
-
+                if self.speed_variance:
+                    for i in range(1, int(count)+1):
+                        position = self.previous_position + (i/count) * vec + (1-i/count) * (self.initial_velocity(self.entity) + random_vector(self.speed + (random.random()*2-1) * self.speed_variance)) * delta_time
+                        start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
+                        self.spawn(position, start_size)
+                else:
+                    for i in range(1, int(count)+1):
+                        position = self.previous_position + (i/count) * vec + (1-i/count) * (self.initial_velocity(self.entity) + random_vector(self.speed)) * delta_time
+                        start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
+                        self.spawn(position, start_size)
+                
             else:
                 for _ in range(int(count)):
                     self.spawn(self.position, self.start_size)
