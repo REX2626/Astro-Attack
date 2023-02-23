@@ -193,6 +193,8 @@ class Console():
         self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out"]
+        
+        self.current_selected_command = 0
 
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
@@ -213,6 +215,12 @@ class Console():
                 elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RETURN:
                     self.enter_text()
 
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_UP:
+                    self.up_pressed()
+
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_DOWN:
+                    self.down_pressed()
+
                 elif event.type == pygame.KEYDOWN:
                     # removes last item from input_text string when backspace is pressed
                     if event.key == pygame.K_BACKSPACE:
@@ -226,6 +234,8 @@ class Console():
             self.draw()
 
     def enter_text(self):
+        self.current_selected_command = 0
+
         if self.input_text != "":
             
             # Checks if this is a function which will take in arguments
@@ -262,6 +272,29 @@ class Console():
 
         # resets the input_text
         self.input_text = ""
+
+    def up_pressed(self):
+        if self.current_selected_command < len(self.previous_commands):
+            self.current_selected_command += 1
+
+            command = self.previous_commands[self.current_selected_command - 1]
+            if "/" in command:
+                self.input_text = command[1:]
+            else:
+                self.input_text = command
+    
+    def down_pressed(self):
+        if self.current_selected_command > 1:
+            self.current_selected_command -= 1
+            
+            command = self.previous_commands[self.current_selected_command - 1]
+            if "/" in command:
+                self.input_text = command[1:]
+            else:
+                self.input_text = command
+        else:
+            self.current_selected_command = 0
+            self.input_text = ""
 
     def run_commands(self):
         # loops through the dictionary
