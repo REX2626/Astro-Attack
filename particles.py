@@ -43,8 +43,7 @@ class Particle():
         min_radius = int(self.current_size*ZOOM)
 
         # draw circle going from out to in
-        for radius1 in range(max_radius*2, min_radius*2, -1): # e.g. range(15, 10, -1), radius*2 so that it can be x.5
-            radius1 = radius1/2
+        for radius1 in range(max_radius, min_radius, -1): # e.g. range(15, 10, -1)
             amount_done = (max_radius-radius1) / (max_radius-min_radius)
             draw_circle(surface, (*self.colour, amount_done*255), (radius, radius), radius1, width=2)
 
