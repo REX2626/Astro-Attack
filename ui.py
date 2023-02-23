@@ -194,8 +194,6 @@ class Console():
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out"]
 
-        self.arguments = []
-
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
         surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
@@ -236,7 +234,12 @@ class Console():
                 split_text = self.input_text.split("(")
                 input_command = split_text[0]
                 split_text[1] = split_text[1][:-1]
-                self.arguments = split_text[1].split(", ")
+                arguments = split_text[1].split(", ")
+            else:
+                # This is needed so that if the command is written in python or not in the self.commands it will not
+                # cause an error by not being able to access the local variable input_command when checking if the input_command
+                # is in self.commands (line 249)
+                input_command = self.input_text
             
             if self.input_text == "help":
                 # displays all of the help messages on separate lines
@@ -247,7 +250,7 @@ class Console():
                 # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
                 self.previous_commands.insert(0, "/" + self.input_text)
 
-                self.commands_to_run.append(split_text)
+                self.commands_to_run.append((input_command, arguments))
 
             else:
                 try:
@@ -271,7 +274,7 @@ class Console():
 
             # if there are arguments eval the list of arguments
             else:
-                self.commands[command[0]](eval(", ".join(self.arguments)))
+                self.commands[command[0]](eval(", ".join(command[1])))
         
         self.commands_to_run.clear()
         
