@@ -96,6 +96,9 @@ Fix first full_screen click not moving the mouse properly
 
 If neutral ship cannot find patrol point - do something
 
+NOTE: pygame.draw.circle uses integer for radius, e.g. diameter is always multiples of two
+Do some caching for circles for particles to improve performance
+
 ### POTENTIAL
 
 Strict Rendering (only rendering objects which will defo be on screen)

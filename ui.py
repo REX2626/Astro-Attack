@@ -466,9 +466,31 @@ def get_minimum_fps(delta_time):
         min_fps = math.inf
 
     if 1/delta_time < min_fps:
-        min_fps = 1/delta_time
+        min_fps = 1 / delta_time
 
     return showing_min_fps
+
+
+average_fps_elapsed_time = 0
+average_fps = 0
+n_fps = 1
+showing_average_fps = 0
+def get_average_fps(delta_time):
+
+    global average_fps_elapsed_time, average_fps, n_fps, showing_average_fps
+    average_fps_elapsed_time += delta_time
+    if average_fps_elapsed_time > 1:
+
+        average_fps_elapsed_time = 0
+        showing_average_fps = average_fps
+        average_fps = 1 / delta_time
+        n_fps = 1
+
+    else:
+        average_fps = (1 / delta_time + n_fps * average_fps) / (n_fps + 1)
+        n_fps += 1
+
+    return showing_average_fps
 
 
 def draw(delta_time):
@@ -491,7 +513,7 @@ def draw(delta_time):
 
     # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results
 
-    label = font.render(f"FPS: {round(1 / delta_time)}", True, (255, 255, 255))
+    label = font.render(f"FPS: {round(get_average_fps(delta_time))}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH - 300, 8))
 
     label = font2.render(f"SCORE: {game.SCORE}", True, (255, 10, 10))
