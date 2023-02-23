@@ -209,7 +209,7 @@ class Console():
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
         surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
-        pygame.draw.rect(surf, (0, 0, 0, 120), (0, 0, game.WIDTH, game.HEIGHT))
+        pygame.draw.rect(surf, (0, 0, 0, 200), (0, 0, game.WIDTH, game.HEIGHT))
         game.WIN.blit(surf, (0, 0))
         self.playing_background = game.WIN.copy()
         
