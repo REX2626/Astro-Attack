@@ -178,13 +178,13 @@ class Console():
     def __init__(self) -> None:
         self.left_text_padding = 20
         self.text_input_height = 50
-        self.previous_command_gap = 45
+        self.chat_history_gap = 45
 
         self.input_text = ""
-        self.previous_commands = []
+        self.chat_history = []
 
-        self.text_input_font = pygame.font.Font(None, 64)
-        self.previous_commands_font = pygame.font.Font(None, 40)
+        self.text_input_font = pygame.font.SysFont("consolas", 50)
+        self.chat_history_font = pygame.font.SysFont("consolas", 35)
 
         self.commands_colour = (255, 204, 0)
 
@@ -192,13 +192,19 @@ class Console():
                          "godmode": commands.god_mode,
                          "zoom": commands.change_max_zoom}
         
+        # console_commands mean that the command is written in this class
+        self.console_commands = {"log": self.log}
+        
         self.commands_to_run = []
 
         self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
-                             "/zoom(zoom_level) - changes how far you can zoom out"]
+                             "/zoom(zoom_level) - changes how far you can zoom out",
+                             "/log(argument) - prints argument to console"]
+        
+        self.current_selected_command = 0
 
-        self.arguments = []
+        self.previous_commands = []
 
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
@@ -219,6 +225,12 @@ class Console():
                 elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RETURN:
                     self.enter_text()
 
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_UP:
+                    self.up_pressed()
+
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_DOWN:
+                    self.down_pressed()
+
                 elif event.type == pygame.KEYDOWN:
                     # removes last item from input_text string when backspace is pressed
                     if event.key == pygame.K_BACKSPACE:
@@ -232,6 +244,8 @@ class Console():
             self.draw()
 
     def enter_text(self):
+        self.current_selected_command = 0
+
         if self.input_text != "":
             
             # Checks if this is a function which will take in arguments
@@ -240,29 +254,63 @@ class Console():
                 split_text = self.input_text.split("(")
                 input_command = split_text[0]
                 split_text[1] = split_text[1][:-1]
-                self.arguments = split_text[1].split(", ")
+                arguments = split_text[1].split(", ")
+            else:
+                # This is needed so that if the command is written in python or not in the self.commands it will not
+                # cause an error by not being able to access the local variable input_command when checking if the input_command
+                # is in self.commands
+                input_command = self.input_text
             
             if self.input_text == "help":
+                self.previous_commands.insert(0, self.input_text)
+
                 # displays all of the help messages on separate lines
                 for message in self.help_message:
-                    self.previous_commands.insert(0, message)
+                    self.chat_history.insert(0, message)
+
+            elif input_command in self.console_commands.keys():
+                self.chat_history.insert(0, "/" + self.input_text)
+                self.previous_commands.insert(0, self.input_text)
+
+                self.console_commands[input_command](eval(", ".join(arguments)))
+
 
             elif input_command in self.commands.keys():
                 # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
-                self.previous_commands.insert(0, "/" + self.input_text)
+                self.chat_history.insert(0, "/" + self.input_text)
+                self.previous_commands.insert(0, self.input_text)
 
-                self.commands_to_run.append(split_text)
+                self.commands_to_run.append((input_command, arguments))
 
             else:
                 try:
                     eval(self.input_text)
-                    self.previous_commands.insert(0, "/" + self.input_text)
+                    self.chat_history.insert(0, "/" + self.input_text)
+                    self.previous_commands.insert(0, self.input_text)
                 except:
                     # just returns what you wrote into the command history
+                    self.chat_history.insert(0, self.input_text)
                     self.previous_commands.insert(0, self.input_text)
 
         # resets the input_text
         self.input_text = ""
+
+    def up_pressed(self):
+        if self.current_selected_command < len(self.previous_commands):
+            self.current_selected_command += 1
+
+            command = self.previous_commands[self.current_selected_command - 1]
+            self.input_text = command
+    
+    def down_pressed(self):
+        if self.current_selected_command > 1:
+            self.current_selected_command -= 1
+
+            command = self.previous_commands[self.current_selected_command - 1]
+            self.input_text = command
+        else:
+            self.current_selected_command = 0
+            self.input_text = ""
 
     def run_commands(self):
         # loops through the dictionary
@@ -275,9 +323,12 @@ class Console():
 
             # if there are arguments eval the list of arguments
             else:
-                self.commands[command[0]](eval(", ".join(self.arguments)))
+                self.commands[command[0]](eval(", ".join(command[1])))
         
         self.commands_to_run.clear()
+
+    def log(self, argument):
+        self.chat_history.insert(0, f"{argument}")
         
     def draw(self):
         # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
@@ -291,13 +342,13 @@ class Console():
             pygame.draw.rect(game.WIN, game.WHITE, (0, height - self.text_input_height, width, self.text_input_height))
 
             # Renders input text
-            text_surface = self.text_input_font.render("/ " + self.input_text, True, game.BLACK)
+            text_surface = self.text_input_font.render("/" + self.input_text, True, game.BLACK)
             game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height))
 
             # Loops through all previous commands and displays them above
-            for i, command in enumerate(self.previous_commands):
-                text_surface = self.previous_commands_font.render(command, True, self.commands_colour)
-                game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height - ((i + 1) * self.previous_command_gap)))
+            for i, command in enumerate(self.chat_history):
+                text_surface = self.chat_history_font.render(command, True, self.commands_colour)
+                game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height - ((i + 1) * self.chat_history_gap)))
             
             # Needed since draw() is called in the while loop
             pygame.display.update()
