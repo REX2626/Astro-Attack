@@ -85,11 +85,10 @@ MAX_Y = HEIGHT + 100
 # Generate 6 star images, from smallest to largest
 circles = []
 for layer in range(layers):
-    diameter = layer + 2
-    radius = diameter / 2
-    surf = pygame.Surface((diameter, diameter))
-    pygame.draw.circle(surf, (200, 200, 200), (radius, radius), radius) # Colour is a light grey, so the stars are not emphasised too much
-    surf = surf.convert()
+    diameter = layer + 1
+    surf = pygame.Surface((3, 3), flags=pygame.SRCALPHA)
+    surf.set_at((1, 1), (255, 255, 255))
+    surf = pygame.transform.smoothscale(surf, (diameter*3, diameter*3))
     circles.append(surf)
 
 draw_circle = WIN.blit
