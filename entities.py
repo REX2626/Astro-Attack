@@ -9,26 +9,40 @@ import pygame
 
 
 
-def entity_collision(object, entity, delta_time):
+def entity_overlap(entity1: Entity, mask1: pygame.mask.Mask, entity2: Entity, mask2: pygame.mask.Mask):
+    x_offset = (entity2.position.x - entity2.image.get_width()/2) - (entity1.position.x - entity1.image.get_width()/2)
+    y_offset = (entity2.position.y - entity2.image.get_height()/2) - (entity1.position.y - entity1.image.get_height()/2)
+
+    return mask1.overlap(mask2, (x_offset, y_offset))
+
+
+def entity_collision(object: Object, entity: Entity, delta_time: float):
     entity_mask = pygame.mask.from_surface(entity.image)
 
-    x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
-    y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
-
-    if object.mask.overlap(entity_mask, (x_offset, y_offset)):
+    overlap = entity_overlap(object, object.mask, entity, entity_mask)
+    if overlap:
 
         vector_to_asteroid = object.position - entity.position
 
+        vector_to_overlap = Vector(overlap[0] + object.image.get_width() + object.position.x, overlap[1] + object.image.get_height() + object.position.y) - entity.position
+
         game.CHUNKS.move_entity(entity, -delta_time) # Move entity backwards, so outside of asteroid
 
-        tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2) # Rotate 90 degrees
+        # If entity is still inside object, move entity bit by bit until it is outside of object
+        original_velocity = entity.velocity
+        entity.velocity = entity.velocity / entity.velocity.magnitude() if entity.velocity.magnitude() else -1*vector_to_asteroid / vector_to_asteroid.magnitude()
+        while entity_overlap(object, object.mask, entity, entity_mask):
+            game.CHUNKS.move_entity(entity, -1)
+        entity.velocity = original_velocity
+
+        tangent_to_asteroid = vector_to_overlap.get_rotate(math.pi/2) # Rotate 90 degrees
         tangent_angle = tangent_to_asteroid.get_angle()
         entity_angle = entity.velocity.get_angle()
         angle_difference = entity_angle - tangent_angle
         entity_rotation = 2 * angle_difference # 1 angle difference makes it go along normal, another difference reflects it through normal
         entity.velocity.rotate(entity_rotation)
 
-        entity.damage(entity.velocity.magnitude()**2/100_000)
+        #entity.damage(entity.velocity.magnitude()**2/100_000)
 
         if hasattr(entity, "make_new_patrol_point"):
             entity.make_new_patrol_point(400, 500, object.position)
@@ -96,7 +110,7 @@ class Ship(Entity):
     def update(self, delta_time):
 
         # Move the ship by it's velocity
-        super().update(delta_time)
+        #super().update(delta_time)
 
         # Inertial Dampening
         """
@@ -106,6 +120,9 @@ class Ship(Entity):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Move the ship by it's velocity
+        super().update(delta_time)
 
         # Rotation Dampening
         """

@@ -55,7 +55,7 @@ Weapons have a certain amount of penetration, more penetration, more damage to h
 Missile have low pen, sniper has high pen
 
 CONSOLE FUNCTIONALITY TO ADD:
-    arguements to functions
+    arguments to functions
     up and down arrows to cycle previous functions
     clipboard functionality
     add transparent background

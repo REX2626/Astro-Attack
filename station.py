@@ -31,8 +31,8 @@ class Station(Object):
 
                     if isinstance(entity, Ship):
 
-                        #entity_collision(self, entity, delta_time)
-                        return
+                        entity_collision(self, entity, delta_time)
+                        #return
 
                     elif isinstance(entity, Bullet):
                         entity_mask = pygame.mask.from_surface(entity.image)
