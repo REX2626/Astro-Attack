@@ -18,17 +18,11 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.3.0 (station)
-Add space stations
-
 POSSIBLE: neutral ship grouping
-
-Better choosing of which station to go to for neutral ships
 
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
-
-Enemies spawn from enemy stations
 
 Enemy stations have weapons, can be destroyed for loot
 
@@ -55,11 +49,6 @@ Weapons have a certain amount of penetration, more penetration, more damage to h
 Missile have low pen, sniper has high pen
 
 CONSOLE FUNCTIONALITY TO ADD:
-    arguements to functions
-    up and down arrows to cycle previous functions
-    clipboard functionality
-    add transparent background
-    console printing
     better colour coordination
     display error message
 
@@ -365,3 +354,16 @@ Improve rendering images on top of each other (boost particles rendering order),
 Change scrap drop to be proportional to enemy difficulty
 
 Make scrap spawn with a random offset from dead ship
+
+Add space stations
+
+Better choosing of which station to go to for neutral ships
+
+Enemies spawn from enemy stations
+
+CONSOLE FUNCTIONALITY:
+    arguements to functions
+    up and down arrows to cycle previous functions
+    clipboard functionality
+    add transparent background
+    console printing
