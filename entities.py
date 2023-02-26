@@ -218,22 +218,22 @@ class Pickup(Entity):
 
 
 
-class HealthPickup(Pickup):
-    def __init__(self, position, velocity=Vector(0, 0), max_speed=700, rotation=0, image=images.HEALTH_PICKUP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, image)
+# class HealthPickup(Pickup):
+#     def __init__(self, position, velocity=Vector(0, 0), max_speed=700, rotation=0, image=images.HEALTH_PICKUP) -> None:
+#         super().__init__(position, velocity, max_speed, rotation, image)
 
-    def update(self, delta_time):
-        if game.player.armour < game.MAX_PLAYER_ARMOUR:
-            super().update(delta_time)
+#     def update(self, delta_time):
+#         if game.player.armour < game.MAX_PLAYER_ARMOUR:
+#             super().update(delta_time)
 
-    def activate(self):
+#     def activate(self):
         
-        game.player.armour += 5
+#         game.player.armour += 5
 
-        if game.player.armour > game.MAX_PLAYER_ARMOUR:
-            game.player.armour = game.MAX_PLAYER_ARMOUR
+#         if game.player.armour > game.MAX_PLAYER_ARMOUR:
+#             game.player.armour = game.MAX_PLAYER_ARMOUR
 
-        game.CHUNKS.remove_entity(self)
+#         game.CHUNKS.remove_entity(self)
 
 
 

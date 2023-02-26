@@ -12,10 +12,13 @@ import random
 
 
 class Station(Object):
-    def __init__(self, position, rotation, max_entities=1, entity_type=Neutral_Ship, image=images.STATION) -> None:
+    def __init__(self, position, rotation, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship, image=images.STATION) -> None:
         super().__init__(position, pygame.transform.rotate(image, rotation / math.pi * 180))
         self.rotation = rotation
         self.max_entities = max_entities
+        self.spawn_cooldown = spawn_cooldown
+        self.current_time = 0
+        self.entities_to_spawn = 0
         self.entity_type = entity_type
 
         self.mask = pygame.mask.from_surface(self.image)
@@ -29,6 +32,17 @@ class Station(Object):
 
     def update(self, delta_time):
         super().update(delta_time)
+
+        # Spawn entities after cooldown
+        if self.entities_to_spawn > 0:
+            self.current_time += delta_time
+
+        if self.current_time > self.spawn_cooldown:
+            for _ in range(self.entities_to_spawn):
+                self.spawn_entity(self.entity_type)
+            self.current_time = 0
+            self.entities_to_spawn = 0
+        
 
         chunk_pos = self.position // game.CHUNK_SIZE
 
@@ -63,11 +77,11 @@ class Station(Object):
 
 
 class FriendlyStation(Station):
-    def __init__(self, position, rotation, max_entities=3, entity_type=Neutral_Ship, image=images.STATION) -> None:
-        super().__init__(position, rotation, max_entities, entity_type, image)
+    def __init__(self, position, rotation, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship, image=images.STATION) -> None:
+        super().__init__(position, rotation, max_entities, spawn_cooldown, entity_type, image)
 
 
 
 class EnemyStation(Station):
-    def __init__(self, position, rotation, max_entities=2, entity_type=Mother_Ship, image=images.STATION) -> None:
-        super().__init__(position, rotation, max_entities, entity_type, image)
+    def __init__(self, position, rotation, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, image=images.STATION) -> None:
+        super().__init__(position, rotation, max_entities, spawn_cooldown, entity_type, image)

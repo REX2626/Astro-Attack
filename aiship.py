@@ -1,6 +1,6 @@
 from objects import Vector
 import entities
-from entities import Ship, Asteroid, HealthPickup
+from entities import Ship, Asteroid#, HealthPickup
 from objects import random_vector
 from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
@@ -122,22 +122,22 @@ class AI_Ship(Ship):
         self.rotate_to(delta_time, self.position.get_angle_to(game.player.position) + math.pi, self.max_rotation_speed)
         self.accelerate_in_direction(self.rotation, 400 * delta_time)
 
-    def find_nearest_health_pickup(self):
-        health_pickups = []
-        for entity in game.CHUNKS.entities:
-            if isinstance(entity, HealthPickup):
-                health_pickups.append(entity)
+    # def find_nearest_health_pickup(self):
+    #     health_pickups = []
+    #     for entity in game.CHUNKS.entities:
+    #         if isinstance(entity, HealthPickup):
+    #             health_pickups.append(entity)
 
-        dist_to_health = math.inf
-        index = 0
+    #     dist_to_health = math.inf
+    #     index = 0
 
-        for i, health_pickup in enumerate(health_pickups):
-            dist = (health_pickup.position - self.position).magnitude()
-            if dist < dist_to_health:
-                dist_to_health = dist
-                index = i
+    #     for i, health_pickup in enumerate(health_pickups):
+    #         dist = (health_pickup.position - self.position).magnitude()
+    #         if dist < dist_to_health:
+    #             dist_to_health = dist
+    #             index = i
 
-        return health_pickups[index]
+    #     return health_pickups[index]
 
 
 
@@ -176,7 +176,7 @@ class Enemy_Ship(AI_Ship):
             # Enemy ships will go into patrol state if the player gets too far while attacking
             if self.state == ATTACK and distance_to_player > 1500:
                 self.state = PATROL
-            
+            """
             # Enemy will stop retreating if its health goes above 1
             if self.state == RETREAT and self.health > 1:
                 self.state = PATROL
@@ -191,6 +191,11 @@ class Enemy_Ship(AI_Ship):
                 if (self.hp.position - self.position).magnitude() < 50:
                     self.hp.destroy()
                     self.health += 5
+
+            """
+
+            if self.state == RETREAT and distance_to_player > 1500:
+                self.state = PATROL
 
 
     def damage(self, damage, entity=None):
@@ -357,7 +362,7 @@ class Mother_Ship(Enemy_Ship):
 
     def destroy(self):
         super().destroy()
-        self.current_station.spawn_entity(Mother_Ship)
+        self.current_station.entities_to_spawn += 1
 
 
     def draw(self, win: pygame.Surface, focus_point):
@@ -467,7 +472,7 @@ class Neutral_Ship(AI_Ship):
 
     def destroy(self):
         super().destroy()
-        self.current_station.spawn_entity(Neutral_Ship)
+        self.current_station.entities_to_spawn += 1
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)

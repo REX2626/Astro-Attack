@@ -701,9 +701,9 @@ pause = Page(
     escape=lambda: True,
 )
 
-systems = Page(
+station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Systems"),
+    Text(0.5, 0.12, "Station"),
     Button(0.3, 0.43, "Armour", function=lambda: Menu.change_page(armour)),
     Button(0.7, 0.43, "Weapon", function=lambda: Menu.change_page(weapon)),
     Button(0.3, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
@@ -728,7 +728,7 @@ armour = Page(
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(systems),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: True
 )
 
@@ -742,7 +742,7 @@ weapon = Page(
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(systems),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: True
 )
 
@@ -755,7 +755,7 @@ engine = Page(
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(systems),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: True
 )
 
@@ -767,7 +767,7 @@ radar = Page(
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(systems),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: True
 )
 
@@ -822,9 +822,13 @@ laser = Page(
     e_press=lambda: True
 )
 
-station = Page(
+systems = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Station"),
+    Text(0.5, 0.12, "Systems"),
+    Text(0.5, 0.3, lambda: f"Current Armour: {game.player.armour}"),
+    Button(0.5, 0.5, "Repair Armour", function=lambda: repair_armour()),
+    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -884,3 +888,13 @@ def change_fullscreen():
 def make_windowed():
     game.FULLSCREEN = False
     pygame.display.set_mode((game.WIDTH, game.HEIGHT), flags=pygame.RESIZABLE)
+
+def repair_armour():
+    if game.SCRAP_COUNT < 5:
+        return
+    else:
+        game.SCRAP_COUNT -= 5
+        game.player.armour += 5
+
+        if game.player.armour > game.MAX_PLAYER_ARMOUR:
+            game.player.armour = game.MAX_PLAYER_ARMOUR
