@@ -70,6 +70,10 @@ class Chunks():
     def add_entity(self, entity: Object):
 
         self.get_chunk(entity).entities.add(entity)
+        
+        if isinstance(entity, Neutral_Ship):
+            print(f"Adding {entity}")
+            print(self.entities)
 
     def remove_entity(self, entity: Object):
 
@@ -105,22 +109,7 @@ class Chunk():
 
         if self.adjoining_asteroid_chunk():
             return
-        
-        # # Mother Ship
-        # if random.random() < 0.05:
 
-        #     self.entities.add(
-
-        #         Mother_Ship(self.random_position(), Vector(0, 0))
-        #     )
-
-        # # Neutral Ship
-        # elif random.random() < 0.1:
-
-        #     self.entities.add(
-
-        #         Neutral_Ship(self.random_position(), Vector(0, 0))
-        #     )
 
         # Health Pickup
         elif random.random() < 0.1:

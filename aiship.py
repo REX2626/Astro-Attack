@@ -282,13 +282,14 @@ class Drone_Enemy(Enemy_Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, current_station=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
 
         self.mother_ship_patrol = None
+        self.current_station = current_station
 
         self.attack_min_dist = 300
         self.attack_max_dist = 600
@@ -352,6 +353,11 @@ class Mother_Ship(Enemy_Ship):
             self.weapon.fire_missile(self.position, final_vector * 100 * -delta_time, 1000, 100, 150, 5)
 
             self.time_reloading = 0
+    
+
+    def destroy(self):
+        super().destroy()
+        self.current_station.spawn_entity(Mother_Ship)
 
 
     def draw(self, win: pygame.Surface, focus_point):
@@ -458,6 +464,10 @@ class Neutral_Ship(AI_Ship):
         else:
             self.recent_enemy = None
             self.state = PATROL
+
+    def destroy(self):
+        super().destroy()
+        self.current_station.spawn_entity(Neutral_Ship)
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)

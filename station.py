@@ -12,12 +12,20 @@ import random
 
 
 class Station(Object):
-    def __init__(self, position, rotation, image=images.STATION) -> None:
+    def __init__(self, position, rotation, max_entities=1, entity_type=Neutral_Ship, image=images.STATION) -> None:
         super().__init__(position, pygame.transform.rotate(image, rotation / math.pi * 180))
         self.rotation = rotation
+        self.max_entities = max_entities
+        self.entity_type = entity_type
+
         self.mask = pygame.mask.from_surface(self.image)
         self.width = self.image.get_width()
         self.height = self.image.get_height()
+
+        enemy_spawn_number = random.randint(1, self.max_entities)
+
+        for _ in range(enemy_spawn_number):
+            self.spawn_entity(self.entity_type)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -43,37 +51,23 @@ class Station(Object):
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             entity.unload() # if bullet collides with asteroid then destroy bullet
                             particles.ParticleSystem(entity.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*entity.damage+1), speed=120, speed_variance=40)
+    
+                            
+    def spawn_entity(self, entity_type):
+        random_position = self.position + random_vector(game.CHUNK_SIZE/2)
+
+        entity = entity_type(random_position, Vector(0, 0), current_station=self)
+        
+        game.CHUNKS.add_entity(entity)
 
 
 
 class FriendlyStation(Station):
-    def __init__(self, position, rotation, image=images.STATION) -> None:
-        super().__init__(position, rotation, image)
-
-        # Spawn in neutral ships
-        enemy_spawn_number = random.randint(1, 3)
-
-        for _ in range(enemy_spawn_number):
-
-            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
-
-            neutral = Neutral_Ship(random_position, Vector(0, 0), current_station=self)
-            
-            game.CHUNKS.add_entity(neutral)
+    def __init__(self, position, rotation, max_entities=3, entity_type=Neutral_Ship, image=images.STATION) -> None:
+        super().__init__(position, rotation, max_entities, entity_type, image)
 
 
 
 class EnemyStation(Station):
-    def __init__(self, position, rotation, image=images.STATION) -> None:
-        super().__init__(position, rotation, image)
-
-        # Spawn in enemies
-        enemy_spawn_number = random.randint(1, 2)
-
-        for _ in range(enemy_spawn_number):
-
-            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
-
-            enemy = Mother_Ship(random_position, Vector(0, 0))
-            
-            game.CHUNKS.add_entity(enemy)
+    def __init__(self, position, rotation, max_entities=2, entity_type=Mother_Ship, image=images.STATION) -> None:
+        super().__init__(position, rotation, max_entities, entity_type, image)
