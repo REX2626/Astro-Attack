@@ -70,10 +70,6 @@ class Chunks():
     def add_entity(self, entity: Object):
 
         self.get_chunk(entity).entities.add(entity)
-        
-        if isinstance(entity, Neutral_Ship):
-            print(f"Adding {entity}")
-            print(self.entities)
 
     def remove_entity(self, entity: Object):
 
