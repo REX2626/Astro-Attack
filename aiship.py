@@ -468,7 +468,8 @@ class Neutral_Ship(AI_Ship):
 
     def destroy(self):
         super().destroy()
-        self.current_station.entities_to_spawn += 1
+        if self.current_station:
+            self.current_station.entities_to_spawn += 1
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
