@@ -404,47 +404,43 @@ class Neutral_Ship(AI_Ship):
     def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
         self.max_speed = max_speed
 
-        # Loop through entities to find friendly station entities
-        stations = []
-        for entity in game.CHUNKS.entities:
-            if type(entity).__name__ == "FriendlyStation":
-                stations.append(entity)
-        
-        # Remove current station so it is not an option to travel to
-        if current_station in stations:
-            stations.remove(current_station)
-
-        # If there is another station(s) to travel to
-        if len(stations) > 0:
-            weights = []
-
-            # appends values to weights with 1 / dist so that the smaller distances have higher weighting
-            for station in stations:
-                dist = (station.position - self.position).magnitude()
-                weights.append(1 / dist)
-
-            # Randomly choose one of the available stations based on the weighting
-            if self.target_station == None:
-                random_station = random.choices(stations, weights=weights, k=1)
-                self.target_station = random_station[0]
+        if self.target_station == None:
+            # Loop through entities to find friendly station entities
+            stations = []
+            for entity in game.CHUNKS.entities:
+                if type(entity).__name__ == "FriendlyStation":
+                    stations.append(entity)
             
-            index = 0
+            # Remove current station so it is not an option to travel to
+            if current_station in stations:
+                stations.remove(current_station)
 
-            if self.target_station in stations:
-                index = stations.index(self.target_station)
+            # If there is another station(s) to travel to
+            if len(stations) > 0:
+                weights = []
 
+                # appends values to weights with 1 / dist so that the smaller distances have higher weighting
+                for station in stations:
+                    dist = (station.position - self.position).magnitude()
+                    weights.append(1 / dist)
+
+                # Randomly choose one of the available stations based on the weighting
+                if self.target_station == None:
+                    random_station = random.choices(stations, weights=weights, k=1)
+                    self.target_station = random_station[0]
+            
+            # If there are no other stations available, just patrol around the current one
+            else:
+                self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
+        else:
             # Move and rotate towards target station
             self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
             self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
-            # Checks to see if the distance between itself and the target station is less to then make a new target station
-            if (1 / weights[index]) < 300:
+            # Checks if it is close enough to the target station to travel to a new one
+            if self.distance_to(self.target_station) < 300:
                 self.current_station = self.target_station
                 self.target_station = None
-        
-        # If there are no other stations available, just patrol around the current one
-        else:
-            self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
 
 
     def damage(self, damage, entity=None):
