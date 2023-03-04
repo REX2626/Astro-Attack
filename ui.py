@@ -194,8 +194,7 @@ class Console():
 
         self.commands = {"spawnneutral": commands.spawn_netral_ship,
                          "godmode": commands.god_mode,
-                         "zoom": commands.change_max_zoom,
-                         "stopmove": commands.stop_player_moving}
+                         "zoom": commands.change_max_zoom}
         
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
