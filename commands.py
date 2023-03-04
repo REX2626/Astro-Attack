@@ -2,7 +2,6 @@ from aiship import Neutral_Ship
 from objects import Vector
 import game
 import pygame
-pygame.init()
 
 
 
