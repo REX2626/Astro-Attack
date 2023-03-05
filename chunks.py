@@ -125,14 +125,14 @@ class Chunk():
         elif random.random() < 0.05 and self.adjoining_empty_chunks():
             self.entities.add(
 
-                FriendlyStation(self.random_position(), random.random() * 2 *math.pi)
+                FriendlyStation(self.random_position())
             )
 
         # Enemy Station
         elif random.random() < 0.05 and self.adjoining_empty_chunks():
             self.entities.add(
 
-                EnemyStation(self.random_position(), random.random() * 2 *math.pi)
+                EnemyStation(self.random_position())
             )
 
 

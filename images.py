@@ -8,6 +8,17 @@ import pygame
 import sys
 import os
 
+
+
+def outline_station_image(image, colour, width, scale):
+    image = pygame.transform.scale_by(image, scale)
+    mask = pygame.mask.from_surface(image)
+    outline = mask.outline()
+
+    # Default outline
+    pygame.draw.polygon(image, colour, outline, width=width)
+    return image
+
 def resource_path(relative_path):
     """Get absolute path to asset, used because the .exe stores assets in a different place"""
     try:
@@ -49,5 +60,8 @@ ENGINE_ICON = load_image("assets/engine_icon.png")
 RADAR_ICON = load_image("assets/radar_icon.png")
 PADLOCK = load_image("assets/padlock.png")
 PLAYER_MINIMAP_IMAGE = load_image("assets/player_minimap.png")
-STATION = load_image("assets/nasa_station.png")
-STATION_ICON = load_image("assets/station_icon.png")
+FRIENDLY_STATION = outline_station_image(load_image("assets/space_station.png"), (0, 255, 0), width=3, scale=10)
+FRIENDLY_STATION_ICON = outline_station_image(load_image("assets/space_station.png"), (0, 255, 0), width=1, scale=1)
+ENEMY_STATION = outline_station_image(load_image("assets/space_station.png"), (255, 0, 0), width=3, scale=10)
+ENEMY_STATION_ICON = outline_station_image(load_image("assets/space_station.png"), (255, 0, 0), width=1, scale=1)
+SELECTED_STATION = outline_station_image(load_image("assets/space_station.png"), (0, 0, 255), width=3, scale=10)

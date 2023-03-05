@@ -1,29 +1,33 @@
 from objects import Object
-from entities import Ship, Bullet, entity_collision
 from objects import random_vector, Vector
 from aiship import Mother_Ship, Neutral_Ship
 import images
-import particles
 import game
-import math
 import pygame
 import random
 
 
 
 class Station(Object):
-    def __init__(self, position, rotation, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship, image=images.STATION) -> None:
-        super().__init__(position, pygame.transform.rotate(image, rotation / math.pi * 180))
-        self.rotation = rotation
+    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+        super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
         self.current_time = 0
         self.entities_to_spawn = 0
         self.entity_type = entity_type
 
-        self.mask = pygame.mask.from_surface(self.image)
+        self.default_image = image
+        self.selected_image = selected_image
+        self.default_scale = 0
+        self.selected_scale = 0
+
+        self.mask = pygame.mask.from_surface(image)
+
         self.width = self.image.get_width()
         self.height = self.image.get_height()
+        
+        self.z = -1
 
         enemy_spawn_number = random.randint(1, self.max_entities)
 
@@ -42,31 +46,8 @@ class Station(Object):
                 self.spawn_entity(self.entity_type)
             self.current_time = 0
             self.entities_to_spawn = 0
-        
 
-        chunk_pos = self.position // game.CHUNK_SIZE
 
-        for y in range(chunk_pos.y-2, chunk_pos.y+3):
-            for x in range(chunk_pos.x-2, chunk_pos.x+3):
-
-                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
-
-                    if isinstance(entity, Ship):
-
-                        #entity_collision(self, entity, delta_time)
-                        return
-
-                    elif isinstance(entity, Bullet):
-                        entity_mask = pygame.mask.from_surface(entity.image)
-
-                        x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
-                        y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
-
-                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
-                            entity.unload() # if bullet collides with asteroid then destroy bullet
-                            particles.ParticleSystem(entity.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*entity.damage+1), speed=120, speed_variance=40)
-    
-                            
     def spawn_entity(self, entity_type):
         random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
@@ -75,13 +56,28 @@ class Station(Object):
         game.CHUNKS.add_entity(entity)
 
 
+    def get_zoomed_image(self):
+        if game.player.station_highlighted == self:
+            if self.selected_scale != game.ZOOM:
+                # if self.scaled_image isn't the right scale -> recalculate the scaled_image
+                self.selected_scale = game.ZOOM
+                self.scaled_selected_image = pygame.transform.scale_by(self.selected_image, game.ZOOM)
+            return self.scaled_selected_image
+        else:
+            if self.default_scale != game.ZOOM:
+                # if self.scaled_image isn't the right scale -> recalculate the scaled_image
+                self.default_scale = game.ZOOM
+                self.scaled_default_image = pygame.transform.scale_by(self.default_image, game.ZOOM)
+            return self.scaled_default_image
+
+
 
 class FriendlyStation(Station):
-    def __init__(self, position, rotation, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship, image=images.STATION) -> None:
-        super().__init__(position, rotation, max_entities, spawn_cooldown, entity_type, image)
+    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+        super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
 
 
 
 class EnemyStation(Station):
-    def __init__(self, position, rotation, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, image=images.STATION) -> None:
-        super().__init__(position, rotation, max_entities, spawn_cooldown, entity_type, image)
+    def __init__(self, position, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=images.SELECTED_STATION, image=images.ENEMY_STATION) -> None:
+        super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)

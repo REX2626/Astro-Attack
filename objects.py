@@ -238,8 +238,6 @@ class Object():
         image = self.get_zoomed_image()
         offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
         win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())
-        # old code
-        # win.blit(self.image, (round(self.position - focus_point + self.offset)).to_tuple())
 
 
 

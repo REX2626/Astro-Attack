@@ -825,7 +825,7 @@ laser = Page(
 systems = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Systems"),
-    Text(0.5, 0.3, lambda: f"Current Armour: {game.player.armour}"),
+    Text(0.5, 0.3, lambda: f"Current Armour {round(game.player.armour)}"),
     Button(0.5, 0.5, "Repair Armour", function=lambda: repair_armour()),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),

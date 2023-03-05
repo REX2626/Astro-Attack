@@ -3,7 +3,7 @@ import images
 from objects import Vector
 import aiship
 from entities import Asteroid, Scrap#, HealthPickup
-from station import Station
+from station import Station, EnemyStation
 import math
 import pygame
 import psutil
@@ -124,7 +124,7 @@ class MiniMap():
         for entity in game.CHUNKS.entities:
             if isinstance(entity, Station):
                 # Blits station image
-                station_image = images.STATION_ICON
+                station_image = images.ENEMY_STATION_ICON if isinstance(entity, EnemyStation) else images.FRIENDLY_STATION_ICON
                 surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
                                           ((entity.position.y - entity.height/2 - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
             else:
@@ -414,13 +414,6 @@ def highlight_station():
                     if entity.position.x - entity.width/2 <= x <= entity.position.x + entity.width/2 and entity.position.y - entity.height/2 <= y <= entity.position.y + entity.height/2:
                         if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):
                             game.player.station_highlighted = entity
-                            outline = entity.mask.outline()
-                            for i in range(len(outline)):
-                                outline[i] = outline[i][0] + entity.position.x - entity.width/2, outline[i][1] + entity.position.y - entity.height/2
-                                outline[i] = outline[i][0] - game.player.position.x, outline[i][1] - game.player.position.y
-                                outline[i] = outline[i][0] * game.ZOOM, outline[i][1] * game.ZOOM
-                                outline[i] = outline[i][0] + game.CENTRE_POINT.x, outline[i][1] + game.CENTRE_POINT.y
-                            pygame.draw.polygon(game.WIN, (255, 0, 0), outline, width=round(3*game.ZOOM))
                             return
     game.player.station_highlighted = None
 

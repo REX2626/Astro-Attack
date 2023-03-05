@@ -38,6 +38,11 @@ Add missile and autoturret weapons
 
 Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
+Add health regen at stations
+Add something else to e menu
+
+Stations can be docked with
+
 Armour:
 A few armour slots (5), but is a bar
 You can repair a whole slot with some scrap, if slot is only still damaged, you still have to pay full slot price
