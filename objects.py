@@ -301,6 +301,18 @@ class Entity(MoveableObject):
     def accelerate_in_direction(self, angle: float, magnitude: float):
         self.accelerate(Vector(-math.sin(angle)*magnitude, -math.cos(angle)*magnitude))
 
+    def accelerate_onto_pos(self, delta_time, target_position: Vector, max_acceleration: float, max_speed: float):
+        distance_to_target = (self.position - target_position).magnitude()
+
+        distance_to_decelerate_from_max = (max_speed)**2 / (2 * 200) # 200 is the value for inertial dampening
+        #distance_to_decelerate = -(self.velocity.magnitude())**2 / (2 * max_acceleration)
+
+        if distance_to_target < distance_to_decelerate_from_max:
+            # Let inertial dampening slow the entity down
+            return
+        else:
+            self.accelerate_to(target_position, max_acceleration)
+
     def get_image(self):
         if self.scale != game.ZOOM:
             # if self.scaled_image isn't the right scale -> recalculate the scaled_image

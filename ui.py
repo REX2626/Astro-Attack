@@ -258,7 +258,10 @@ class Console():
                 split_text = self.input_text.split("(")
                 input_command = split_text[0]
                 split_text[1] = split_text[1][:-1]
-                arguments = split_text[1].split(", ")
+                if split_text[1] == "":
+                    arguments = ""
+                else:
+                    arguments = split_text[1].split(", ")
             else:
                 # This is needed so that if the command is written in python or not in the self.commands it will not
                 # cause an error by not being able to access the local variable input_command when checking if the input_command
@@ -273,10 +276,12 @@ class Console():
                     self.chat_history.insert(0, message)
 
             elif input_command in self.console_commands.keys():
-                self.chat_history.insert(0, "/" + self.input_text)
                 self.previous_commands.insert(0, self.input_text)
 
-                self.console_commands[input_command](eval(", ".join(arguments)))
+                try:
+                    self.console_commands[input_command](eval(", ".join(arguments)))
+                except:
+                    self.chat_history.append("ERROR")
 
 
             elif input_command in self.commands.keys():
@@ -327,11 +332,15 @@ class Console():
 
             # if there are arguments eval the list of arguments
             else:
-                self.commands[command[0]](eval(", ".join(command[1])))
+                try:
+                    self.commands[command[0]](eval(", ".join(command[1])))
+                except:
+                    self.chat_history.append("ERROR")
         
         self.commands_to_run.clear()
 
     def log(self, argument):
+        self.chat_history.insert(0, "/" + self.input_text)
         self.chat_history.insert(0, f"{argument}")
         
     def draw(self):
