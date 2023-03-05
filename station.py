@@ -1,6 +1,6 @@
 from objects import Object
 from objects import random_vector, Vector
-from aiship import Mother_Ship, Neutral_Ship
+from aiship import Mother_Ship, Neutral_Ship_Cargo
 import images
 import game
 import pygame
@@ -9,7 +9,7 @@ import random
 
 
 class Station(Object):
-    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
         super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
@@ -73,7 +73,7 @@ class Station(Object):
 
 
 class FriendlyStation(Station):
-    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
 
 

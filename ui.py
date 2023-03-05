@@ -194,7 +194,8 @@ class Console():
 
         self.commands = {"spawnneutral": commands.spawn_netral_ship,
                          "godmode": commands.god_mode,
-                         "zoom": commands.change_max_zoom}
+                         "zoom": commands.change_max_zoom,
+                         "spawnstation": commands.spawn_station}
         
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
@@ -202,6 +203,7 @@ class Console():
         self.commands_to_run = []
 
         self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
+                             "/spawnstation() - spawns in friendly station at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out",
                              "/log(argument) - prints argument to console"]

@@ -1,4 +1,5 @@
-from aiship import Neutral_Ship
+from aiship import Neutral_Ship_Cargo
+from station import FriendlyStation
 from objects import Vector
 import game
 import pygame
@@ -10,9 +11,16 @@ import pygame
 def spawn_netral_ship(number):
 
     for i in range(number):
-        neutral = Neutral_Ship(game.player.position, Vector(0, 0))
+        neutral = Neutral_Ship_Cargo(game.player.position, Vector(0, 0))
                 
         game.CHUNKS.add_entity(neutral)
+
+
+def spawn_station():
+
+    station = FriendlyStation(game.player.position)
+
+    game.CHUNKS.add_entity(station)
 
 
 # boosts stats by a lot

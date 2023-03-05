@@ -381,24 +381,24 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
-        self.recent_enemy = recent_enemy
+
+        self.mother_ship = None
+
         self.current_station = current_station
         self.target_station = target_station
+
+        self.min_patrol_dist = 1000
+        self.max_patrol_dist = 4000
+
+        self.patrol_max_speed = 50
 
     def update(self, delta_time):
         super().update(delta_time)
 
         if self.state == PATROL:
             self.patrol_to_station(delta_time, current_station=self.current_station)
-        elif self.state == ATTACK:
-            self.attack_player_state(delta_time)
-        elif self.state == ATTACK_ENEMY:
-            self.attack_enemy_state(delta_time)
-
-        if self.state == ATTACK and self.distance_to(game.player) > 1500:
-            self.state = PATROL
 
         
     def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
@@ -431,7 +431,7 @@ class Neutral_Ship(AI_Ship):
             
             # If there are no other stations available, just patrol around the current one
             else:
-                self.patrol_state(delta_time, min_dist=1000, max_dist=4000)
+                self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
         else:
             # Move and rotate towards target station
             self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
@@ -442,6 +442,73 @@ class Neutral_Ship(AI_Ship):
                 self.current_station = self.target_station
                 self.target_station = None
 
+    def draw(self, win: pygame.Surface, focus_point):
+        super().draw(win, focus_point)
+        if game.DEBUG_SCREEN:
+            pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+
+
+class Neutral_Ship_Cargo(Neutral_Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+        if neutral_list is None:
+            neutral_list = []
+        self.neutral_list = neutral_list
+
+        self.spawn_neutrals()
+
+    def spawn_neutrals(self):
+        for _ in range(2):
+
+            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
+
+            neutral = Neutral_Ship_Fighter(random_position, Vector(0, 0), mother_ship=self)
+            
+            self.neutral_list.append(neutral)
+            
+            game.CHUNKS.add_entity(neutral)
+
+    def destroy(self):
+        super().destroy()
+        if self.current_station:
+            self.current_station.entities_to_spawn += 1
+
+
+
+class Neutral_Ship_Fighter(Neutral_Ship):
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+
+        self.mother_ship: Neutral_Ship_Cargo = mother_ship
+
+        self.min_patrol_dist = 100
+        self.max_patrol_dist = 400
+
+        self.patrol_max_speed = 100
+
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        self.target_station = self.mother_ship.target_station
+
+        if self.state == ATTACK:
+            self.attack_player_state(delta_time)
+        elif self.state == ATTACK_ENEMY:
+            self.attack_enemy_state(delta_time)
+
+        if self.state == ATTACK and self.distance_to(game.player) > 1000:
+            self.state = PATROL
+
+    def attack_enemy_state(self, delta_time):
+        if self.recent_enemy.health > 0:
+            self.max_speed = 300
+            self.rotate_to(delta_time, self.position.get_angle_to(self.recent_enemy.position), self.max_rotation_speed)
+            self.shoot()
+            self.accelerate_in_direction(self.rotation, 400 * delta_time)
+        else:
+            self.recent_enemy = None
+            self.state = PATROL
 
     def damage(self, damage, entity=None):
         if entity and isinstance(entity, Ship):
@@ -454,24 +521,3 @@ class Neutral_Ship(AI_Ship):
                 self.recent_enemy = entity
         
         super().damage(damage)
-
-
-    def attack_enemy_state(self, delta_time):
-        if self.recent_enemy.health > 0:
-            self.max_speed = 300
-            self.rotate_to(delta_time, self.position.get_angle_to(self.recent_enemy.position), self.max_rotation_speed)
-            self.shoot()
-            self.accelerate_in_direction(self.rotation, 400 * delta_time)
-        else:
-            self.recent_enemy = None
-            self.state = PATROL
-
-    def destroy(self):
-        super().destroy()
-        if self.current_station:
-            self.current_station.entities_to_spawn += 1
-
-    def draw(self, win: pygame.Surface, focus_point):
-        super().draw(win, focus_point)
-        if game.DEBUG_SCREEN:
-            pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
