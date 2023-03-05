@@ -18,7 +18,7 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.3.0 (station)
-POSSIBLE: neutral ship grouping
+More general attack_entity function for all ai ships
 
 Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
 
@@ -26,13 +26,9 @@ Neutral ship when attacking, will only become passive again once the whole group
 
 Enemy stations have weapons, can be destroyed for loot
 
-Neutral ships travel between neutral stations
-
 Neutral stations can be traded with
 
 New mothership image, large and powerful
-
-New neutral ship image, cargo vessel
 
 Add missile and autoturret weapons
 
@@ -372,3 +368,11 @@ CONSOLE FUNCTIONALITY:
     clipboard functionality
     add transparent background
     console printing
+
+Neutral ships travel between neutral stations
+
+POSSIBLE: neutral ship grouping
+
+New neutral ship image, cargo vessel
+
+Accelerate onto position function
