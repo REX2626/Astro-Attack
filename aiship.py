@@ -142,7 +142,7 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.GREEN_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.RED_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
@@ -468,6 +468,24 @@ class Neutral_Ship_Cargo(Neutral_Ship):
             
             game.CHUNKS.add_entity(neutral)
 
+    def damage(self, damage, entity=None):
+        if entity and isinstance(entity, Ship):
+
+            if isinstance(entity, Player_Ship):
+                self.alert_group()
+
+            if isinstance(entity, Enemy_Ship):
+                for neutral in self.neutral_list:
+                    neutral.recent_enemy = entity
+                    neutral.state = ATTACK_ENEMY
+        
+        super().damage(damage)
+
+    def alert_group(self):
+        for enemy in self.neutral_list:
+            if enemy.state != RETREAT:
+                enemy.state = ATTACK
+
     def destroy(self):
         super().destroy()
         if self.current_station:
@@ -476,7 +494,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.GREEN_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship
@@ -515,9 +533,11 @@ class Neutral_Ship_Fighter(Neutral_Ship):
 
             if isinstance(entity, Player_Ship):
                 self.state = ATTACK
+                self.mother_ship.alert_group()
 
             elif isinstance(entity, Enemy_Ship):
-                self.state = ATTACK_ENEMY
-                self.recent_enemy = entity
+                for neutral in self.mother_ship.neutral_list:
+                    neutral.recent_enemy = entity
+                    neutral.state = ATTACK_ENEMY
         
         super().damage(damage)
