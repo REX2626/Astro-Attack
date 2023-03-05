@@ -381,7 +381,7 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, recent_enemy=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.recent_enemy = recent_enemy
         self.current_station = current_station
