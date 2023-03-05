@@ -508,7 +508,8 @@ class Neutral_Ship_Fighter(Neutral_Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        self.target_station = self.mother_ship.target_station
+        if self.mother_ship in game.CHUNKS.entities:
+            self.target_station = self.mother_ship.target_station
 
         if self.state == ATTACK:
             self.attack_player_state(delta_time)
