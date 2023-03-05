@@ -1,4 +1,5 @@
 import pygame
+from ui import Bar as UIBar
 import game
 import images
 import main
@@ -642,6 +643,60 @@ class UpgradeBar(Widget):
 
 
 
+class Bar(UIBar):
+    def __init__(self, x, y, width, height, value, max_value, colour, outline_width=0, outline_colour=game.WHITE, curve=0, flatten_left=False, flatten_right=False) -> None:
+        super().__init__(x, y, width, height, colour, outline_width, outline_colour, curve, flatten_left, flatten_right)
+        self.value = value
+        self.max_value = max_value
+
+    def draw(self):
+        super().update(self.value() / self.max_value())
+        super().draw()
+
+
+
+class ArmourBar(Bar):
+    def __init__(self, x, y, width, height, value, max_value, price, number, colour, outline_width=0, outline_colour=game.WHITE, curve=0, flatten_left=False, flatten_right=False) -> None:
+        super().__init__(x, y, width, height, value, max_value, colour, outline_width, outline_colour, curve, flatten_left, flatten_right)
+        self.number = number
+        self.price = price
+        self.upgrade_value = None
+        self.price_rect = None
+
+    def draw(self):
+        self.price_rect = None
+        for n in range(self.number):
+            # Draw bar
+            bar = UIBar(lambda: self.x()+n*(self.width/self.number-self.outline_width), self.y, self.width/self.number, self.height, self.colour, self.outline_width, self.outline_colour, self.left_curve, flatten_left=False if n==0 else True, flatten_right=False if n==self.number-1 else True)
+            bar.update(max(0, min(1, self.value()/self.max_value()*self.number - n)))
+            bar.draw()
+
+            # If this bar is the current when to heal
+            if not self.price_rect and self.value()/self.max_value()*self.number - n < 1:
+                x = self.x()+n*(self.width/self.number-self.outline_width)
+                width = self.width/self.number
+
+                self.price_rect = (x, self.y()-self.height/2, width, self.height)
+                self.upgrade_value = (n+1)/self.number * self.max_value()
+
+                if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
+                else: colour = (255, 0, 0)
+                number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30)).render(str(self.price), True, colour)
+                game.WIN.blit(number, (x + width*0.3 - number.get_width()/2, self.y() - number.get_height()/2))
+
+                scrap_image = pygame.transform.scale_by(images.SCRAP, 1.8)
+                game.WIN.blit(scrap_image, (x + width*0.7 - scrap_image.get_width()/2, self.y()-scrap_image.get_height()/2))
+
+    def click(self, mouse):
+        mx, my = mouse[0], mouse[1]
+        p = self.price_rect
+        if game.SCRAP_COUNT >= self.price and p[0] <= mx <= p[0]+p[2] and p[1] <= my <= p[1]+p[3]:
+            game.SCRAP_COUNT -= self.price
+            game.player.armour = self.upgrade_value
+            Menu.update()
+
+
+
 
 # FRAMEWORK
 ########################################################################################################################################################
@@ -825,8 +880,8 @@ laser = Page(
 systems = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Systems"),
-    Text(0.5, 0.3, lambda: f"Current Armour {round(game.player.armour)}"),
-    Button(0.5, 0.5, "Repair Armour", function=lambda: repair_armour()),
+    Text(0.25, 0.3, lambda: f"Armour {round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25),
+    ArmourBar(lambda: game.WIDTH*0.39, lambda: game.HEIGHT*0.3, width=430, height=85, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=10),
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,

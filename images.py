@@ -65,4 +65,4 @@ FRIENDLY_STATION = outline_station_image(load_image("assets/space_station.png"),
 FRIENDLY_STATION_ICON = outline_station_image(load_image("assets/space_station.png"), (0, 255, 0), width=1, scale=1)
 ENEMY_STATION = outline_station_image(load_image("assets/space_station.png"), (255, 0, 0), width=3, scale=10)
 ENEMY_STATION_ICON = outline_station_image(load_image("assets/space_station.png"), (255, 0, 0), width=1, scale=1)
-SELECTED_STATION = outline_station_image(load_image("assets/space_station.png"), (0, 0, 255), width=3, scale=10)
+SELECTED_STATION = outline_station_image(load_image("assets/space_station.png"), (255, 255, 0), width=3, scale=10)

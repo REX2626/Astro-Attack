@@ -17,7 +17,7 @@ class Bar():
     def __init__(self, x, y, width, height, colour, outline_width=0, outline_colour=game.WHITE, curve=0, flatten_left=False, flatten_right=False) -> None:
         self.x = x
         self.y = y
-        self.width = width
+        self.width = width-outline_width*2
         self.height = height
         self.original_width = width
         self.colour = colour
@@ -33,7 +33,7 @@ class Bar():
     def draw(self):
         pygame.draw.rect(game.WIN, self.colour,
                         rect=(self.x()+self.outline_width, self.y() - self.height/2 + self.outline_width, # bar position is middle left
-                              self.width                 , self.height-self.outline_width*2),
+                              self.width, self.height-self.outline_width*2),
                         
                         border_top_left_radius=self.left_curve-self.outline_width, # - self.outline_width to be the same curve as the inside curve of the outline
                         border_bottom_left_radius=self.left_curve-self.outline_width,

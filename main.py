@@ -191,7 +191,6 @@ def main():
 
     global player
     player = add_player()
-    player.open_station_menu = lambda: menu.Menu.station()
 
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE

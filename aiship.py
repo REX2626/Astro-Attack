@@ -229,7 +229,7 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=2, health=5, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
