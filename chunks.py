@@ -1,6 +1,5 @@
 from objects import Vector, Object, Entity
 from entities import Asteroid#, HealthPickup
-from aiship import Mother_Ship, Neutral_Ship
 from station import FriendlyStation, EnemyStation
 import math
 import random
