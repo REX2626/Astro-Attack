@@ -664,7 +664,7 @@ class ArmourBar(Bar):
         self.price = price
         self.upgrade_value = None
         self.price_rect = None
-        self.button_rect = (self.x() + self.width + 5, self.y()-self.height/2, 120, self.height)
+        self.button_rect = lambda: (self.x() + self.width + 5, self.y()-self.height/2, 120, self.height)
 
     def draw(self):
         self.price_rect = None
@@ -687,11 +687,11 @@ class ArmourBar(Bar):
 
         # Highlight button if hovered
         mx, my = pygame.mouse.get_pos()
-        r = self.button_rect
-        if r[0] <= mx <= r[0]+r[2] and r[1] <= my <= r[1]+r[3]:
-            pygame.draw.rect(game.WIN, self.colour, self.button_rect, border_radius=self.left_curve)
+        rect = self.button_rect()
+        if rect[0] <= mx <= rect[0]+rect[2] and rect[1] <= my <= rect[1]+rect[3]:
+            pygame.draw.rect(game.WIN, self.colour, rect, border_radius=self.left_curve)
 
-        pygame.draw.rect(game.WIN, game.BLACK, self.button_rect, width=self.outline_width, border_radius=self.left_curve)
+        pygame.draw.rect(game.WIN, game.BLACK, rect, width=self.outline_width, border_radius=self.left_curve)
 
         if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
         else: colour = (255, 0, 0)
@@ -705,7 +705,7 @@ class ArmourBar(Bar):
         mx, my = mouse[0], mouse[1]
 
         # If click on price button
-        r = self.button_rect
+        r = self.button_rect()
         if game.SCRAP_COUNT >= self.price and r[0] <= mx <= r[0]+r[2] and r[1] <= my <= r[1]+r[3]:
             game.SCRAP_COUNT -= self.price
             game.player.armour = self.upgrade_value
