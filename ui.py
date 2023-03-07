@@ -3,7 +3,8 @@ import images
 from objects import Vector
 import aiship
 from entities import Asteroid, Scrap#, HealthPickup
-from station import Station, EnemyStation
+from station import Station, EnemyStation, FriendlyStation
+from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
 import math
 import pygame
 import psutil
@@ -192,21 +193,23 @@ class Console():
 
         self.commands_colour = (255, 204, 0)
 
-        self.commands = {"spawnneutral": commands.spawn_netral_ship,
+        self.commands = {"spawnentity": commands.spawn_entity,
                          "godmode": commands.god_mode,
-                         "zoom": commands.change_max_zoom,
-                         "spawnstation": commands.spawn_station}
+                         "zoom": commands.change_max_zoom}
         
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
         
         self.commands_to_run = []
 
-        self.help_message = ["/spawnneutral(frequency) - spawns in neutral ship at current location",
-                             "/spawnstation() - spawns in friendly station at current location",
+        self.help_message = ["/spawnentity(entity_class, frequency) - spawns in entity at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out",
-                             "/log(argument) - prints argument to console"]
+                             "/log(argument) - prints argument to console",
+                             "/entitylist - prints list of entities to spawn"]
+        
+        self.entity_list_message = ["EnemyStation, FriendlyStation, Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy,",
+                                    "Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter, Scrap"]
         
         self.current_selected_command = 0
 
@@ -277,13 +280,19 @@ class Console():
                 for message in self.help_message:
                     self.chat_history.insert(0, message)
 
+            elif self.input_text == "entitylist":
+                self.previous_commands.insert(0, self.input_text)
+
+                for message in self.entity_list_message:
+                    self.chat_history.insert(0, message)
+
             elif input_command in self.console_commands.keys():
                 self.previous_commands.insert(0, self.input_text)
 
                 try:
                     self.console_commands[input_command](eval(", ".join(arguments)))
-                except:
-                    self.chat_history.append("ERROR")
+                except Exception as e:
+                    self.chat_history.insert(0, f"{e}")
 
 
             elif input_command in self.commands.keys():
@@ -336,8 +345,8 @@ class Console():
             else:
                 try:
                     self.commands[command[0]](eval(", ".join(command[1])))
-                except:
-                    self.chat_history.append("ERROR")
+                except Exception as e:
+                    self.chat_history.insert(0, f"{e}")
         
         self.commands_to_run.clear()
 

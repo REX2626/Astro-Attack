@@ -1,26 +1,21 @@
-from aiship import Neutral_Ship_Cargo
-from station import FriendlyStation
+from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
+from station import FriendlyStation, EnemyStation
 from objects import Vector
+from entities import Entity, Scrap, Asteroid
 import game
 import pygame
+import random
 
 
+# Spawns entity
+def spawn_entity(arguments):
 
+    entity_class, frequency = arguments
 
-# spawns neutral ship at current player position
-def spawn_netral_ship(number):
+    for i in range(frequency):
+        entity = entity_class(game.player.position + Vector(random.random() - 0.5, random.random() - 0.5))
 
-    for i in range(number):
-        neutral = Neutral_Ship_Cargo(game.player.position, Vector(0, 0))
-                
-        game.CHUNKS.add_entity(neutral)
-
-
-def spawn_station():
-
-    station = FriendlyStation(game.player.position)
-
-    game.CHUNKS.add_entity(station)
+        game.CHUNKS.add_entity(entity)
 
 
 # boosts stats by a lot
