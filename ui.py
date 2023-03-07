@@ -215,6 +215,8 @@ class Console():
 
         self.previous_commands = []
 
+        self.cursor_pos = 0
+
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
         surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
@@ -239,15 +241,36 @@ class Console():
 
                 elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_DOWN:
                     self.down_pressed()
+                
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_LEFT:
+                    self.left_pressed()
+
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RIGHT:
+                    self.right_pressed()
 
                 elif event.type == pygame.KEYDOWN:
                     # removes last item from input_text string when backspace is pressed
                     if event.key == pygame.K_BACKSPACE:
-                        self.input_text = self.input_text[:-1]
+                        if len(self.input_text) > 1:
+                            if self.cursor_pos > 0:
+                                self.cursor_pos -= 1
+                            self.input_text = self.input_text.replace("|", "")
+                            text = ""
+                            for i, char in enumerate(self.input_text):
+                                if i != self.cursor_pos:
+                                    text += char
+                            self.input_text = text
+                            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
                     # add pressed character to input_text
                     else:
-                        self.input_text += event.unicode
+                        start_len = len(self.input_text)
+                        self.input_text = self.input_text[:self.cursor_pos] + event.unicode + self.input_text[self.cursor_pos:]
+                        end_len = len(self.input_text)
+                        if start_len != end_len:
+                            self.cursor_pos += 1
+                        self.input_text = self.input_text.replace("|", "")
+                        self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
             # must draw here since this is the only game loop running
             self.draw()
@@ -256,6 +279,7 @@ class Console():
         self.current_selected_command = 0
 
         if self.input_text != "":
+            self.input_text = self.input_text.replace("|", "")
             
             # Checks if this is a function which will take in arguments
             if "(" in self.input_text:
@@ -314,6 +338,8 @@ class Console():
 
         # resets the input_text
         self.input_text = ""
+        
+        self.cursor_pos = 0
 
     def up_pressed(self):
         if self.current_selected_command < len(self.previous_commands):
@@ -331,6 +357,18 @@ class Console():
         else:
             self.current_selected_command = 0
             self.input_text = ""
+
+    def left_pressed(self):
+        if self.cursor_pos > 0:
+            self.cursor_pos -= 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+    
+    def right_pressed(self):
+        if self.cursor_pos < len(self.input_text) - 1:
+            self.cursor_pos += 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
     def run_commands(self):
         # loops through the dictionary
