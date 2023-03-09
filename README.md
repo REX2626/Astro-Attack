@@ -24,15 +24,9 @@ Improve Neutral ship functionality - better decision making in fights (who to sh
 
 Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
 
-Enemy stations have weapons, can be destroyed for loot
-
 Neutral stations can be traded with
 
 New mothership image, large and powerful
-
-Add missile and autoturret weapons
-
-Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
 
 Add health regen at stations
 Add something else to e menu
@@ -40,8 +34,6 @@ Add something else to e menu
 Stations can be docked with
 
 Armour:
-A few armour slots (5), but is a bar
-You can repair a whole slot with some scrap, if slot is only still damaged, you still have to pay full slot price
 When health is damaged, it effects how ships work, e.g. start smoking, visual screen effects, speed reduced, shield stops working, weapon not as effective
 When bits of player ship stops working, message should come up
 Some visual to show armour, and it breaking
@@ -60,6 +52,10 @@ Missions (stations will give a reward for completing a mission)
 
 Saving and loading
 
+Add missile and autoturret weapons
+
+Enemy stations have weapons, can be destroyed for loot
+
 ### a1.5.0 (sound)
 
 ### a1.6.0 (bosses, ship customization, friendly ships)
@@ -71,7 +67,7 @@ Make bullets do less damage the further away they go (mainly for gatling gun)
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
 
-Change colour of enemy bullets
+Change colour of neutral bullets
 
 Make ships have a thruster animation
 
@@ -103,13 +99,6 @@ Add radar upgrades so that mini map can be improved
 At some point, lower the initial upgrade values (high atm so testing is easier)
 
 Have different shoot speed for enemy and player
-
-Add text interface (commands)
-
-Add space stations
-Enemy ships can spawn at enemy stations
-Neutral ships can move from station to station
-Player can interact with stations
 
 Add money system, different currencies, get cash from killing
 
@@ -376,3 +365,16 @@ POSSIBLE: neutral ship grouping
 New neutral ship image, cargo vessel
 
 Accelerate onto position function
+
+Change player health to armour, top 50% can be healed but lower 50% can only be repaired at a station
+
+Change colour of enemy bullets
+
+Add space stations
+Enemy ships can spawn at enemy stations
+Neutral ships can move from station to station
+Player can interact with stations
+
+Armour:
+A few armour slots (5), but is a bar
+You can repair a whole slot with some scrap, if slot is only still damaged, you still have to pay full slot price
