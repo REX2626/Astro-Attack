@@ -344,8 +344,6 @@ class Missile(Entity):
         for entity in entities_to_damage:
             entity.damage(self.explode_damage)
 
-        self.destroy()
-
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)
