@@ -267,8 +267,7 @@ class Missile_Ship(Enemy_Ship):
         self.particles.active = True
 
         if distance_to_player < 60:
-            if self.exploding == False:
-                self.exploding = True
+            self.exploding = True
 
         if self.exploding:
             self.time_to_explode += delta_time

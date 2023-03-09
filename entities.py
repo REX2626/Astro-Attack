@@ -324,8 +324,7 @@ class Missile(Entity):
         self.accelerate_in_direction(self.rotation, 2000 * delta_time)
 
         if self.distance_to(game.player) < self.explode_distance:
-            if self.exploding == False:
-                self.exploding = True
+            self.exploding = True
         
         if self.exploding:
             self.time_to_explode += delta_time

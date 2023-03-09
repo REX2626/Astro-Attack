@@ -689,7 +689,7 @@ class ArmourBar(Bar):
         self.price = price
         self.upgrade_value = None
         self.price_rect = None
-        self.button_rect = lambda: (self.x() + self.width() + 10, self.y()-self.height()/2, 120, self.height())
+        self.button_rect = lambda: (self.x() + self.width() + 10, self.y()-self.height()/2, 0.1*game.WIDTH, self.height())
 
     def draw(self):
         self.price_rect = None
@@ -710,24 +710,24 @@ class ArmourBar(Bar):
             bar.update(max(0, min(1, self.value()/self.max_value()*self.number - n)))
             bar.draw()
 
-        # Draw price button
-        x = self.x() + self.width() + 37
-
         # Highlight button if hovered
         mx, my = pygame.mouse.get_pos()
         rect = self.button_rect()
         if rect[0] <= mx <= rect[0]+rect[2] and rect[1] <= my <= rect[1]+rect[3]:
             pygame.draw.rect(game.WIN, self.colour, rect, border_radius=self.curve)
 
+        # Draw price box
         pygame.draw.rect(game.WIN, game.BLACK, rect, width=self.outline_width, border_radius=self.curve)
 
+        # Draw price number
         if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
         else: colour = (255, 0, 0)
         number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30)).render(str(self.price), True, colour)
-        game.WIN.blit(number, (x - number.get_width()/2, self.y() - number.get_height()/2))
+        game.WIN.blit(number, (rect[0] + 0.225*rect[2] - number.get_width()/2, self.y() - number.get_height()/2))
 
+        # Draw price scrap image
         scrap_image = pygame.transform.scale_by(images.SCRAP, game.HEIGHT/images.SCRAP.get_height()*0.07)
-        game.WIN.blit(scrap_image, (x + 51 - scrap_image.get_width()/2, self.y()-scrap_image.get_height()/2))
+        game.WIN.blit(scrap_image, (rect[0] + 0.65*rect[2] - scrap_image.get_width()/2, self.y()-scrap_image.get_height()/2))
 
     def click(self, mouse):
         mx, my = mouse[0], mouse[1]
