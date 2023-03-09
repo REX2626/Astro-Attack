@@ -292,7 +292,7 @@ class Bullet(Entity):
 
 
 class Missile(Entity):
-    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, image=images.MISSILE) -> None:
+    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
         
         self.max_speed = max_speed
@@ -300,6 +300,9 @@ class Missile(Entity):
         self.explode_distance = explode_distance
         self.explode_radius = explode_radius
         self.explode_damage = explode_damage
+        self.explode_countdown = explode_countdown
+        self.time_to_explode = 0
+        self.exploding = False
         
         # Boost particle effect
         boost_distance = 10
@@ -321,7 +324,13 @@ class Missile(Entity):
         self.accelerate_in_direction(self.rotation, 2000 * delta_time)
 
         if self.distance_to(game.player) < self.explode_distance:
-            self.explode(self.explode_radius)
+            if self.exploding == False:
+                self.exploding = True
+        
+        if self.exploding:
+            self.time_to_explode += delta_time
+            if self.time_to_explode > self.explode_countdown:
+                self.explode(self.explode_radius)
 
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)
@@ -335,14 +344,19 @@ class Missile(Entity):
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
+        damage_values = []
 
         for entity in entity_list:
             if isinstance(entity, Ship):
-                if entity.distance_to(self) < radius:
+                distance = entity.distance_to(self)
+                if distance < radius:
                     entities_to_damage.append(entity)
+                    damage_values.append(1 - distance / self.explode_radius)
         
-        for entity in entities_to_damage:
-            entity.damage(self.explode_damage)
+        for i, entity in enumerate(entities_to_damage):
+            entity.damage(self.explode_damage * damage_values[i])
+
+        self.destroy()
 
 
     def destroy(self):

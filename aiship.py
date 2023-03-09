@@ -236,11 +236,14 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 800
         self.explode_radius = 100
         self.explode_damage = 10
+        self.explode_countdown = explode_countdown
+        self.time_to_explode = 0
+        self.exploding = False
         
         # Boost particle effect
         boost_distance = 20
@@ -264,21 +267,30 @@ class Missile_Ship(Enemy_Ship):
         self.particles.active = True
 
         if distance_to_player < 60:
-            self.explode(self.explode_radius)
+            if self.exploding == False:
+                self.exploding = True
+
+        if self.exploding:
+            self.time_to_explode += delta_time
+            if self.time_to_explode > self.explode_countdown:
+                self.explode(self.explode_radius)
 
     def explode(self, radius):
         self.scrap_count=0
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
+        damage_values = []
 
         for entity in game.CHUNKS.entities:
             if isinstance(entity, Ship):
-                if entity.distance_to(self) < radius:
+                distance = entity.distance_to(self)
+                if distance < radius:
                     entities_to_damage.append(entity)
+                    damage_values.append(1 - distance / self.explode_radius)
         
-        for entity in entities_to_damage:
-            entity.damage(self.explode_damage)
+        for i, entity in enumerate(entities_to_damage):
+            entity.damage(self.explode_damage * damage_values[i])
 
     def destroy(self):
         super().destroy()
