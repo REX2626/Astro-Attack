@@ -643,63 +643,91 @@ class UpgradeBar(Widget):
 
 
 
-class Bar(UIBar):
-    def __init__(self, x, y, width, height, value, max_value, colour, outline_width=0, outline_colour=game.BLACK, curve=0, flatten_left=False, flatten_right=False) -> None:
-        super().__init__(x, y, width, height, colour, outline_width, outline_colour, curve, flatten_left, flatten_right)
+class Bar():
+    """x, y, width, height are proportional to screen size"""
+    def __init__(self, x, y, width, height, value, max_value, colour, outline_width=0, outline_colour=game.BLACK, curve=0) -> None:
         self.x = lambda: x * game.WIDTH
         self.y = lambda: y * game.HEIGHT
+        self.width = lambda: width * game.WIDTH - outline_width*2
+        self.height = lambda: height * game.HEIGHT
+        self.original_width = self.width
+        self.colour = colour
+        self.outline_width = outline_width
+        self.outline_colour = outline_colour
+        self.curve = curve
         self.value = value
         self.max_value = max_value
 
+    def update(self, new_percent):
+        """Updates the percentage of the bar, NOTE: percentage is from 0 to 1"""
+        self.width = lambda: (self.original_width()-self.outline_width*2) * new_percent
+
     def draw(self):
-        super().update(self.value() / self.max_value())
-        super().draw()
+        self.update(self.value() / self.max_value())
+        pygame.draw.rect(game.WIN, self.colour,
+                        rect=(self.x()+self.outline_width, self.y() - self.height()/2 + self.outline_width, # bar position is middle left
+                              self.width(), self.height()-self.outline_width*2),
+                        
+                        border_radius=self.curve-self.outline_width  # - self.outline_width to be the same curve as the inside curve of the outline
+                        )
+        
+        if self.outline_width:
+            pygame.draw.rect(game.WIN, self.outline_colour,
+                        rect=(self.x()             , self.y() - self.height()/2, # bar position is middle left
+                              self.original_width(), self.height()),
+
+                        width=self.outline_width,
+                        border_radius=self.curve
+                        )
 
 
 
 class ArmourBar(Bar):
-    def __init__(self, x, y, width, height, value, max_value, price, number, colour, outline_width=0, outline_colour=game.BLACK, curve=0, flatten_left=False, flatten_right=False) -> None:
-        super().__init__(x, y, width, height, value, max_value, colour, outline_width, outline_colour, curve, flatten_left, flatten_right)
+    def __init__(self, x, y, width, height, value, max_value, price, number, colour, outline_width=0, outline_colour=game.BLACK, curve=0) -> None:
+        super().__init__(x, y, width, height, value, max_value, colour, outline_width, outline_colour, curve)
         self.number = number
         self.price = price
         self.upgrade_value = None
         self.price_rect = None
-        self.button_rect = lambda: (self.x() + self.width + 5, self.y()-self.height/2, 120, self.height)
+        self.button_rect = lambda: (self.x() + self.width() + 10, self.y()-self.height()/2, 120, self.height())
 
     def draw(self):
         self.price_rect = None
         for n in range(self.number):
             # If this bar is the current one to heal
             if not self.price_rect and self.value()/self.max_value()*self.number - n < 1:
-                x = self.x()+n*(self.width/self.number-self.outline_width)
-                width = self.width/self.number
+                x = self.x()+n*(self.width()/self.number)#-self.outline_width)
+                width = self.width()/self.number
+                if n+1 != self.number: width += self.outline_width
 
-                self.price_rect = (x, self.y()-self.height/2, width, self.height)
+                self.price_rect = (x, self.y()-self.height()/2, width, self.height())
                 self.upgrade_value = (n+1)/self.number * self.max_value()
 
             # Draw bar
-            bar = UIBar(lambda: self.x()+n*(self.width/self.number-self.outline_width), self.y, self.width/self.number, self.height, self.colour, self.outline_width, self.outline_colour, self.left_curve, flatten_left=False if n==0 else True, flatten_right=False if n==self.number-1 else True)
+            width = self.width()/self.number
+            if n+1 != self.number: width += self.outline_width
+            bar = UIBar(lambda: self.x()+n*(self.width()/self.number), self.y, width, self.height(), self.colour, self.outline_width, self.outline_colour, self.curve, flatten_left=False if n==0 else True, flatten_right=False if n==self.number-1 else True)
             bar.update(max(0, min(1, self.value()/self.max_value()*self.number - n)))
             bar.draw()
 
         # Draw price button
-        x = self.x() + self.width + 33
+        x = self.x() + self.width() + 37
 
         # Highlight button if hovered
         mx, my = pygame.mouse.get_pos()
         rect = self.button_rect()
         if rect[0] <= mx <= rect[0]+rect[2] and rect[1] <= my <= rect[1]+rect[3]:
-            pygame.draw.rect(game.WIN, self.colour, rect, border_radius=self.left_curve)
+            pygame.draw.rect(game.WIN, self.colour, rect, border_radius=self.curve)
 
-        pygame.draw.rect(game.WIN, game.BLACK, rect, width=self.outline_width, border_radius=self.left_curve)
+        pygame.draw.rect(game.WIN, game.BLACK, rect, width=self.outline_width, border_radius=self.curve)
 
         if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
         else: colour = (255, 0, 0)
         number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30)).render(str(self.price), True, colour)
         game.WIN.blit(number, (x - number.get_width()/2, self.y() - number.get_height()/2))
 
-        scrap_image = pygame.transform.scale_by(images.SCRAP, 1.8)
-        game.WIN.blit(scrap_image, (x + 52 - scrap_image.get_width()/2, self.y()-scrap_image.get_height()/2))
+        scrap_image = pygame.transform.scale_by(images.SCRAP, game.HEIGHT/images.SCRAP.get_height()*0.07)
+        game.WIN.blit(scrap_image, (x + 51 - scrap_image.get_width()/2, self.y()-scrap_image.get_height()/2))
 
     def click(self, mouse):
         mx, my = mouse[0], mouse[1]
@@ -898,15 +926,15 @@ systems = Page(
     Text(0.5, 0.12, "Systems"),
 
     Text(0.3, 0.3, "Health", font_size=25),
-    Bar(0.39, 0.298, width=410, height=85, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
+    Bar(0.39, 0.298, width=0.32, height=0.1, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
     Text(0.445, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25),
 
     Text(0.3, 0.45, "Armour", font_size=25),
-    ArmourBar(0.39, 0.448, width=430, height=85, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=12),
+    ArmourBar(0.39, 0.448, width=0.32, height=0.1, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=12),
     Text(0.445, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25),
 
     Text(0.3, 0.6, "Shield", font_size=25),
-    Bar(0.39, 0.598, width=410, height=85, value=lambda: game.player.shield, max_value=lambda: game.MAX_PLAYER_SHIELD, colour=(34, 130, 240), outline_width=5, curve=12),
+    Bar(0.39, 0.598, width=0.32, height=0.1, value=lambda: game.player.shield, max_value=lambda: game.MAX_PLAYER_SHIELD, colour=(34, 130, 240), outline_width=5, curve=12),
     Text(0.43, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25),
 
     Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),

@@ -1,11 +1,10 @@
-from objects import Vector
+from objects import Vector, random_vector
 from entities import Ship
 from weapons import PlayerGun
 import images
 import particles
 import game
 import math
-import random
 import pygame
 
 
@@ -39,11 +38,16 @@ class Player_Ship(Ship):
 
         boost_distance = 20
 
-        boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation))
+        def ship_offset(ship, distance): return Vector(distance * math.sin(ship.rotation), distance * math.cos(ship.rotation))
+
+        def boost_offset(player): return ship_offset(player, boost_distance)
         self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=180, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
         
-        boost_offset = lambda player: Vector(boost_distance * math.sin(player.rotation), boost_distance * math.cos(player.rotation)) + Vector(0, 1).get_rotate(random.random()*2*math.pi)
+        def boost_offset(player): return ship_offset(player, boost_distance) + random_vector(1)
         self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=360, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
+
+        def smoke_offset(player): return ship_offset(player, 4) + random_vector(7)
+        self.smoke_particles = particles.ParticleSystem(self, entity_offset=smoke_offset, z=0, start_size=4, colour=game.LIGHT_GREY, duration=None, lifetime=1.5, frequency=80, speed_variance=10, initial_velocity=lambda player: Vector(0, 0))
 
     def update(self, delta_time):
 
@@ -124,6 +128,11 @@ class Player_Ship(Ship):
 
         if hasattr(self.weapon, "draw"):
             self.weapon.draw(win, focus_point)
+
+        if self.health < 0.7 * game.MAX_PLAYER_HEALTH:
+            self.smoke_particles.active = True
+        else:
+            self.smoke_particles.active = False
 
         if self.tracked_enemy:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.aim_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.aim_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20*game.ZOOM, width=round(2*game.ZOOM))
