@@ -4,7 +4,6 @@ from aiship import Mother_Ship, Neutral_Ship_Cargo
 import images
 import game
 import pygame
-import random
 
 
 
@@ -13,8 +12,8 @@ class Station(Object):
         super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
-        self.current_time = 0
-        self.entities_to_spawn = 0
+        self.current_time = spawn_cooldown # Entities are spawned in straight away
+        self.entities_to_spawn = max_entities
         self.entity_type = entity_type
 
         self.default_image = image
@@ -29,10 +28,6 @@ class Station(Object):
         
         self.z = -1
 
-        enemy_spawn_number = random.randint(1, self.max_entities)
-
-        for _ in range(enemy_spawn_number):
-            self.spawn_entity(self.entity_type)
 
     def update(self, delta_time):
         super().update(delta_time)
