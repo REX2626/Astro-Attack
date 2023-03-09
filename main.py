@@ -115,10 +115,10 @@ def handle_player_input(keys_pressed, delta_time):
         player.tracked_enemy = player.aiming_enemy
 
     if keys_pressed[pygame.K_UP]:
-        game.ZOOM = min(game.ZOOM + game.ZOOM * delta_time, 20) # MAX ZOOM is 20x normal
+        scroll(5*delta_time)
 
     if keys_pressed[pygame.K_DOWN]:
-        game.ZOOM = max(game.ZOOM - game.ZOOM * delta_time, (game.WIDTH)/(2*(game.LOAD_DISTANCE)*CHUNK_SIZE)) # MIN ZOOM is automatic, based on chunk loading distance
+        scroll(-5*delta_time)
 
     if keys_pressed[pygame.K_1]:
         game.player.weapon = PlayerGun(game.player)
