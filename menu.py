@@ -734,7 +734,7 @@ class ArmourBar(Bar):
 
         # If click on price button
         r = self.button_rect()
-        if game.SCRAP_COUNT >= self.price and r[0] <= mx <= r[0]+r[2] and r[1] <= my <= r[1]+r[3]:
+        if game.SCRAP_COUNT >= self.price and self.value() != self.max_value() and r[0] <= mx <= r[0]+r[2] and r[1] <= my <= r[1]+r[3]:
             game.SCRAP_COUNT -= self.price
             game.player.armour = self.upgrade_value
             Menu.update()
