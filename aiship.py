@@ -522,6 +522,8 @@ class Neutral_Ship_Fighter(Neutral_Ship):
 
         self.patrol_max_speed = 100
 
+        self.recent_enemy = None
+
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -532,7 +534,10 @@ class Neutral_Ship_Fighter(Neutral_Ship):
         if self.state == ATTACK:
             self.attack_entity_state(delta_time, entity=game.player)
         elif self.state == ATTACK_ENEMY:
-            self.attack_entity_state(delta_time, entity=self.recent_enemy)
+            if self.recent_enemy in game.CHUNKS.entities:
+                self.attack_entity_state(delta_time, entity=self.recent_enemy)
+            else:
+                self.state = PATROL
 
         if self.state == ATTACK and self.distance_to(game.player) > 1000:
             self.state = PATROL
