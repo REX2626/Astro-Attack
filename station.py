@@ -3,6 +3,7 @@ from objects import random_vector, Vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
 import images
 import game
+import random
 import pygame
 
 
@@ -13,7 +14,7 @@ class Station(Object):
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
         self.current_time = spawn_cooldown # Entities are spawned in straight away
-        self.entities_to_spawn = max_entities
+        self.entities_to_spawn = random.randint(1, max_entities)
         self.entity_type = entity_type
 
         self.default_image = image

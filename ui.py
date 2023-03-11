@@ -79,10 +79,10 @@ class MiniMap():
         self.x, self.y = self.position
         self.width = width
         self.height = height
-        self.enemy_colour = (255, 0, 0)
+        self.enemy_colour = (230, 0, 0)
         self.asteroid_colour = game.LIGHT_GREY
         self.player_colour = (255, 255, 255)
-        self.neutral_colour = (0, 255, 0)
+        self.neutral_colour = (5, 230, 20)
         # self.health_pickup_colour = (0, 0, 255)
         self.scrap_colour = (255, 255, 0)
         self.entity_size = 3

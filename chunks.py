@@ -1,7 +1,6 @@
 from objects import Vector, Object, Entity
 from entities import Asteroid#, HealthPickup
 from station import FriendlyStation, EnemyStation
-import math
 import random
 import game
 

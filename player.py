@@ -20,7 +20,7 @@ class Player_Ship(Ship):
         armour=game.MAX_PLAYER_ARMOUR,
         shield=game.MAX_PLAYER_SHIELD, shield_delay=3, shield_recharge=game.PLAYER_SHIELD_RECHARGE,
         boost_amount=game.MAX_BOOST_AMOUNT, boost_change=5,
-        image=images.RED_SHIP
+        image=images.PLAYER_SHIP
 
         ) -> None:
 

@@ -52,6 +52,8 @@ Missions (stations will give a reward for completing a mission)
 
 Saving and loading
 
+Add hitboxes
+
 Add missile and autoturret weapons
 
 Enemy stations have weapons, can be destroyed for loot
