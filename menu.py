@@ -768,7 +768,7 @@ info = Page(
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
-                        Systems: E
+                        Systems & Station: E
                         Look: Mouse
                         Zoom: Scroll
                         Shoot: Left Click
@@ -783,8 +783,7 @@ settings = Page(
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"        , font_size=40, value="SIZE_LINK"    , function_action=None),
-    SettingButton(0.25, 3/6, lambda: f"BULLET SPEED: {game.BULLET_SPEED}"  , font_size=40, value="BULLET_SPEED" , function_action=None, min=10, max=1000),
-    SettingButton(0.75, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, min=4, max=26),
+    SettingButton(0.25, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, min=4, max=26),
     Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: settings_click(),
     escape=lambda: Menu.change_page(main_menu),

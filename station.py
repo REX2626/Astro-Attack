@@ -72,6 +72,11 @@ class FriendlyStation(Station):
     def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
 
+    def update(self, delta_time):
+        super().update(delta_time)
+        if self.distance_to(game.player) < 500:
+            game.player.health = min(game.MAX_PLAYER_HEALTH, game.player.health + delta_time)
+
 
 
 class EnemyStation(Station):

@@ -1,3 +1,4 @@
+# Import all objects in case they are used in a command
 from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
 from station import FriendlyStation, EnemyStation
 from objects import Vector

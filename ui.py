@@ -4,7 +4,7 @@ from objects import Vector
 import aiship
 from entities import Asteroid, Scrap#, HealthPickup
 from station import Station, EnemyStation, FriendlyStation
-from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
+from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter # For commands
 import math
 import pygame
 import psutil
@@ -461,13 +461,14 @@ def cursor_highlighting():
 
 
 def highlight_station():
+    """Highlights FriendlyStation"""
     x, y = pygame.mouse.get_pos()
     cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
     chunk_pos = cursor_pos // game.CHUNK_SIZE
     for cy in range(chunk_pos.y-1, chunk_pos.y+2):
         for cx in range(chunk_pos.x-1, chunk_pos.x+2):
             for entity in game.CHUNKS.get_chunk((cx, cy)).entities:
-                if isinstance(entity, Station):
+                if isinstance(entity, FriendlyStation):
                     x, y = cursor_pos.x, cursor_pos.y
                     if entity.position.x - entity.width/2 <= x <= entity.position.x + entity.width/2 and entity.position.y - entity.height/2 <= y <= entity.position.y + entity.height/2:
                         if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):

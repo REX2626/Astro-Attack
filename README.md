@@ -17,33 +17,12 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.3.0 (station)
-More general attack_entity function for all ai ships
-
-Improve Neutral ship functionality - better decision making in fights (who to shoot at, enemy or player)
-
-Neutral ship when attacking, will only become passive again once the whole group of enemies are defeated
-
-Neutral stations can be traded with
-
-New mothership image, large and powerful
-
-Add health regen at stations
-Add something else to e menu
-
-Stations can be docked with
-
-Armour:
-When health is damaged, it effects how ships work, e.g. start smoking, visual screen effects, speed reduced, shield stops working, weapon not as effective
-When bits of player ship stops working, message should come up
-Some visual to show armour, and it breaking
-Once armour is broken, all damage goes into health
-Weapons have a certain amount of penetration, more penetration, more damage to health
-Missile have low pen, sniper has high pen
-
+### a1.3.1 (console improvements and minor tweaks)
 CONSOLE FUNCTIONALITY TO ADD:
     better colour coordination
     display error message
+
+Improve player minimap arrow
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Enemies become more difficult
@@ -57,6 +36,23 @@ Add hitboxes
 Add missile and autoturret weapons
 
 Enemy stations have weapons, can be destroyed for loot
+
+Stations can be docked with
+
+New mothership image, large and powerful
+
+Weapons have a certain amount of penetration, more penetration, more damage to health
+Missile have low pen, sniper has high pen
+
+When health is damaged, it effects how ships work, e.g. start smoking, visual screen effects, speed reduced, shield stops working, weapon not as effective
+When bits of player ship stops working, message should come up
+Some visual to show armour, and it breaking
+
+Improve neutral ship fighting AI
+
+Fix AI colliding with Asteroids
+
+Add thruster particles to ships
 
 ### a1.5.0 (sound)
 
@@ -79,6 +75,8 @@ Fix issue with not rendering some objects right on edge of screen (strict render
 Fix first full_screen click not moving the mouse properly
 
 If neutral ship cannot find patrol point - do something
+
+Improve E menu
 
 NOTE: pygame.draw.circle uses integer for radius, e.g. diameter is always multiples of two
 Do some caching for circles for particles to improve performance
@@ -372,6 +370,8 @@ Change player health to armour, top 50% can be healed but lower 50% can only be 
 
 Change colour of enemy bullets
 
+More general attack_entity function for all ai ships
+
 Add space stations
 Enemy ships can spawn at enemy stations
 Neutral ships can move from station to station
@@ -380,3 +380,8 @@ Player can interact with stations
 Armour:
 A few armour slots (5), but is a bar
 You can repair a whole slot with some scrap, if slot is only still damaged, you still have to pay full slot price
+Once armour is broken, all damage goes into health
+
+Add health regen at stations
+
+Neutral stations can be traded with
