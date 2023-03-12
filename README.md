@@ -54,6 +54,8 @@ Fix AI colliding with Asteroids
 
 Add thruster particles to ships
 
+Add special features to weapons (e.g. sniper can zoom in on enemy)
+
 ### a1.5.0 (sound)
 
 ### a1.6.0 (bosses, ship customization, friendly ships)

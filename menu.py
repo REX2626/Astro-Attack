@@ -755,7 +755,8 @@ main_menu = Page(
     Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: main.main()),
     Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
     Button(0.5, 6/8, "Info"         , font_size=40, function=lambda: Menu.change_page(info)),
-    Button(0.5, 7/8, "Quit"         , font_size=40, function=game.quit)
+    Button(0.5, 7/8, "Quit"         , font_size=40, function=game.quit),
+    Text(0.95, 0.95, "a1.3.0", font_size=20)
 )
 
 info = Page(
