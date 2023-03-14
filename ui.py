@@ -192,6 +192,10 @@ class Console():
         self.chat_history_font = pygame.font.SysFont("consolas", 35)
 
         self.commands_colour = (255, 204, 0)
+        self.old_commands_colour = (105, 89, 26)
+        self.output_colour = (13, 11, 255)
+        self.miscellaneous_colour = (186, 186, 186)
+        self.error_colour = (199, 46, 12)
 
         self.commands = {"spawnentity": commands.spawn_entity,
                          "godmode": commands.god_mode,
@@ -278,13 +282,13 @@ class Console():
 
                 # displays all of the help messages on separate lines
                 for message in self.help_message:
-                    self.chat_history.insert(0, message)
+                    self.chat_history.insert(0, [message, self.miscellaneous_colour])
 
             elif self.input_text == "entitylist":
                 self.previous_commands.insert(0, self.input_text)
 
                 for message in self.entity_list_message:
-                    self.chat_history.insert(0, message)
+                    self.chat_history.insert(0, [message, self.miscellaneous_colour])
 
             elif input_command in self.console_commands.keys():
                 self.previous_commands.insert(0, self.input_text)
@@ -292,12 +296,12 @@ class Console():
                 try:
                     self.console_commands[input_command](eval(", ".join(arguments)))
                 except Exception as e:
-                    self.chat_history.insert(0, f"{e}")
+                    self.chat_history.insert(0, [f"{e}", self.error_colour])
 
 
             elif input_command in self.commands.keys():
                 # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
-                self.chat_history.insert(0, "/" + self.input_text)
+                self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
                 self.previous_commands.insert(0, self.input_text)
 
                 self.commands_to_run.append((input_command, arguments))
@@ -305,11 +309,11 @@ class Console():
             else:
                 try:
                     eval(self.input_text)
-                    self.chat_history.insert(0, "/" + self.input_text)
+                    self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
                     self.previous_commands.insert(0, self.input_text)
                 except:
                     # just returns what you wrote into the command history
-                    self.chat_history.insert(0, self.input_text)
+                    self.chat_history.insert(0, [self.input_text, self.miscellaneous_colour])
                     self.previous_commands.insert(0, self.input_text)
 
         # resets the input_text
@@ -351,8 +355,8 @@ class Console():
         self.commands_to_run.clear()
 
     def log(self, argument):
-        self.chat_history.insert(0, "/" + self.input_text)
-        self.chat_history.insert(0, f"{argument}")
+        self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
+        self.chat_history.insert(0, [f"{argument}", self.output_colour])
         
     def draw(self):
         # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
@@ -371,7 +375,7 @@ class Console():
 
             # Loops through all previous commands and displays them above
             for i, command in enumerate(self.chat_history):
-                text_surface = self.chat_history_font.render(command, True, self.commands_colour)
+                text_surface = self.chat_history_font.render(command[0], True, command[1])
                 game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height - ((i + 1) * self.chat_history_gap)))
             
             # Needed since draw() is called in the while loop
