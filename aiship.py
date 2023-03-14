@@ -142,7 +142,7 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.RED_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.ENEMY_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
@@ -236,11 +236,14 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
-        self.attack_max_speed = 800
+        self.attack_max_speed = 750
         self.explode_radius = 100
-        self.explode_damage = 10
+        self.explode_damage = 8
+        self.explode_countdown = explode_countdown
+        self.time_to_explode = 0
+        self.exploding = False
         
         # Boost particle effect
         boost_distance = 20
@@ -264,22 +267,29 @@ class Missile_Ship(Enemy_Ship):
         self.particles.active = True
 
         if distance_to_player < 60:
-            self.explode(self.explode_radius)
+            self.exploding = True
+
+        if self.exploding:
+            self.time_to_explode += delta_time
+            if self.time_to_explode > self.explode_countdown:
+                self.explode(self.explode_radius)
 
     def explode(self, radius):
         self.scrap_count=0
-        self.destroy()
 
         # Have to create separate list otherwise the set game.CHUNKS.entities will change size while iterating though it
         entities_to_damage = []
+        damage_values = []
 
         for entity in game.CHUNKS.entities:
             if isinstance(entity, Ship):
-                if entity.distance_to(self) < radius:
+                distance = entity.distance_to(self)
+                if distance < radius:
                     entities_to_damage.append(entity)
+                    damage_values.append(1 - distance / self.explode_radius)
         
-        for entity in entities_to_damage:
-            entity.damage(self.explode_damage)
+        for i, entity in enumerate(entities_to_damage):
+            entity.damage(self.explode_damage * damage_values[i])
 
     def destroy(self):
         super().destroy()
@@ -457,7 +467,7 @@ class Neutral_Ship(AI_Ship):
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP_CARGO) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
         if neutral_list is None:
             neutral_list = []
@@ -502,7 +512,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.GREEN_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship
@@ -511,6 +521,8 @@ class Neutral_Ship_Fighter(Neutral_Ship):
         self.max_patrol_dist = 400
 
         self.patrol_max_speed = 100
+
+        self.recent_enemy = None
 
 
     def update(self, delta_time):
@@ -522,7 +534,10 @@ class Neutral_Ship_Fighter(Neutral_Ship):
         if self.state == ATTACK:
             self.attack_entity_state(delta_time, entity=game.player)
         elif self.state == ATTACK_ENEMY:
-            self.attack_entity_state(delta_time, entity=self.recent_enemy)
+            if self.recent_enemy in game.CHUNKS.entities:
+                self.attack_entity_state(delta_time, entity=self.recent_enemy)
+            else:
+                self.state = PATROL
 
         if self.state == ATTACK and self.distance_to(game.player) > 1000:
             self.state = PATROL

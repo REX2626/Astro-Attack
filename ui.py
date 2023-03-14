@@ -4,7 +4,7 @@ from objects import Vector
 import aiship
 from entities import Asteroid, Scrap#, HealthPickup
 from station import Station, EnemyStation, FriendlyStation
-from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
+from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter # For commands
 import math
 import pygame
 import psutil
@@ -79,10 +79,10 @@ class MiniMap():
         self.x, self.y = self.position
         self.width = width
         self.height = height
-        self.enemy_colour = (255, 0, 0)
+        self.enemy_colour = (230, 0, 0)
         self.asteroid_colour = game.LIGHT_GREY
         self.player_colour = (255, 255, 255)
-        self.neutral_colour = (0, 255, 0)
+        self.neutral_colour = (5, 230, 20)
         # self.health_pickup_colour = (0, 0, 255)
         self.scrap_colour = (255, 255, 0)
         self.entity_size = 3
@@ -219,6 +219,8 @@ class Console():
 
         self.previous_commands = []
 
+        self.cursor_pos = 0
+
     def check_for_inputs(self):
         # Take an image of the current playing screen, then darken it, and save to be used for drawing
         surf = pygame.Surface((game.WIN.get_size()), pygame.SRCALPHA)
@@ -243,15 +245,36 @@ class Console():
 
                 elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_DOWN:
                     self.down_pressed()
+                
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_LEFT:
+                    self.left_pressed()
+
+                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RIGHT:
+                    self.right_pressed()
 
                 elif event.type == pygame.KEYDOWN:
                     # removes last item from input_text string when backspace is pressed
                     if event.key == pygame.K_BACKSPACE:
-                        self.input_text = self.input_text[:-1]
+                        if len(self.input_text) > 1:
+                            if self.cursor_pos > 0:
+                                self.cursor_pos -= 1
+                            self.input_text = self.input_text.replace("|", "")
+                            text = ""
+                            for i, char in enumerate(self.input_text):
+                                if i != self.cursor_pos:
+                                    text += char
+                            self.input_text = text
+                            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
                     # add pressed character to input_text
                     else:
-                        self.input_text += event.unicode
+                        start_len = len(self.input_text)
+                        self.input_text = self.input_text[:self.cursor_pos] + event.unicode + self.input_text[self.cursor_pos:]
+                        end_len = len(self.input_text)
+                        if start_len != end_len:
+                            self.cursor_pos += 1
+                        self.input_text = self.input_text.replace("|", "")
+                        self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
             # must draw here since this is the only game loop running
             self.draw()
@@ -260,6 +283,7 @@ class Console():
         self.current_selected_command = 0
 
         if self.input_text != "":
+            self.input_text = self.input_text.replace("|", "")
             
             # Checks if this is a function which will take in arguments
             if "(" in self.input_text:
@@ -318,6 +342,8 @@ class Console():
 
         # resets the input_text
         self.input_text = ""
+        
+        self.cursor_pos = 0
 
     def up_pressed(self):
         if self.current_selected_command < len(self.previous_commands):
@@ -335,6 +361,18 @@ class Console():
         else:
             self.current_selected_command = 0
             self.input_text = ""
+
+    def left_pressed(self):
+        if self.cursor_pos > 0:
+            self.cursor_pos -= 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+    
+    def right_pressed(self):
+        if self.cursor_pos < len(self.input_text) - 1:
+            self.cursor_pos += 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
     def run_commands(self):
         # loops through the dictionary
@@ -427,13 +465,14 @@ def cursor_highlighting():
 
 
 def highlight_station():
+    """Highlights FriendlyStation"""
     x, y = pygame.mouse.get_pos()
     cursor_pos = (Vector(x, y) - game.CENTRE_POINT) / game.ZOOM + game.player.position
     chunk_pos = cursor_pos // game.CHUNK_SIZE
     for cy in range(chunk_pos.y-1, chunk_pos.y+2):
         for cx in range(chunk_pos.x-1, chunk_pos.x+2):
             for entity in game.CHUNKS.get_chunk((cx, cy)).entities:
-                if isinstance(entity, Station):
+                if isinstance(entity, FriendlyStation):
                     x, y = cursor_pos.x, cursor_pos.y
                     if entity.position.x - entity.width/2 <= x <= entity.position.x + entity.width/2 and entity.position.y - entity.height/2 <= y <= entity.position.y + entity.height/2:
                         if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):

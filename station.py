@@ -3,8 +3,8 @@ from objects import random_vector, Vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
 import images
 import game
-import pygame
 import random
+import pygame
 
 
 
@@ -13,8 +13,8 @@ class Station(Object):
         super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
-        self.current_time = 0
-        self.entities_to_spawn = 0
+        self.current_time = spawn_cooldown # Entities are spawned in straight away
+        self.entities_to_spawn = random.randint(1, max_entities)
         self.entity_type = entity_type
 
         self.default_image = image
@@ -29,10 +29,6 @@ class Station(Object):
         
         self.z = -1
 
-        enemy_spawn_number = random.randint(1, self.max_entities)
-
-        for _ in range(enemy_spawn_number):
-            self.spawn_entity(self.entity_type)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -75,6 +71,11 @@ class Station(Object):
 class FriendlyStation(Station):
     def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
+
+    def update(self, delta_time):
+        super().update(delta_time)
+        if self.distance_to(game.player) < 500:
+            game.player.health = min(game.MAX_PLAYER_HEALTH, game.player.health + delta_time)
 
 
 
