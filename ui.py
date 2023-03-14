@@ -388,9 +388,14 @@ class Console():
                 try:
                     self.commands[command[0]](eval(", ".join(command[1])))
                 except Exception as e:
-                    self.chat_history.insert(0, f"{e}")
+                    self.chat_history.insert(0, [f"{e}", self.error_colour])
         
         self.commands_to_run.clear()
+
+        # Change colour of previously run commands
+        for command in self.chat_history:
+            if command[1] == self.commands_colour:
+                command[1] = self.old_commands_colour
 
     def log(self, argument):
         self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
