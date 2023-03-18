@@ -17,12 +17,14 @@ ATTACK = 1
 RETREAT = 2
 ATTACK_ENEMY = 3
 
+level_text_cache = dict()
+
 
 
 class AI_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=images.DEFAULT) -> None:
         super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, armour, shield_delay, shield_recharge, image)
-        
+
         self.state = state
         # Initialises start patrol point
         self.make_new_patrol_point(0, 0, self.position)
@@ -31,7 +33,14 @@ class AI_Ship(Ship):
         start_accelerations = [300, -300]
         self.acceleration_constant = random.choice(start_accelerations)
         self.max_rotation_speed = max_rotation_speed
-        
+
+        self.level = level
+
+        # Every 10 levels damage is increased by +1
+        self.weapon.damage *= (self.level/10 + 1)
+
+        # Adds 1 hp every level
+        self.health *= self.level + 1
 
     def check_for_asteroid(self, chunk_pos):
         # Loop through chunks in a 3x3 grid centred around the original chunk you are checking
@@ -139,11 +148,24 @@ class AI_Ship(Ship):
 
     #     return health_pickups[index]
 
+    def draw(self, win: pygame.Surface, focus_point):
+        super().draw(win, focus_point)
+
+        # Checking to see if level text has not been cached already
+        if f"Lvl: {self.level}, {game.ZOOM}" not in level_text_cache:
+            text_surface = pygame.font.SysFont("consolas", int(15 * game.ZOOM)).render(f"Lvl: {self.level}", True, (255, 255, 255))
+            level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"] = text_surface
+
+            game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
+        else:
+            text_surface: pygame.Surface = level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"]
+            game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
+
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.ENEMY_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.ENEMY_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
         self.mother_ship_patrol = mother_ship
@@ -236,8 +258,8 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 750
         self.explode_radius = 100
         self.explode_damage = 8
@@ -298,14 +320,14 @@ class Missile_Ship(Enemy_Ship):
 
 
 class Drone_Enemy(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, rotation=0, max_rotation_speed=5, weapon=EnemyGatlingGun, scrap_count=1, health=1, armour=0, shield=2, shield_delay=2, shield_recharge=4, state=PATROL, mother_ship=None, image=images.DRONE_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGatlingGun, scrap_count=1, health=1, armour=0, shield=2, shield_delay=2, shield_recharge=4, state=PATROL, mother_ship=None, image=images.DRONE_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
 
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, current_station=None, image=images.MOTHER_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, self, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, current_station=None, image=images.MOTHER_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
         self.enemy_list = enemy_list
@@ -334,18 +356,25 @@ class Mother_Ship(Enemy_Ship):
                 break
         
         # Spawn in enemies
-        enemy_spawn_number = random.randint(3, 6)
+        enemy_spawn_number = random.randint(2, int(4 * (self.level/10 + 1)))
 
         for _ in range(enemy_spawn_number):
 
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
-            if random.random() < 0.2:
-                enemy = Missile_Ship(random_position, Vector(0, 0), mother_ship=self)
-            elif random.random() < 0.4:
-                enemy = Drone_Enemy(random_position, Vector(0, 0), mother_ship=self)
+            if self.level < 10:
+                if random.random() < 0.5:
+                    enemy = Drone_Enemy(random_position, Vector(0, 0), level=self.level, mother_ship=self)
+                else:
+                    enemy = Enemy_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
+            
             else:
-                enemy = Enemy_Ship(random_position, Vector(0, 0), mother_ship=self)
+                if random.random() < 0.2:
+                    enemy = Missile_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
+                elif random.random() < 0.4:
+                    enemy = Drone_Enemy(random_position, Vector(0, 0), level=self.level, mother_ship=self)
+                else:
+                    enemy = Enemy_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
             
             self.enemy_list.append(enemy)
             
@@ -399,8 +428,8 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
 
         self.mother_ship = None
 
@@ -467,8 +496,8 @@ class Neutral_Ship(AI_Ship):
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP_CARGO) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP_CARGO) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
         if neutral_list is None:
             neutral_list = []
         self.neutral_list = neutral_list
@@ -512,8 +541,8 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship
 

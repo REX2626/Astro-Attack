@@ -47,7 +47,7 @@ class Station(Object):
     def spawn_entity(self, entity_type):
         random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
-        entity = entity_type(random_position, Vector(0, 0), current_station=self)
+        entity = entity_type(random_position, Vector(0, 0), level=game.CURRENT_SHIP_LEVEL, current_station=self)
         
         game.CHUNKS.add_entity(entity)
 
