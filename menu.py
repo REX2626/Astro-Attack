@@ -1,4 +1,5 @@
 import pygame
+import json
 from ui import Bar as UIBar
 import game
 import images
@@ -21,7 +22,7 @@ class Menu():
     DEFAULT_PADY = 12
     DEFAULT_OUTLINE_COLOUR = (20, 20, 20)
     DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
-    DEFAULT_CLICK_OUTLINE_COLOUR = (180, 180, 180)
+    DEFAULT_CLICK_OUTLINE_COLOUR = (190, 190, 190)
     SLIDER_WIDTH = 0.02 # percentage (0 to 1) of screen width
     SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
     SLIDER_OUTLINE = (30, 30, 30, 150)
@@ -77,23 +78,25 @@ class Menu():
                 Menu.mouse_moved(mouse)
                 Menu.update() # buttons will be checked if they are hovered on or not
 
-            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 # runs Menu.escape_pressed, if that returns True, then follow suit and return True
                 if Menu.escape_pressed():
                     return True
 
             elif event.type == pygame.KEYDOWN:
 
-                if event.__dict__["key"] == pygame.K_UP:
+                if event.key == pygame.K_UP:
                     Menu.up_pressed()
 
-                elif event.__dict__["key"] == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN:
                     Menu.down_pressed()
 
-                elif event.__dict__["key"] == pygame.K_e:
+                elif event.key == pygame.K_e:
                     # if e_pressed return True, then go back to the game
                     if Menu.e_pressed():
                         return True
+                    
+                Menu.key_pressed(event)
 
                 Menu.update()
 
@@ -129,6 +132,11 @@ class Menu():
     def down_pressed():
         if Menu.current_page.down:
             Menu.current_page.down()
+
+    def key_pressed(event):
+        for widget in Menu.current_page.widgets:
+            if hasattr(widget, "key_pressed"):
+                widget.key_pressed(event)
 
     def pause():
         Menu.change_page(pause)
@@ -192,24 +200,24 @@ class Widget():
         self.y = y
 
         # pos is - width/2 to centre the object, objects are drawn from the top left coord
-        # NOTE: get_position_x and get_position_y return the top left part of the Widget
+        # NOTE: get_x and get_y return the top left part of the Widget
         if type(self.x) == float:
-            self.get_position_x = lambda self: self.x * game.WIDTH
+            self.get_x = lambda self: self.x * game.WIDTH
 
         elif type(self.x) == int:
             if self.x < 0:
-                self.get_position_x = lambda self: game.WIDTH + self.x
+                self.get_x = lambda self: game.WIDTH + self.x
             else:
-                self.get_position_x = lambda self: self.x
+                self.get_x = lambda self: self.x
         
         if type(self.y) == float:
-            self.get_position_y = lambda self: self.y * game.HEIGHT
+            self.get_y = lambda self: self.y * game.HEIGHT
 
         elif type(self.y) == int:
             if self.y < 0:
-                self.get_position_y = lambda self: game.HEIGHT + self.y
+                self.get_y = lambda self: game.HEIGHT + self.y
             else:
-                self.get_position_y = lambda self: self.y
+                self.get_y = lambda self: self.y
 
 
 
@@ -225,12 +233,12 @@ class Image(Widget):
         ratio = min(game.WIDTH * self.image.get_width() / 1_000_000, # Ratio of image width to game width
                     game.HEIGHT * self.image.get_width() / 625_000)
         image = pygame.transform.scale_by(self.image, ratio)
-        game.WIN.blit(image, (self.get_position_x(self) - image.get_width()/2, self.get_position_y(self) - image.get_height()/2))
+        game.WIN.blit(image, (self.get_x(self) - image.get_width()/2, self.get_y(self) - image.get_height()/2))
 
 
 
 class Text(Widget):
-    """Text can be single of multi-line
+    """Text can be single or multi-line
        x, y is the centre of the first line of the Text
        font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
        text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
@@ -238,24 +246,6 @@ class Text(Widget):
     """
     def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
         super().__init__(x, y)
-
-        if type(self.x) == float:
-            self.get_position_x = lambda self, label: self.x * game.WIDTH - label.get_width()/2
-
-        elif type(self.x) == int:
-            if self.x < 0:
-                self.get_position_x = lambda self, label: game.WIDTH + self.x - label.get_width()/2
-            else:
-                self.get_position_x = lambda self, label: self.x - label.get_width()/2
-        
-        if type(self.y) == float:
-            self.get_position_y = lambda self, label: self.y * game.HEIGHT - label.get_height()/2
-
-        elif type(self.y) == int:
-            if self.y < 0:
-                self.get_position_y = lambda self, label: game.HEIGHT + self.y - label.get_height()/2
-            else:
-                self.get_position_y = lambda self, label: self.y - label.get_height()/2
 
         if isinstance(text, str):
             self.text = [sentence.lstrip() for sentence in text.split("\n")]
@@ -283,7 +273,7 @@ class Text(Widget):
         labels = self.get_labels()
         cum_height = 0 # cumulative height of all the labels above a certain label
         for label in labels:
-            position = self.get_position_x(self, label), self.get_position_y(self, label) + cum_height # Adjust coordinates to be centre of Widget
+            position = self.get_x(self) - label.get_width()/2, self.get_y(self) - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
             cum_height += label.get_height()
             game.WIN.blit(label, position)
 
@@ -326,8 +316,8 @@ class Button(Text):
 
     def get_rect(self, label):
         width, height = self.get_width(label), self.get_height(label)
-        x, y = self.get_position_x(self, label), self.get_position_y(self, label)
-        return x, y, width, height#
+        x, y = self.get_x(self) - label.get_width()/2, self.get_y(self) - label.get_height()/2
+        return x, y, width, height
 
     def get_label(self):
         """For buttons which currently only use the first line of text to create the button"""
@@ -348,7 +338,7 @@ class Button(Text):
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
         pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
-        position = self.get_position_x(self, label), self.get_position_y(self, label) # Adjust coordinates to be centre of Widget
+        position = self.get_x(self) - label.get_width()/2, self.get_y(self) - label.get_height()/2 # Adjust coordinates to be centre of Widget
         game.WIN.blit(label, position)
 
 
@@ -459,11 +449,11 @@ class SettingButton(Button):
         if self.uniform:
             width, height = self.get_max_width(), self.get_height(label)
             width_difference = width - self.get_width(label)
-            x, y = self.get_position_x(self, label) - width_difference/2, self.get_position_y(self, label)
+            x, y = self.get_x(self) - label.get_width()/2 - width_difference/2, self.get_y(self) - label.get_height()/2
             return x, y, width, height
 
         width, height = self.get_width(label), self.get_height(label)
-        x, y = self.get_position_x(self, label), self.get_position_y(self, label)
+        x, y = self.get_x(self) - label.get_width()/2, self.get_y(self) - label.get_height()/2
         return x, y, width, height
 
     def draw(self):
@@ -509,7 +499,7 @@ class Rectangle(Widget):
 
 
     def draw(self):
-        pygame.draw.rect(game.WIN, self.colour, (self.get_position_x(self), self.get_position_y(self), self.get_width(self), self.get_height(self)), border_radius=self.curve)
+        pygame.draw.rect(game.WIN, self.colour, (self.get_x(self), self.get_y(self), self.get_width(self), self.get_height(self)), border_radius=self.curve)
 
 
 
@@ -550,8 +540,8 @@ class UpgradeBar(Widget):
         mx, my = mouse[0], mouse[1]
 
         # check if text bar is clicked on
-        x = self.get_position_x(self)
-        y = self.get_position_y(self)
+        x = self.get_x(self)
+        y = self.get_y(self)
         width = game.WIDTH * self.button_width
         height = game.HEIGHT * self.height
         if mx > x and mx < x + width and my > y and my < y + height:
@@ -564,8 +554,8 @@ class UpgradeBar(Widget):
             width = game.WIDTH * self.bar_width
             height = game.HEIGHT * self.height
             button_width = game.WIDTH * self.button_width
-            x = self.get_position_x(self) + bar * (width + self.gap) + button_width + self.gap
-            y = self.get_position_y(self)
+            x = self.get_x(self) + bar * (width + self.gap) + button_width + self.gap
+            y = self.get_y(self)
 
             # if clicked on
             if mx > x and mx < x + width and my > y and my < y + height:
@@ -599,47 +589,47 @@ class UpgradeBar(Widget):
 
         # draw text bar
         if self.get_value() == self.min_value: # if level 0, text bar has a select outline
-            Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.select_outline_colour, curve=10).draw()
+            Rectangle(int(self.get_x(self)), int(self.get_y(self)), button_width, height, self.select_outline_colour, curve=10).draw()
         else:
-            Rectangle(int(self.get_position_x(self)), int(self.get_position_y(self)), button_width, height, self.outline_colour, curve=10).draw()
+            Rectangle(int(self.get_x(self)), int(self.get_y(self)), button_width, height, self.outline_colour, curve=10).draw()
 
-        Rectangle(int(self.get_position_x(self)+2), int(self.get_position_y(self)+2), button_width-4, height-4, self.button_colour, curve=10).draw()
+        Rectangle(int(self.get_x(self)+2), int(self.get_y(self)+2), button_width-4, height-4, self.button_colour, curve=10).draw()
         label = self.get_label()
-        game.WIN.blit(label, (self.get_position_x(self) + button_width/2 - label.get_width()/2, self.get_position_y(self) + height/2 - label.get_height()/2))
+        game.WIN.blit(label, (self.get_x(self) + button_width/2 - label.get_width()/2, self.get_y(self) + height/2 - label.get_height()/2))
 
 
         # draw bars
         for bar in range(self.bars):
 
-            x = self.get_position_x(self) + bar * (width + self.gap) + button_width + self.gap
+            x = self.get_x(self) + bar * (width + self.gap) + button_width + self.gap
 
             # draw bar outline
             if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different outline colour
-                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.select_outline_colour, curve=10).draw()
+                Rectangle(int(x), int(self.get_y(self)), width, height, self.select_outline_colour, curve=10).draw()
             else:
-                Rectangle(int(x), int(self.get_position_y(self)), width, height, self.outline_colour, curve=10).draw()
+                Rectangle(int(x), int(self.get_y(self)), width, height, self.outline_colour, curve=10).draw()
 
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
             if bar+1 <= self.level:
 
                 if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
-                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.select_colour, curve=10).draw()
+                    Rectangle(int(x+2), int(self.get_y(self)+2), width-4, height-4, self.select_colour, curve=10).draw()
 
                 else: # fill in with regular colour
-                    Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, self.bar_colour, curve=10).draw()
+                    Rectangle(int(x+2), int(self.get_y(self)+2), width-4, height-4, self.bar_colour, curve=10).draw()
 
             else: # fill in with background colour
-                Rectangle(int(x+2), int(self.get_position_y(self)+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
+                Rectangle(int(x+2), int(self.get_y(self)+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
 
                 if bar == self.level: # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
                     number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(bar+1), True, colour)
-                    game.WIN.blit(number, (x + width*0.3 - number.get_width()/2, self.get_position_y(self) + height/2 - number.get_height()/2))
-                    game.WIN.blit(scrap , (x + width*0.7 - scrap.get_width()/2 , self.get_position_y(self) + height/2 - scrap.get_height()/2))
+                    game.WIN.blit(number, (x + width*0.3 - number.get_width()/2, self.get_y(self) + height/2 - number.get_height()/2))
+                    game.WIN.blit(scrap , (x + width*0.7 - scrap.get_width()/2 , self.get_y(self) + height/2 - scrap.get_height()/2))
 
                 else: # all of the locked bars show padlocks
-                    game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.get_position_y(self) + height/2 - padlock.get_height()/2))
+                    game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.get_y(self) + height/2 - padlock.get_height()/2))
 
 
 
@@ -741,6 +731,159 @@ class ArmourBar(Bar):
 
 
 
+class WorldList():
+    """
+    0 <= (x, y, width, height, gap) <= 1
+    """
+    def __init__(self, x, y, width, height, gap) -> None:
+        self.x = lambda: game.WIDTH * x
+        self.y = lambda: game.HEIGHT * y
+        self.width = lambda: game.WIDTH * width
+        self.height = lambda: game.HEIGHT * height
+        self.gap = lambda: game.HEIGHT * gap
+
+        self.list: list[World] = [World("John's World", 349588), World("Epic world", 253466)]
+
+        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + (len(self.list)-1)*(height+gap), (20, 20, 20))
+
+        self.buttons = [WorldButton(x, y + idx*(self.height()+self.gap())/game.HEIGHT, world.name, world.seed, function=lambda: self.start_world(world)) for idx, world in enumerate(self.list)]
+
+    def start_world(self, world):
+        # chunks = json.load(world.name)
+        main.main()
+
+    def click(self, mouse):
+        for button in self.buttons:
+            if button.click(mouse) is True:
+                return True
+            
+    def create_world(self, name, seed):
+        self.list.append(World(name, seed))
+
+        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
+
+        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + (len(self.list)-1)*(height+gap), (20, 20, 20))
+
+        self.buttons = [WorldButton(x, y + idx*(self.height()+self.gap())/game.HEIGHT, world.name, world.seed, function=lambda: self.start_world(world)) for idx, world in enumerate(self.list)]
+
+    def draw(self):
+        self.rectangle.draw()
+
+        for button in self.buttons:
+
+            # Make all buttons the same width
+            button.padx = (self.width() - button.label.get_width())/2
+
+            # Make all buttons the same height
+            button.pady = (self.height() - button.label.get_height())/2
+
+            # Draw button
+            button.draw()
+
+
+
+class World():
+    def __init__(self, name, seed) -> None:
+        self.name = name
+        self.seed = seed
+
+
+
+class WorldButton(Button):
+    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
+        super().__init__(x, y, name, font, font_size, colour, padx, pady, function, box_colour, outline_colour, hover_colour)
+        self.seed = str(seed)
+
+    def draw(self):
+        # Draw button
+        self.label = self.get_label()
+        if self.touching_mouse(pygame.mouse.get_pos()):
+            self.current_box_colour = self.hover_colour
+        else:
+            self.current_box_colour = self.box_colour
+
+        label = self.label # This is updated in Page.draw()
+        x, y, width, height = self.get_rect(label)
+        pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
+        pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
+
+        # Draw name
+        position = self.get_x(self) - self.get_width(self.label)*0.45, self.get_y(self) - label.get_height()/2 # Adjust coordinates to be left of button
+        game.WIN.blit(label, position)
+
+        # Draw seed
+        seed = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
+        game.WIN.blit(seed, (self.get_x(self) + self.get_width(self.label)*0.2, self.get_y(self) - seed.get_height()/2))
+
+
+
+class TextInput(Widget):
+    def __init__(self, x, y, width, height, header="", font_size=Menu.DEFAULT_FONT_SIZE, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
+        super().__init__(x, y)
+        self.width = width
+        self.height = height
+        self.header = header
+        self.font_size = font_size
+        self.outline_colour = outline_colour
+        self.click_outline_colour = click_outline_colour
+        self.selected = False
+        self.text = ""
+
+    def get_width(self):
+        return self.width * game.WIDTH
+    
+    def get_height(self):
+        return self.height * game.HEIGHT
+    
+    def get_rect(self):
+        return self.get_x(self) - self.get_width()/2, self.get_y(self) - self.get_height()/2, self.get_width(), self.get_height()
+    
+    def touching_mouse(self, mouse):
+        x, y, width, height = self.get_rect()
+        return (mouse[0] > x and mouse[0] < x + width and
+                mouse[1] > y and mouse[1] < y + height)
+    
+    def click(self, mouse):
+        if self.touching_mouse(mouse):
+            self.selected = True
+            Menu.update()
+        else:
+            self.selected = False
+
+    def key_pressed(self, event):
+        if self.selected:
+            if event.key == pygame.K_BACKSPACE:
+                self.text = self.text[:-1]
+            elif event.unicode.isalpha() or event.unicode.isdigit() or event.unicode in "!\"#$%&'()*+, -./:;<=>?@[\]^_`{|}~":
+                self.text += event.unicode
+
+    def draw(self):
+        # Draw rectangle outline
+        if self.selected:
+            pygame.draw.rect(game.WIN, self.click_outline_colour, self.get_rect(), width=round(game.WIDTH/300))
+        else:
+            pygame.draw.rect(game.WIN, self.outline_colour, self.get_rect(), width=round(game.WIDTH/300))
+
+        # Draw header
+        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.header, True, game.WHITE)
+        game.WIN.blit(label, (self.get_x(self) - self.get_width()/2, self.get_y(self) - self.get_height()/2 - label.get_height()))
+
+        # Draw input text
+        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, game.WHITE)
+        game.WIN.blit(label, (self.get_x(self) - self.get_width()/2 + round(game.WIDTH/300), self.get_y(self) - label.get_height()/2))
+
+
+
+
+class SeedTextInput(TextInput):
+    def key_pressed(self, event):
+        super().key_pressed(event)
+        for char in self.text:
+            if not char.isdigit():
+                self.text = self.text.replace(char, "")
+
+
+
 
 # FRAMEWORK
 ########################################################################################################################################################
@@ -751,8 +894,8 @@ class ArmourBar(Bar):
 
 main_menu = Page(
     Image(0.5, 3/16, images.ASTRO_ATTACK_LOGO),
-    Button(0.5, 3/8, "Single Player", font_size=40, function=lambda: main.main()),
-    Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: main.main()),
+    Button(0.5, 3/8, "Single Player", font_size=40, function=lambda: Menu.change_page(single_player)),
+    Button(0.5, 4/8, "Multiplayer"  , font_size=40, function=lambda: Menu.change_page(multiplayer)),
     Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
     Button(0.5, 6/8, "Info"         , font_size=40, function=lambda: Menu.change_page(info)),
     Button(0.5, 7/8, "Quit"         , font_size=40, function=game.quit),
@@ -775,7 +918,7 @@ info = Page(
                         Shoot: Left Click
                         Target: Right Click
                         Change Weapon: 1, 2, 3, 4""", font_size=20),
-    Button(0.5, 5/6,   "MAIN MENU"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 5/6,   "Main Menu"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )
 
@@ -785,8 +928,8 @@ settings = Page(
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"        , font_size=40, value="SIZE_LINK"    , function_action=None),
     SettingButton(0.25, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, min=4, max=26),
-    Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu)),
-    click=lambda: settings_click(),
+    Button(0.5, 5/6, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),
     up=lambda: settings_up(),
     down=lambda: settings_down()
@@ -798,6 +941,28 @@ pause = Page(
     Button(0.5, 0.46, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     background_colour=None,
     escape=lambda: True,
+)
+
+single_player = Page(
+    WorldList(0.5, 0.2, width=0.6, height=0.12, gap=0.04),
+    Button(0.5, 0.71, "New World", function=lambda: Menu.change_page(new_world)),
+    Button(0.5, 5/6, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    escape=lambda: Menu.change_page(main_menu)
+)
+
+multiplayer = Page(
+    Text(0.5, 0.45, "Coming soon in a1.7!"),
+    Button(0.5, 5/6, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    escape=lambda: Menu.change_page(main_menu)
+)
+
+new_world = Page(
+    TextInput(0.5, 0.3, 0.5, 0.1, "Name"),
+    SeedTextInput(0.5, 0.53, 0.5, 0.1, "Seed"),
+    Button(0.5, 0.71, "Create World", function=lambda: create_world()),
+    Button(0.5, 5/6, "Back" , font_size=40, function=lambda: Menu.change_page(single_player)),
+    click=lambda: page_click(),
+    escape=lambda: Menu.change_page(single_player)
 )
 
 station = Page(
@@ -949,7 +1114,7 @@ death_screen = Page(
     Text(  0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
     Text(  0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
     Button(0.5, 4/6, "PLAY AGAIN", font_size=40, function=lambda: main.main()),
-    Button(0.5, 5/6, "MAIN MENU" , font_size=40, function=lambda: Menu.change_page(main_menu))
+    Button(0.5, 5/6, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu))
 )
 
 
@@ -958,13 +1123,33 @@ death_screen = Page(
 ### Functions ###
 #################
 
-def settings_click():
+def get_widget(name: str, page: Page=None):
+    if not page: page = Menu.current_page
+    for widget in page.widgets:
+        if widget.__name__ == name:
+            return widget
+
+def create_world():
+    # Get name and seed
+    for widget in Menu.current_page.widgets:
+        if type(widget) == TextInput:
+            name = widget.text
+        elif type(widget) == SeedTextInput:
+            seed = widget.text
+
+    for widget in single_player.widgets:
+        if isinstance(widget, WorldList):
+            widget.create_world(name, seed)
+
+    Menu.change_page(single_player)
+
+def page_click():
     """If there is a selected widget that shouldn't be, un-select it"""
     mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
-        if isinstance(widget, SettingButton) and widget.selected and not widget.touching_mouse(mouse): # if widget should be un-selected
+        if hasattr(widget, "selected") and widget.selected and not widget.touching_mouse(mouse): # if widget should be un-selected
             widget.selected = False
-            widget.outline_colour = widget.original_outline_colour
+            if isinstance(widget, SettingButton): widget.outline_colour = widget.original_outline_colour
             Menu.update()
             break
 

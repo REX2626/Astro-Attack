@@ -166,10 +166,11 @@ def update_objects(delta_time):
         # Update object e.g. move it
         object.update(delta_time)
 
-    # Bullets are updated after everything else to ensure that the ships they may hit have been updated (and moved to the right position)
+    # Asteroids are updated after ships to ensure that ships are never inside of an asteroid
     for object in filter(lambda object: type(object) == Asteroid, CHUNKS.entities.copy()):
         object.update(delta_time)
 
+    # Bullets are updated after everything else to ensure that the ships they may hit have been updated (and moved to the right position)
     for object in filter(lambda object: type(object) == Bullet, CHUNKS.entities.copy()):
         object.update(delta_time)
 
@@ -223,7 +224,7 @@ def main():
             elif event.type == pygame.VIDEORESIZE:
                 update_playing_screen_size()
 
-            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_e:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
 
                 start = perf_counter()
 
@@ -235,7 +236,7 @@ def main():
 
                 time1 = perf_counter() - start + time1
 
-            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 
                 # Fix delta_time so that time paused is not included
                 start = perf_counter()
@@ -250,13 +251,13 @@ def main():
                 # Correct time1
                 time1 = perf_counter() - start + time1
 
-            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_F3:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_F3:
                 if game.DEBUG_SCREEN:
                     game.DEBUG_SCREEN = False
                 else:
                     game.DEBUG_SCREEN = True
 
-            elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_SLASH:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SLASH:
                 # Fix delta_time so that time paused is not included
                 start = perf_counter()
 

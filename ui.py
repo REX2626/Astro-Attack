@@ -234,22 +234,22 @@ class Console():
                 if event.type == pygame.QUIT:
                     game.quit()
 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_ESCAPE:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     game.CONSOLE_SCREEN = False
                 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RETURN:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     self.enter_text()
 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_UP:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                     self.up_pressed()
 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_DOWN:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                     self.down_pressed()
                 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_LEFT:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
                     self.left_pressed()
 
-                elif event.type == pygame.KEYDOWN and event.__dict__["key"] == pygame.K_RIGHT:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
                     self.right_pressed()
 
                 elif event.type == pygame.KEYDOWN:

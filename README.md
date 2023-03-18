@@ -17,13 +17,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.3.1 (console improvements and minor tweaks)
-CONSOLE FUNCTIONALITY TO ADD:
-    better colour coordination
-    display error message
-
-Improve player minimap arrow
-
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Enemies become more difficult
 
@@ -55,6 +48,10 @@ Fix AI colliding with Asteroids
 Add thruster particles to ships
 
 Add special features to weapons (e.g. sniper can zoom in on enemy)
+
+When you take damage, bar is highlighted with damage before the health/armour/shield disappears
+
+Add back buttons
 
 ### a1.5.0 (sound)
 
@@ -90,7 +87,7 @@ Strict Rendering (only rendering objects which will defo be on screen)
 Think about doing rotozoom as it filters the image (AA), can be costly tho
 
 Add friendly AI ship
-Add some basic coding interface 
+Add some basic coding interface
 
 Add ammo system
 
@@ -387,3 +384,5 @@ Once armour is broken, all damage goes into health
 Add health regen at stations
 
 Neutral stations can be traded with
+
+### a1.4.0 (gameplay loop - difficulty, missions and saving)
