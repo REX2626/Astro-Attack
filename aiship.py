@@ -155,11 +155,10 @@ class AI_Ship(Ship):
         if f"Lvl: {self.level}, {game.ZOOM}" not in level_text_cache:
             text_surface = pygame.font.SysFont("consolas", int(15 * game.ZOOM)).render(f"Lvl: {self.level}", True, (255, 255, 255))
             level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"] = text_surface
-
-            game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
         else:
             text_surface: pygame.Surface = level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"]
-            game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
+        
+        game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
 
 
 
