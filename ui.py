@@ -199,7 +199,8 @@ class Console():
 
         self.commands = {"spawnentity": commands.spawn_entity,
                          "godmode": commands.god_mode,
-                         "zoom": commands.change_max_zoom}
+                         "zoom": commands.change_max_zoom,
+                         "score": commands.add_score}
         
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
@@ -209,6 +210,7 @@ class Console():
         self.help_message = ["/spawnentity(entity_class, frequency) - spawns in entity at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out",
+                             "/score(score) - adds score to current score"
                              "/log(argument) - prints argument to console",
                              "/entitylist - prints list of entities to spawn"]
         

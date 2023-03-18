@@ -33,3 +33,6 @@ def god_mode(arguments):
 
 def change_max_zoom(zoom):
     game.CURRENT_MIN_ZOOM = zoom
+
+def add_score(score):
+    game.SCORE += score
