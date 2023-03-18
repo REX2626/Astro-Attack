@@ -334,7 +334,7 @@ class Console():
 
             else:
                 try:
-                    eval(self.input_text)
+                    exec(self.input_text)
                     self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
                     self.previous_commands.insert(0, self.input_text)
                 except:
