@@ -618,6 +618,9 @@ def draw(delta_time):
         label = font3.render(f"Seed: {game.SEED}", True, (255, 255, 255))
         WIN.blit(label, (8, 248))
 
+        label = font3.render(f"Difficulty: {game.CURRENT_SHIP_LEVEL}", True, (255, 255, 255))
+        WIN.blit(label, (8, 278))
+
     label = font.render(f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH/2-193, game.HEIGHT-114))
 
