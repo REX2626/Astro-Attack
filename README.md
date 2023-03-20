@@ -61,6 +61,12 @@ When you take damage, bar is highlighted with damage before the health/armour/sh
 
 Add back buttons
 
+Fix ships getting stuck in asteroids
+
+Make it so you have to be near to a station to click on it
+
+Lower station spawning, make enemy stations spawn more than friendly
+
 ### a1.5.0 (sound)
 
 ### a1.6.0 (bosses, ship customization, friendly ships)
