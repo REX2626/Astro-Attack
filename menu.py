@@ -55,6 +55,9 @@ class Menu():
     def resize():
         """Re-draw the current_page but with the updated screen dimensions"""
         game.update_screen_size()
+        for widget in Menu.current_page.widgets:
+            if hasattr(widget, "resize"):
+                widget.resize()
         Menu.update()
 
     def check_for_inputs():
@@ -253,18 +256,38 @@ class Text(Widget):
         self.colour = colour
         self.spacing = lambda: spacing * game.HEIGHT
 
-    def get_labels(self):
-        """Creates a list of label for every sentence of the text"""
+        self.labels_text = None
+        self.labels_size = None
+
+    def update_labels_info(self):
+        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+            text = self.text()
+        else:
+            text = self.text
+        self.labels_text = text
+
+        self.labels_size = round(game.WIDTH * self.font_size / 900)
+
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
 
-        if isinstance(self.text, list):
-            labels = [font.render(sentence, True, self.colour) for sentence in self.text]
+        if isinstance(text, list):
+            self.labels = [font.render(sentence, True, self.colour) for sentence in text]
         else: # if text is a function
-            if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-                text = self.text()
-                labels = [font.render(sentence.lstrip(), True, self.colour) for sentence in text.split("\n")] # split sentence up into lines, then turn each line into a label
+            self.labels = [font.render(sentence.lstrip(), True, self.colour) for sentence in text.split("\n")] # split sentence up into lines, then turn each line into a label
 
-        return labels
+        return self.labels
+
+    def get_labels(self):
+        """Creates a list of label for every sentence of the text"""
+        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+            text = [sentence.lstrip() for sentence in self.text().split("\n")]
+        else:
+            text = self.text
+
+        if text != self.labels_text or round(game.WIDTH * self.font_size / 900) != self.labels_size:
+            self.update_labels_info()
+        
+        return self.labels
 
     def draw(self):
         labels = self.get_labels()
@@ -292,7 +315,10 @@ class Button(Text):
         self.outline_colour = outline_colour
         self.hover_colour = hover_colour
         self.uniform = uniform
-        self.label = self.get_label() # Called at the start of Page.draw, use self.label instead of self.get_label for performance
+
+        self.label_text = None
+        self.label_size = None
+        self.update_label_info()
 
     def click(self, mouse):
         if self.touching_mouse(mouse):
@@ -339,6 +365,17 @@ class Button(Text):
         x, y = self.get_x() - label.get_width()/2, self.get_y() - label.get_height()/2
         return x, y, width, height
 
+    def update_label_info(self):
+        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+            text = self.text()
+        else:
+            text = self.text[0]
+        self.label_text = text
+
+        self.label_size = round(game.WIDTH * self.font_size / 900)
+
+        self.label = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
+
     def get_label(self):
         """For buttons which currently only use the first line of text to create the button"""
         if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
@@ -346,7 +383,10 @@ class Button(Text):
         else:
             text = self.text[0]
 
-        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
+        if text != self.label_text or round(game.WIDTH * self.font_size / 900) != self.label_size:
+            self.update_label_info()
+
+        return self.label
 
     def draw(self):
         if self.touching_mouse(pygame.mouse.get_pos()):
@@ -450,9 +490,6 @@ class SettingButton(Button):
             setattr(game, self.value, self.get_value() - 1 if self.get_value() > self.min else self.min)
         if self.function_action:
             self.function_action()
-
-    def get_label(self):
-        return pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(self.text(), True, self.colour)
 
     def draw(self):
         super().draw()
@@ -836,13 +873,14 @@ class WorldList():
         Menu.update()
 
     def create_world(self, name, seed):
-        self.list.append(World(name, seed))
+        world = World(name, seed)
+        self.list.append(world)
 
         x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
 
         self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
 
-        self.buttons = [WorldButton(x, y + idx*(self.height()+self.gap())/game.HEIGHT, world.name, world.seed, function=lambda: self.start_world(world)) for idx, world in enumerate(self.list)]
+        self.buttons.append(WorldButton(x, y + len(self.buttons)*(self.height()+self.gap())/game.HEIGHT, name, seed, function=lambda: self.start_world(world)))
 
     def draw(self):
         # If no worlds, then don't draw list
@@ -888,6 +926,7 @@ class WorldButton(Button):
     def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
         super().__init__(x, y, name, font, font_size, colour, padx, pady, function, box_colour, outline_colour, hover_colour)
         self.seed = str(seed)
+        self.resize()
 
     def touching_mouse(self, mouse, rect: tuple, scroll_height):
         if mouse[0] < rect[0] or mouse[0] > rect[0] + rect[2] or mouse[1] < rect[1] or mouse[1] > rect[1] + rect[3]:
@@ -903,6 +942,9 @@ class WorldButton(Button):
         if self.touching_mouse(mouse, rect, scroll_height):
             self.function()
             return True # Tells the Menu that this Button has been clicked on
+        
+    def resize(self):
+        self.seed_surf = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
 
     def draw(self, surf, x_offset, y_offset, rect, scroll_height):
         # Draw button
@@ -918,11 +960,11 @@ class WorldButton(Button):
         pygame.draw.rect(surf, self.outline_colour    , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
 
         # Draw name
-        position = self.get_x() - self.get_width(self.label)*0.45 + x_offset, self.get_y() - label.get_height()/2 + y_offset # Adjust coordinates to be left of button
+        position = self.get_x() - self.get_width(label)*0.45 + x_offset, self.get_y() - label.get_height()/2 + y_offset # Adjust coordinates to be left of button
         surf.blit(label, position)
 
         # Draw seed
-        seed = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
+        seed = self.seed_surf
         position = self.get_x() + self.get_width(self.label)*0.2 + x_offset, self.get_y() - seed.get_height()/2 + y_offset
         surf.blit(seed, position)
 
