@@ -212,8 +212,7 @@ def main():
         draw_window(delta_time)
 
         # Level increases every 10 score + position from centre
-    
-        game.CURRENT_SHIP_LEVEL = int(game.SCORE / 10) + max(0, int(5*math.log10(game.player.position.magnitude() / 10000 + 0.00001)))
+        game.CURRENT_SHIP_LEVEL = int(game.SCORE / 10) + int(game.player.position.magnitude() / 10_000)
 
         if player.health <= 0:
             menu.Menu.death_screen()

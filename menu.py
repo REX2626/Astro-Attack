@@ -629,11 +629,11 @@ class UpgradeBar(Widget):
 
         # draw text bar
         if self.get_value() == self.min_value: # if level 0, text bar has a select outline
-            Rectangle(int(self.get_x()), int(self.get_y()), button_width, height, self.select_outline_colour, curve=10).draw()
+            pygame.draw.rect(game.WIN, self.select_outline_colour, (self.get_x(), self.get_y(), button_width, height), border_radius=10)
         else:
-            Rectangle(int(self.get_x()), int(self.get_y()), button_width, height, self.outline_colour, curve=10).draw()
+            pygame.draw.rect(game.WIN, self.outline_colour, (self.get_x(), self.get_y(), button_width, height), border_radius=10)
 
-        Rectangle(int(self.get_x()+2), int(self.get_y()+2), button_width-4, height-4, self.button_colour, curve=10).draw()
+        pygame.draw.rect(game.WIN, self.button_colour, (self.get_x()+2, self.get_y()+2, button_width-4, height-4), border_radius=10)
         label = self.get_label()
         game.WIN.blit(label, (self.get_x() + button_width/2 - label.get_width()/2, self.get_y() + height/2 - label.get_height()/2))
 
@@ -645,21 +645,21 @@ class UpgradeBar(Widget):
 
             # draw bar outline
             if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different outline colour
-                Rectangle(int(x), int(self.get_y()), width, height, self.select_outline_colour, curve=10).draw()
+                pygame.draw.rect(game.WIN, self.select_outline_colour, (x, self.get_y(), width, height), border_radius=10)
             else:
-                Rectangle(int(x), int(self.get_y()), width, height, self.outline_colour, curve=10).draw()
+                pygame.draw.rect(game.WIN, self.outline_colour, (x, self.get_y(), width, height), border_radius=10)
 
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
             if bar+1 <= self.level:
 
                 if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
-                    Rectangle(int(x+2), int(self.get_y()+2), width-4, height-4, self.select_colour, curve=10).draw()
+                    pygame.draw.rect(game.WIN, self.select_colour, (x+2, self.get_y()+2, width-4, height-4), border_radius=10)
 
                 else: # fill in with regular colour
-                    Rectangle(int(x+2), int(self.get_y()+2), width-4, height-4, self.bar_colour, curve=10).draw()
+                    pygame.draw.rect(game.WIN, self.bar_colour, (x+2, self.get_y()+2, width-4, height-4), border_radius=10)
 
             else: # fill in with background colour
-                Rectangle(int(x+2), int(self.get_y()+2), width-4, height-4, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10).draw()
+                pygame.draw.rect(game.WIN, Menu.DEFAULT_BACKGROUND_COLOUR, (x+2, self.get_y()+2, width-4, height-4), border_radius=10)
 
                 if bar == self.level: # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR

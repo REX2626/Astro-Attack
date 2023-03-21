@@ -119,18 +119,18 @@ class Chunk():
                 Asteroid(self.random_position())
             )
 
-        # Friendly Station
-        elif random.random() < 0.05 and self.adjoining_empty_chunks():
-            self.entities.add(
-
-                FriendlyStation(self.random_position())
-            )
-
         # Enemy Station
-        elif random.random() < 0.05 and self.adjoining_empty_chunks():
+        elif random.random() < 0.04 and self.adjoining_empty_chunks():
             self.entities.add(
 
                 EnemyStation(self.random_position())
+            )
+
+        # Friendly Station
+        elif random.random() < 0.04 and self.adjoining_empty_chunks():
+            self.entities.add(
+
+                FriendlyStation(self.random_position())
             )
 
 
