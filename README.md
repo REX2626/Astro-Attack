@@ -61,8 +61,6 @@ When you take damage, bar is highlighted with damage before the health/armour/sh
 
 Add back buttons
 
-Fix ships getting stuck in asteroids
-
 Make it so you have to be near to a station to click on it
 
 Lower station spawning, make enemy stations spawn more than friendly
@@ -400,3 +398,5 @@ Add health regen at stations
 Neutral stations can be traded with
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
+
+Fix ships getting stuck in asteroids

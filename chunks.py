@@ -127,7 +127,7 @@ class Chunk():
             )
 
         # Friendly Station
-        elif random.random() < 0.04 and self.adjoining_empty_chunks():
+        elif random.random() < 0.03 and self.adjoining_empty_chunks():
             self.entities.add(
 
                 FriendlyStation(self.random_position())

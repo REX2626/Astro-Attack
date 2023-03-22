@@ -17,9 +17,24 @@ def entity_collision(object, entity, delta_time):
 
     if object.mask.overlap(entity_mask, (x_offset, y_offset)):
 
-        vector_to_asteroid = object.position - entity.position
-
         game.CHUNKS.move_entity(entity, -delta_time) # Move entity backwards, so outside of asteroid
+
+        # Move entity out of Asteroid if entity is still in Asteroid
+        # This occurs because the current delta_time could be shorter than the previous delta_time, so the entity is not moved backwards enough
+        original_velocity = entity.velocity.copy()
+        entity.velocity.set_magnitude(1)
+        while True:
+            x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
+            y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
+
+            if not object.mask.overlap(entity_mask, (x_offset, y_offset)):
+                break
+
+            game.CHUNKS.move_entity(entity, -1)
+
+        entity.velocity = original_velocity
+
+        vector_to_asteroid = object.position - entity.position
 
         tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2) # Rotate 90 degrees
         tangent_angle = tangent_to_asteroid.get_angle()
@@ -95,9 +110,6 @@ class Ship(Entity):
 
     def update(self, delta_time):
 
-        # Move the ship by it's velocity
-        super().update(delta_time)
-
         # Inertial Dampening
         """
         -> velocity is added with the inverse velocity, making velocity 0
@@ -106,6 +118,9 @@ class Ship(Entity):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Move the ship by it's velocity
+        super().update(delta_time)
 
         # Rotation Dampening
         """

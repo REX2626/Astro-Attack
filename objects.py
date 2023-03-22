@@ -1,6 +1,4 @@
 import pygame
-import os
-import sys
 import math
 import images
 import game
@@ -185,6 +183,9 @@ class Vector():
         self.rotate(angle)
         self.x += position.x
         self.y += position.y
+
+    def copy(self):
+        return Vector(self.x, self.y)
 
     def in_range(self, x, y, width, height):
         return self.x >= x and self.x <= x + width and self.y >= y and self.y <= y + height
