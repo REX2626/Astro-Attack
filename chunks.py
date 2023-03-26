@@ -1,6 +1,7 @@
 from objects import Vector, Object, Entity
 from entities import Asteroid#, HealthPickup
 from station import FriendlyStation, EnemyStation
+from aiship import Mother_Ship
 import random
 import game
 
@@ -131,6 +132,12 @@ class Chunk():
             self.entities.add(
 
                 FriendlyStation(self.random_position())
+            )
+
+        elif random.random() < 0.01 and self.adjoining_empty_chunks():
+            self.entities.add(
+
+                Mother_Ship(self.random_position())
             )
 
 

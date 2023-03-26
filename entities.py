@@ -22,7 +22,8 @@ def entity_collision(object, entity, delta_time):
         # Move entity out of Asteroid if entity is still in Asteroid
         # This occurs because the current delta_time could be shorter than the previous delta_time, so the entity is not moved backwards enough
         original_velocity = entity.velocity.copy()
-        entity.velocity.set_magnitude(1)
+        if entity.velocity.magnitude() != 0: # There was a division by zero error
+            entity.velocity.set_magnitude(1)
         while True:
             x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
             y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
@@ -47,6 +48,7 @@ def entity_collision(object, entity, delta_time):
 
         if hasattr(entity, "make_new_patrol_point"):
             entity.make_new_patrol_point(400, 500, object.position)
+            entity.state = 0 # Patrol state
 
         particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
 

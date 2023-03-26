@@ -22,7 +22,7 @@ Enemy Levels:
     enemies have specific levels
     harder enemy levels get spawned in based on different factors (score, time played, distance from origin etc)
     easy levels mean they will do less damage and motherships will not spawn difficult enemies
-    motherships only spawn missiles for higher levels
+    motherships only spawn missiles and have shields for higher levels
     when difficulty increases, stations spawn motherships of higher levels which spawn difficult enemies
     on low difficulty you can get patrols of easy enemies far from stations
 

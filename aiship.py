@@ -16,6 +16,7 @@ PATROL = 0
 ATTACK = 1
 RETREAT = 2
 ATTACK_ENEMY = 3
+PATROL_TO_STATION = 4
 
 level_text_cache = dict()
 
@@ -37,10 +38,15 @@ class AI_Ship(Ship):
         self.level = level
 
         # Every 10 levels damage is increased by +1
-        self.weapon.damage *= (self.level/10 + 1)
+        self.weapon.damage += self.level/10
 
-        # Adds 1 hp every level
-        self.health *= self.level + 1
+        # Adds 0.5 hp every level
+        self.health += self.level/2
+
+        # Enemies below lvl 5 do not have a shield
+        if self.level < 5:
+            self.shield = 0
+            self.shield_recharge = 0
 
     def check_for_asteroid(self, chunk_pos):
         # Loop through chunks in a 3x3 grid centred around the original chunk you are checking
@@ -163,7 +169,7 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.ENEMY_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=2, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=images.ENEMY_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
@@ -257,7 +263,7 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=4, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 750
         self.explode_radius = 100
@@ -325,7 +331,7 @@ class Drone_Enemy(Enemy_Ship):
 
 
 class Mother_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=10, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, current_station=None, image=images.MOTHER_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1.5, weapon=EnemySniper, scrap_count=3, health=8, armour=0, shield=3, shield_delay=5, shield_recharge=1, state=PATROL, enemy_list=None, current_station=None, image=images.MOTHER_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, self, image)
         if enemy_list is None:
             enemy_list = []
@@ -445,8 +451,10 @@ class Neutral_Ship(AI_Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
-        if self.state == PATROL:
+        if self.state == PATROL_TO_STATION:
             self.patrol_to_station(delta_time, current_station=self.current_station)
+        elif self.state == PATROL:
+            self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
 
         
     def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
@@ -479,7 +487,7 @@ class Neutral_Ship(AI_Ship):
             
             # If there are no other stations available, just patrol around the current one
             else:
-                self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
+                self.state = PATROL
         else:
             # Move and rotate towards target station
             self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
@@ -497,7 +505,7 @@ class Neutral_Ship(AI_Ship):
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP_CARGO) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, neutral_list=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP_CARGO) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
         if neutral_list is None:
             neutral_list = []
@@ -542,7 +550,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, mother_ship=None, current_station=None, target_station=None, image=images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship
@@ -560,6 +568,8 @@ class Neutral_Ship_Fighter(Neutral_Ship):
 
         if self.mother_ship in game.CHUNKS.entities:
             self.target_station = self.mother_ship.target_station
+        else:
+            self.state = PATROL
 
         if self.state == ATTACK:
             self.attack_entity_state(delta_time, entity=game.player)
@@ -567,10 +577,10 @@ class Neutral_Ship_Fighter(Neutral_Ship):
             if self.recent_enemy in game.CHUNKS.entities:
                 self.attack_entity_state(delta_time, entity=self.recent_enemy)
             else:
-                self.state = PATROL
+                self.state = PATROL_TO_STATION
 
         if self.state == ATTACK and self.distance_to(game.player) > 1000:
-            self.state = PATROL
+            self.state = PATROL_TO_STATION
 
     def damage(self, damage, entity=None):
         if entity and isinstance(entity, Ship):
