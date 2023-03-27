@@ -275,7 +275,7 @@ class AdjustableText(Widget):
             if x + bounds.width >= self.bottom_x:
                 x, y = self.top_x, y + self.line_spacing
 
-            if x + bounds.width >= self.bottom_x or y + bounds.height >= self.bottom_y:
+            if x + bounds.width >= self.bottom_x or y + self.line_spacing >= self.bottom_y:
                 self.default_font_size -= 1
                 self.font = freetype.SysFont(self.font_type, self.default_font_size)
                 self.line_spacing = self.font.get_sized_height()
@@ -283,11 +283,11 @@ class AdjustableText(Widget):
                 break
             
             if low_letter:
-                render_list.append((x, y + (self.line_spacing - bounds.height) + low_letter_difference, word))
+                render_list.append((x, y + (self.line_spacing - bounds.height), word))
                 low_letter = False
                 #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height) + low_letter_difference, bounds.width, bounds.height), 1)
             else:
-                render_list.append((x, y + (self.line_spacing - bounds.height), word))
+                render_list.append((x, y + (self.line_spacing - bounds.height) - low_letter_difference, word))
                 #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height), bounds.width, bounds.height), 1)
             x += bounds.width + space.width
 
