@@ -1,6 +1,7 @@
 import pygame
 import random
 import json
+from pygame import freetype
 from ui import Bar as UIBar
 import game
 import images
@@ -233,6 +234,76 @@ class Image(Widget):
                     game.HEIGHT * self.image.get_width() / 625_000)
         image = pygame.transform.scale_by(self.image, ratio)
         game.WIN.blit(image, (self.get_x() - image.get_width()/2, self.get_y() - image.get_height()/2))
+
+
+
+class AdjustableText(Widget):
+    def __init__(self, top_x, top_y, bottom_x, bottom_y, text="Text", font=Menu.DEFAULT_FONT, default_font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
+        self.top_x = top_x
+        self.top_y = top_y
+        self.bottom_x = bottom_x
+        self.bottom_y = bottom_y
+
+        self.text = text
+        self.words = self.text.split(" ")
+        self.font_type = font
+        self.default_font_size = default_font_size
+        self.colour = colour
+
+        self.font = freetype.SysFont(self.font_type, self.default_font_size)
+
+        self.line_spacing = self.font.get_sized_height()
+
+        self.low_letters = ["g", "j", "q", "p", "y"]
+
+    def render_words(self):
+        low_letter_difference = self.font.get_rect("y").height - self.font.get_rect("u").height
+        low_letter = False
+        x, y = self.top_x, self.top_y
+        space = self.font.get_rect(' ')
+
+        render_list = []
+
+        for word in self.words:
+            bounds = self.font.get_rect(word)
+
+            for letter in self.low_letters:
+                if letter in word:
+                    low_letter = True
+                    break
+
+            if x + bounds.width >= self.bottom_x:
+                x, y = self.top_x, y + self.line_spacing
+
+            if x + bounds.width >= self.bottom_x or y + bounds.height >= self.bottom_y:
+                self.default_font_size -= 1
+                self.font = freetype.SysFont(self.font_type, self.default_font_size)
+                self.line_spacing = self.font.get_sized_height()
+                self.render_words()
+                break
+            
+            if low_letter:
+                render_list.append((x, y + (self.line_spacing - bounds.height) + low_letter_difference, word))
+                low_letter = False
+                #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height) + low_letter_difference, bounds.width, bounds.height), 1)
+            else:
+                render_list.append((x, y + (self.line_spacing - bounds.height), word))
+                #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height), bounds.width, bounds.height), 1)
+            x += bounds.width + space.width
+
+        return render_list
+
+    def draw(self):
+        pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
+
+        render_list = self.render_words()
+
+        if len(render_list) == len(self.words):
+            for element in render_list:
+                self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
+
+
+
 
 
 
@@ -1046,6 +1117,30 @@ class SeedTextInput(TextInput):
 
 
 
+class Mission(Widget):
+    def __init__(self, x, y) -> None:
+        super().__init__(x, y)
+
+        self.info = "Kill 10 Enemies in 20 minutes"
+
+        self.info_text = AdjustableText((x-0.1)*game.WIDTH, (y-0.2) * game.HEIGHT, (x+0.1)* game.WIDTH, (y-0.1)*game.HEIGHT, text=self.info, default_font_size=70)
+
+        self.accept_button = Button(x, y, "Accept", function=lambda: self.accept)
+        self.decline_button = Button(x, y+0.1, "Decline", function=lambda: self.decline)
+
+    def accept(self):
+        return
+    
+    def decline(self):
+        return
+    
+    def draw(self):
+        self.info_text.draw()
+        self.accept_button.draw()
+        self.decline_button.draw()
+
+
+
 
 # FRAMEWORK
 ########################################################################################################################################################
@@ -1140,17 +1235,49 @@ quit_confirm = Page(
 
 station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Station"),
-    Button(0.3, 0.43, "Armour", function=lambda: Menu.change_page(armour)),
-    Button(0.7, 0.43, "Weapon", function=lambda: Menu.change_page(weapon)),
-    Button(0.3, 0.8, "Engine", function=lambda: Menu.change_page(engine)),
-    Button(0.7, 0.8, "Radar" , function=lambda: Menu.change_page(radar)),
-    Image(0.3, 0.26, images.ARMOUR_ICON, scale=6),
-    Image(0.7, 0.28, images.WEAPON_ICON, scale=6),
-    Image(0.3, 0.635, images.ENGINE_ICON, scale=6),
-    Image(0.7, 0.62, images.RADAR_ICON, scale=6),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.5, 0.11, "Upgrades"),
+    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Button(0.2, 0.7, "Armour", function=lambda: Menu.change_page(armour)),
+    Button(0.4, 0.7, "Weapon", function=lambda: Menu.change_page(weapon)),
+    Button(0.6, 0.7, "Engine", function=lambda: Menu.change_page(engine)),
+    Button(0.8, 0.7, "Radar" , function=lambda: Menu.change_page(radar)),
+    Image(0.2, 0.5, images.ARMOUR_ICON, scale=6),
+    Image(0.4, 0.5, images.WEAPON_ICON, scale=6),
+    Image(0.6, 0.5, images.ENGINE_ICON, scale=6),
+    Image(0.8, 0.5, images.RADAR_ICON, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: True,
+    e_press=lambda: True
+)
+
+missions = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.11, "Missions"),
+    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Mission(0.5, 0.5),
+    AdjustableText(100, 100, 300, 300, "Yo Rex this is working quite well now!"),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
+    background_colour=None,
+    escape=lambda: True,
+    e_press=lambda: True
+)
+
+stats = Page(
+    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
+    Text(0.5, 0.11, "Stats"),
+    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Text(0.5, 0.5, "You are bad at this game"),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -1158,12 +1285,12 @@ station = Page(
 
 armour = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Armour"),
+    Text(0.5, 0.11, "Armour"),
     UpgradeBar(0.19, 0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     UpgradeBar(0.19, 0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=20),
     UpgradeBar(0.19, 0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1171,13 +1298,13 @@ armour = Page(
 
 weapon = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Weapon"),
+    Text(0.5, 0.11, "Weapon"),
     Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.3, 0.7, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Button(0.7, 0.3, "Laser"  , function=lambda: Menu.change_page(laser)),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1185,12 +1312,12 @@ weapon = Page(
 
 engine = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Engine"),
+    Text(0.5, 0.11, "Engine"),
     UpgradeBar(0.19, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.19, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.19, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1198,11 +1325,11 @@ engine = Page(
 
 radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Radar"),
+    Text(0.5, 0.11, "Radar"),
     UpgradeBar(0.19, 0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     UpgradeBar(0.19, 0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1210,12 +1337,12 @@ radar = Page(
 
 default_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Default"),
+    Text(0.5, 0.11, "Default"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1223,12 +1350,12 @@ default_gun = Page(
 
 gatling_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Gatling"),
+    Text(0.5, 0.11, "Gatling"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1236,12 +1363,12 @@ gatling_gun = Page(
 
 sniper_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Sniper"),
+    Text(0.5, 0.11, "Sniper"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1249,11 +1376,11 @@ sniper_gun = Page(
 
 laser = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Laser"),
+    Text(0.5, 0.11, "Laser"),
     UpgradeBar(0.19, 0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
+    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
+    Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True

@@ -6,6 +6,7 @@ from entities import Bullet, Asteroid
 from player import add_player
 from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
 from particles import ParticleSystem
+from station import FriendlyStation
 import ui
 import menu
 import graphics
@@ -192,6 +193,9 @@ def main():
 
     global player
     player = add_player()
+
+    starting_station = FriendlyStation(position=game.LAST_PLAYER_POS)
+    game.CHUNKS.add_entity(starting_station)
 
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE
