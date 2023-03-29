@@ -1118,27 +1118,90 @@ class SeedTextInput(TextInput):
 
 
 class Mission(Widget):
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y, width, height, number, goal, mission_type, reward) -> None:
         super().__init__(x, y)
+        self.width = width
+        self.height = height
 
-        self.info = "Kill 10 Enemies in 20 minutes"
+        self.accept_button = Button(x, y, "Accept", function=lambda: self.accept())
+        self.decline_button = Button(x, y+0.1, "Decline", function=lambda: self.decline())
+        self.collect_reward_button = Button(x, y, "Collect Reward", function=lambda: self.collect_reward())
 
-        self.info_text = AdjustableText((x-0.1)*game.WIDTH, (y-0.2) * game.HEIGHT, (x+0.1)* game.WIDTH, (y-0.1)*game.HEIGHT, text=self.info, default_font_size=70)
+        self.mission_manager: MissionManager = None
 
-        self.accept_button = Button(x, y, "Accept", function=lambda: self.accept)
-        self.decline_button = Button(x, y+0.1, "Decline", function=lambda: self.decline)
+        self.number = number
+        self.current_number = 0
+
+        self.progress_bar = Bar(x-(self.width/2), y+0.1+(self.height/8), width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
+
+        self.goal = goal
+
+        self.mission_type = mission_type
+
+        self.reward = reward
+
+        if self.mission_type == game.KILL:
+            self.title_text = Text(x, y-0.1-self.height/2, "Kill Mission")
+
+            self.info = f"Kill {self.number} {self.goal}s REWARDS: {self.reward} Scrap"
+
+        self.info_text = AdjustableText((x-(self.width/2))*game.WIDTH, (y-(self.height/2)) * game.HEIGHT, (x+(self.width/2))* game.WIDTH, (y-0.3+self.height/2)*game.HEIGHT, text=self.info, default_font_size=70)
+
+        self.active = False
 
     def accept(self):
-        return
+        self.active = True
+        game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type]
     
     def decline(self):
-        return
+        self.mission_manager.remove_mission(self)
     
-    def draw(self):
-        self.info_text.draw()
-        self.accept_button.draw()
-        self.decline_button.draw()
+    def collect_reward(self):
+        game.SCRAP_COUNT += self.reward
+        self.decline()
+    
+    def click(self, mouse):
+        if not self.active:
+            if self.accept_button.click(mouse) is True: return True
+            if self.decline_button.click(mouse) is True: return True
+        if self.current_number >= self.number:
+            if self.collect_reward_button.click(mouse) is True: return True
 
+        Menu.update()
+    
+    def update(self):
+        self.title_text.draw()
+        self.info_text.draw()
+        if self.active:
+            self.current_number = game.CURRENT_MISSION[0]
+            if self.current_number >= self.number:
+                self.collect_reward_button.draw()
+            self.progress_bar.draw()
+
+        else:
+            self.accept_button.draw()
+            self.decline_button.draw()
+
+class MissionManager(Widget):
+    def __init__(self, x, y, missions) -> None:
+        super().__init__(x, y)
+
+        self.missions: list = missions
+
+        for mission in self.missions:
+            mission.mission_manager = self
+
+    def remove_mission(self, mission):
+        if mission in self.missions:
+            self.missions.remove(mission)
+
+    def click(self, mouse):
+        for mission in self.missions:
+            mission.click(mouse)
+
+    def draw(self):
+        for mission in self.missions:
+            mission.update()
 
 
 
@@ -1260,7 +1323,7 @@ missions = Page(
     Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
     Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
     Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
-    Mission(0.5, 0.5),
+    MissionManager(0.5, 0.5, [Mission(0.5, 0.7, 0.2, 0.4, 10, "Neutral_Ship_Fighter", game.KILL, 10)]),
     AdjustableText(100, 100, 300, 300, "Yo Rex this is working quite well now!"),
     Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.11, images.SCRAP, scale=6),
