@@ -285,25 +285,20 @@ class AdjustableText(Widget):
             if low_letter:
                 render_list.append((x, y + (self.line_spacing - bounds.height), word))
                 low_letter = False
-                #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height) + low_letter_difference, bounds.width, bounds.height), 1)
             else:
                 render_list.append((x, y + (self.line_spacing - bounds.height) - low_letter_difference, word))
-                #pygame.draw.rect(game.WIN, (255, 0, 0), (x, y + (self.line_spacing - bounds.height), bounds.width, bounds.height), 1)
             x += bounds.width + space.width
 
         return render_list
 
     def draw(self):
-        pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
+        # pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
 
         render_list = self.render_words()
 
         if len(render_list) == len(self.words):
             for element in render_list:
                 self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
-
-
-
 
 
 
@@ -761,7 +756,7 @@ class Bar():
 
     def update(self, new_percent):
         """Updates the percentage of the bar, NOTE: percentage is from 0 to 1"""
-        self.width = lambda: (self.original_width()-self.outline_width*2) * new_percent
+        self.width = lambda: min(self.original_width()-self.outline_width*2, (self.original_width()-self.outline_width*2) * new_percent)
 
     def draw(self):
         self.update(self.value() / self.max_value())
@@ -1191,6 +1186,9 @@ class MissionManager(Widget):
         for mission in self.missions:
             mission.mission_manager = self
 
+    def add_mission(self, mission):
+        self.missions.append(mission)
+
     def remove_mission(self, mission):
         if mission in self.missions:
             self.missions.remove(mission)
@@ -1324,7 +1322,6 @@ missions = Page(
     Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
     Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
     MissionManager(0.5, 0.5, [Mission(0.5, 0.7, 0.2, 0.4, 10, "Neutral_Ship_Fighter", game.KILL, 10)]),
-    AdjustableText(100, 100, 300, 300, "Yo Rex this is working quite well now!"),
     Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
     Image(0.9, 0.11, images.SCRAP, scale=6),
     background_colour=None,

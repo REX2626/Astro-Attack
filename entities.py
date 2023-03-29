@@ -6,8 +6,6 @@ import game
 import random
 import math
 import pygame
-import sys
-from functools import reduce
 
 
 
