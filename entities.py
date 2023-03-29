@@ -185,6 +185,7 @@ class Ship(Entity):
                 self.destroy()
 
     def destroy(self):
+        # If ship dies and it is a target of a kill mission, then the progress of that mission increases
         if game.CURRENT_MISSION:
             if game.CURRENT_MISSION[3] == game.KILL and game.CURRENT_MISSION[2] == self.__class__.__name__:
                 game.CURRENT_MISSION[0] += 1
