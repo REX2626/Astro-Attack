@@ -22,8 +22,7 @@ def entity_collision(object, entity, delta_time):
         # Move entity out of Asteroid if entity is still in Asteroid
         # This occurs because the current delta_time could be shorter than the previous delta_time, so the entity is not moved backwards enough
         original_velocity = entity.velocity.copy()
-        if entity.velocity.magnitude() != 0: # There was a division by zero error
-            entity.velocity.set_magnitude(1)
+        entity.velocity.set_magnitude(1)
         while True:
             x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
             y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
@@ -117,6 +116,9 @@ class Ship(Entity):
         self.rotation_speed = Vector1D(0)
 
     def update(self, delta_time):
+        
+        # Move the ship by it's velocity
+        super().update(delta_time)
 
         # Inertial Dampening
         """
@@ -126,9 +128,6 @@ class Ship(Entity):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
-
-        # Move the ship by it's velocity
-        super().update(delta_time)
 
         # Rotation Dampening
         """

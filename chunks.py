@@ -23,6 +23,7 @@ class Chunks():
                 chunk = Chunk(Vector(x, y))
                 self.list[(x, y)] = chunk
         setattr(Chunk, "generate", generate)
+        self.add_entity(FriendlyStation(position=game.LAST_PLAYER_POS))
 
     def update(self, player):
         
