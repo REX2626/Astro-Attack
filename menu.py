@@ -1140,6 +1140,8 @@ class Mission():
         self.mission_type = mission_type
         self.reward = reward
 
+        self.progress_text = Text(self.x, self.y-0.1+(self.height/2), text=lambda: f"{self.current_number}/{self.number}", font_size=25)
+
         self.progress_bar = Bar(self.x-(self.width/2), self.y+0.1+(self.height/8), width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
 
         if self.mission_type == game.KILL:
@@ -1166,6 +1168,7 @@ class Mission():
     def claim_reward(self):
         self.mission_manager.any_mission_active = False
         game.SCRAP_COUNT += self.reward
+        game.CURRENT_MISSION = None
         self.decline() # Removes this mission after claiming reward
     
     def click(self, mouse):
@@ -1188,6 +1191,7 @@ class Mission():
             if self.current_number >= self.number:
                 self.claim_reward_button.draw()
             self.progress_bar.draw()
+            self.progress_text.draw()
 
         else:
             if self.active:

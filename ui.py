@@ -9,6 +9,7 @@ import math
 import pygame
 import psutil
 import commands
+from pygame import freetype
 
 
 
@@ -29,7 +30,7 @@ class Bar():
 
     def update(self, new_percent):
         """Updates the percentage of the bar, NOTE: percentage is from 0 to 1"""
-        self.width = (self.original_width-self.outline_width*2) * new_percent
+        self.width = (self.original_width-self.outline_width*2) * min(1, new_percent)
 
     def draw(self):
         pygame.draw.rect(game.WIN, self.colour,
@@ -427,6 +428,129 @@ class Console():
             pygame.display.update()
 
 
+
+class AdjustableText():
+    def __init__(self, top_x, top_y, bottom_x, bottom_y, font, default_font_size, colour, text="Text") -> None:
+        self.top_x = top_x
+        self.top_y = top_y
+        self.bottom_x = bottom_x
+        self.bottom_y = bottom_y
+
+        self.text = text
+        self.words = self.text.split(" ")
+        self.font_type = font
+        self.default_font_size = default_font_size
+        self.colour = colour
+
+        self.font = freetype.SysFont(self.font_type, self.default_font_size)
+
+        self.line_spacing = self.font.get_sized_height()
+
+        self.low_letters = ["g", "j", "q", "p", "y"]
+
+    def render_words(self):
+        low_letter_difference = self.font.get_rect("y").height - self.font.get_rect("u").height
+        low_letter = False
+        x, y = self.top_x, self.top_y
+        space = self.font.get_rect(' ')
+
+        render_list = []
+
+        for word in self.words:
+            bounds = self.font.get_rect(word)
+
+            for letter in self.low_letters:
+                if letter in word:
+                    low_letter = True
+                    break
+
+            if x + bounds.width >= self.bottom_x:
+                x, y = self.top_x, y + self.line_spacing
+
+            if x + bounds.width >= self.bottom_x or y + self.line_spacing >= self.bottom_y:
+                break
+            
+            if low_letter:
+                render_list.append((x, y + (self.line_spacing - bounds.height), word))
+                low_letter = False
+            else:
+                render_list.append((x, y + (self.line_spacing - bounds.height) - low_letter_difference, word))
+            x += bounds.width + space.width
+
+        return render_list
+
+    def draw(self):
+        # pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
+
+        render_list = self.render_words()
+
+        while len(render_list) < len(self.words):
+            self.default_font_size -= 1
+            self.font = freetype.SysFont(self.font_type, self.default_font_size)
+            self.line_spacing = self.font.get_sized_height()
+            render_list = self.render_words()
+
+        for element in render_list:
+            self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
+
+
+
+class MissionOverview():
+    def __init__(self, x, y, width, height) -> None:
+        # Coordinates are from right side of MissionOverview ui to make it easier
+        self.x = x
+        self.y = y
+
+        self.width = width
+        self.height = height
+
+        self.title = "Mission"
+
+        self.font = freetype.SysFont("bahnschrift", 30)
+        
+        self.info = "You do not have a mission currently"
+        self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
+
+        self.progress_text = "0/0"
+        self.progress_bar = Bar(lambda: self.x() - self.width + 10, lambda: self.y() + self.height/3 + 20, self.width - 20, 50, (0, 0, 255), 2, (0, 0, 0), 5)
+
+    def draw(self):
+        pygame.draw.rect(game.WIN, game.DARK_GREY, (self.x() - self.width, self.y() - (self.height/2), self.width, self.height), border_radius=7)
+
+        if game.CURRENT_MISSION:
+            if game.CURRENT_MISSION[0] >= game.CURRENT_MISSION[1]:
+                claim_reward_text = "Claim Reward"
+                bounds = self.font.get_rect(claim_reward_text)
+                self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()+self.height/4-bounds.height/2), claim_reward_text, (255, 182, 36))
+            else:
+                self.progress_text = f"{game.CURRENT_MISSION[0]}/{game.CURRENT_MISSION[1]}"
+                bounds = self.font.get_rect(self.progress_text)
+                self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()+self.height/4-bounds.height/2), self.progress_text, (255, 255, 255))
+
+                self.progress_bar.update(game.CURRENT_MISSION[0]/game.CURRENT_MISSION[1])
+                self.progress_bar.draw()
+
+            if game.CURRENT_MISSION[3] == game.KILL:
+                self.title = "Kill Mission"
+
+                self.info = f"Kill {game.CURRENT_MISSION[1]} {game.CURRENT_MISSION[2]}s"
+        
+        else:
+            self.title = "Mission"
+
+            self.info = "You do not have a mission currently"
+
+
+        bounds = self.font.get_rect(self.title)
+        self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()-self.height/2+bounds.height/2), self.title, (255, 255, 255))
+
+        self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
+        self.info_text.draw()
+
+            
+
+
+
 class Canvas():
     def __init__(self) -> None:
         self.elements = []
@@ -438,6 +562,7 @@ class Canvas():
         self.add("speed_bar" , Bar(lambda: 97, lambda: game.HEIGHT-100, width=206, height=46, colour=(30, 190, 190), outline_width=3, curve=7))
         self.add("mini_map"  , MiniMap((0, 0), width=350, height=350))
         self.add("hotbar"    , Hotbar(height=195, number=4, size=52, gap=26))
+        self.add("mission_overview", MissionOverview(lambda: game.WIDTH, lambda: game.HEIGHT/2, 200, 400))
         self.add("cursor_image", Image(pygame.mouse.get_pos(), image=images.CURSOR))
         self.add("console_panel", Console())
 
