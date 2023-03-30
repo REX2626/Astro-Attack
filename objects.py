@@ -1,6 +1,4 @@
 import pygame
-import os
-import sys
 import math
 import images
 import game
@@ -205,20 +203,27 @@ def random_vector(magnitude: float) -> Vector:
 
 
 class Object():
-    def __init__(self, position, image=images.DEFAULT) -> None:
+    def __init__(self, position, image=lambda: images.DEFAULT) -> None:
         
         # Make position a vector
         if type(position) != Vector:
             self.position = Vector(position[0], position[1])
         else:
             self.position: Vector = position
+        
+        self.image = image()
+
+        self.load_image = image # a function that returns a pygame Surface
+        self.scale = 1
+        self.scaled_image = self.image
 
         # Set the size (dimensions), original size of image, doesn't change when rotating
-        self.size = Vector(image.get_width(), image.get_height())
-
-        self.image = image
-        self.scale = 1
-        self.scaled_image = image
+        self.size = Vector(self.image.get_width(), self.image.get_height())
+    
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.image = self.load_image()
+        self.scaled_image = pygame.transform.scale_by(self.image, self.scale)
         
     def update(self, delta_time):
         pass
@@ -242,7 +247,7 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, image=images.DEFAULT) -> None:
+    def __init__(self, position, velocity, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, image)
 
         # Make velocity a vector
@@ -262,14 +267,18 @@ class MoveableObject(Object):
 
 
 class Entity(MoveableObject):
-    def __init__(self, position, velocity, rotation=0, image=images.DEFAULT) -> None:
+    def __init__(self, position, velocity, rotation=0, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, image)
 
         # self.rotation is stored as radians
         self.rotation = rotation
         self.image_rotation = 0
-        self.rotated_image = image
-        self.set_rotation(rotation) 
+        self.rotated_image = self.image
+        self.set_rotation(rotation)
+    
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
 
     def set_rotation(self, rotation):
         self.rotation = rotation

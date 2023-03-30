@@ -20,7 +20,7 @@ class Player_Ship(Ship):
         armour=game.MAX_PLAYER_ARMOUR,
         shield=game.MAX_PLAYER_SHIELD, shield_delay=3, shield_recharge=game.PLAYER_SHIELD_RECHARGE,
         boost_amount=game.MAX_BOOST_AMOUNT, boost_change=5,
-        image=images.PLAYER_SHIP
+        image=lambda: images.PLAYER_SHIP
 
         ) -> None:
 
@@ -139,12 +139,9 @@ class Player_Ship(Ship):
      
 
 
-def add_player():
+def get_player():
 
-    # Red Player Ship
-    global player
-    game.LAST_PLAYER_POS = Vector(0, 0)
+    # Create Player_Ship
     player = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
     game.CHUNKS.add_entity(player)
-    game.player = player
     return player

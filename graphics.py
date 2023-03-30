@@ -86,7 +86,7 @@ MAX_Y = HEIGHT + 100
 circles = []
 for layer in range(layers):
     diameter = layer + 1
-    surf = pygame.Surface((200, 200))
+    surf = pygame.Surface((200, 200), flags=pygame.SRCALPHA)
     pygame.draw.circle(surf, (200, 200, 200), (100, 100), 100)
     surf = pygame.transform.smoothscale(surf, (diameter, diameter))
     circles.append(surf)

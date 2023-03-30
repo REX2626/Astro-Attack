@@ -30,8 +30,6 @@ Enemies become more difficult
 
 Missions (stations will give a reward for completing a mission)
 
-Saving and loading
-
 Add hitboxes
 
 Add missile and autoturret weapons
@@ -64,8 +62,6 @@ Add back buttons
 Fix ships getting stuck in asteroids
 
 Make it so you have to be near to a station to click on it
-
-Lower station spawning, make enemy stations spawn more than friendly
 
 ### a1.5.0 (sound)
 
@@ -400,3 +396,6 @@ Add health regen at stations
 Neutral stations can be traded with
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
+Lower station spawning, make enemy stations spawn more than friendly
+
+Saving and loading

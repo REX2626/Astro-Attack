@@ -7,8 +7,6 @@ import game
 
 class Chunks():
     def __init__(self) -> None:
-        global LOAD_DISTANCE, CHUNK_SIZE
-        LOAD_DISTANCE, CHUNK_SIZE = game.LOAD_DISTANCE, game.CHUNK_SIZE
         self.list = {}
         self.entities: set[Object] = set() # The currently loaded entities
 
@@ -28,15 +26,15 @@ class Chunks():
     def update(self, player):
         
         # Turn coordinates into chunk coordinates
-        chunk_coords = player.position // CHUNK_SIZE
+        chunk_coords = player.position // game.CHUNK_SIZE
 
         # Unload all entities
         original_entities = self.entities
         self.entities = set()
 
         # Loop through chunks in square around player's position
-        for y in range(chunk_coords.y - LOAD_DISTANCE, chunk_coords.y + LOAD_DISTANCE + 1):
-            for x in range(chunk_coords.x - LOAD_DISTANCE, chunk_coords.x + LOAD_DISTANCE + 1):
+        for y in range(chunk_coords.y - game.LOAD_DISTANCE, chunk_coords.y + game.LOAD_DISTANCE + 1):
+            for x in range(chunk_coords.x - game.LOAD_DISTANCE, chunk_coords.x + game.LOAD_DISTANCE + 1):
                 
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
@@ -57,7 +55,7 @@ class Chunks():
         if type(arg) == tuple:
             position = arg
         else:
-            position = (arg.position // CHUNK_SIZE).to_tuple()
+            position = (arg.position // game.CHUNK_SIZE).to_tuple()
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
@@ -79,9 +77,9 @@ class Chunks():
     # optomized
     def move_entity(self, entity: Entity, delta_time):
         
-        original_chunk_pos = (int(entity.position.x // CHUNK_SIZE), int(entity.position.y // CHUNK_SIZE))
+        original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
         entity.position += entity.velocity * delta_time
-        new_chunk_pos = (int(entity.position.x // CHUNK_SIZE), int(entity.position.y // CHUNK_SIZE))
+        new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
 
         if new_chunk_pos != original_chunk_pos:
             self.get_chunk(original_chunk_pos).entities.remove(entity)
@@ -162,5 +160,5 @@ class Chunk():
         return True
 
     def random_position(self):
-        return Vector(random.randint(self.position.x * CHUNK_SIZE, self.position.x * CHUNK_SIZE + CHUNK_SIZE - 1),
-            random.randint(self.position.y * CHUNK_SIZE, self.position.y * CHUNK_SIZE + CHUNK_SIZE - 1))
+        return Vector(random.randint(self.position.x * game.CHUNK_SIZE, self.position.x * game.CHUNK_SIZE + game.CHUNK_SIZE - 1),
+            random.randint(self.position.y * game.CHUNK_SIZE, self.position.y * game.CHUNK_SIZE + game.CHUNK_SIZE - 1))

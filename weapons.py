@@ -8,15 +8,21 @@ import pygame
 
 
 class DefaultGun():
-    def __init__(self, ship: "entities.Ship", damage=1, fire_rate=1, speed=game.BULLET_SPEED, spread=0, image=images.BULLET) -> None:
+    def __init__(self, ship: "entities.Ship", damage=1, fire_rate=1, speed=game.BULLET_SPEED, spread=0, image=lambda: images.BULLET) -> None:
         self.ship = ship
         self.damage = damage
         self.reload_time = 1 / fire_rate
         self.speed = speed
         self.spread = spread
-        self.image = image
+        self.image = image()
+        
+        self.load_image = image
 
         self.time_reloading = 0
+    
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.image = self.load_image()
 
     def update(self, delta_time):
         self.time_reloading += delta_time
@@ -38,7 +44,7 @@ class DefaultGun():
                 ship=ship,
                 damage=self.damage,
                 lifetime=3,
-                image=self.image
+                image=self.load_image
                 )
 
             game.CHUNKS.add_entity(bullet)
@@ -66,12 +72,12 @@ class PlayerGun(DefaultGun):
 
 class EnemyGun(DefaultGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=1, fire_rate=1, image=images.RED_BULLET)
+        super().__init__(ship, damage=1, fire_rate=1, image=lambda: images.RED_BULLET)
 
 
 
 class GatlingGun(DefaultGun):
-    def __init__(self, ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=images.GATLING_BULLET) -> None:
+    def __init__(self, ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=lambda: images.GATLING_BULLET) -> None:
         super().__init__(ship, damage, fire_rate, speed, spread, image)
     
 
@@ -90,12 +96,12 @@ class PlayerGatlingGun(GatlingGun):
     
 class EnemyGatlingGun(GatlingGun):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=0.4, fire_rate=3, speed=600, image=images.RED_GATLING_BULLET)
+        super().__init__(ship, damage=0.4, fire_rate=3, speed=600, image=lambda: images.RED_GATLING_BULLET)
 
 
 
 class Sniper(DefaultGun):
-    def __init__(self, ship, damage=2, fire_rate=3, speed=1500, spread=0, image=images.SNIPER_BULLET) -> None:
+    def __init__(self, ship, damage=2, fire_rate=3, speed=1500, spread=0, image=lambda: images.SNIPER_BULLET) -> None:
         super().__init__(ship, damage, fire_rate, speed, spread, image)
 
 
@@ -114,7 +120,7 @@ class PlayerSniper(Sniper):
 
 class EnemySniper(Sniper):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=3, fire_rate=0.5, speed=1200, image=images.RED_SNIPER_BULLET)
+        super().__init__(ship, damage=3, fire_rate=0.5, speed=1200, image=lambda: images.RED_SNIPER_BULLET)
 
 
 

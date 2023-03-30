@@ -42,12 +42,18 @@ class Asteroid(Object):
 
         # Generate random asteroid image
         if not image:
-            image = random.choice(images.ASTEROIDS)
+            number = random.randint(0, len(images.ASTEROIDS)-1)
+        super().__init__(position, lambda: images.ASTEROIDS[number])
         
         # Set Asteroid to random rotation
-        image = pygame.transform.rotate(image, random.random() * 360)
-        self.mask = pygame.mask.from_surface(image)
-        super().__init__(position, image)
+        self.rotation = random.random() * 360
+        self.image = pygame.transform.rotate(self.image, self.rotation)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self.image = pygame.transform.rotate(self.image, self.rotation)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -75,7 +81,7 @@ class Asteroid(Object):
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         # self.rotation is stored as radians
@@ -186,7 +192,7 @@ class Ship(Entity):
 
 
 class Pickup(Entity):
-    def __init__(self, position, velocity=Vector(0, 0), max_speed=200, rotation=0, image=images.DEFAULT) -> None:
+    def __init__(self, position, velocity=Vector(0, 0), max_speed=200, rotation=0, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
         self.max_speed = max_speed
 
@@ -219,7 +225,7 @@ class Pickup(Entity):
 
 
 # class HealthPickup(Pickup):
-#     def __init__(self, position, velocity=Vector(0, 0), max_speed=700, rotation=0, image=images.HEALTH_PICKUP) -> None:
+#     def __init__(self, position, velocity=Vector(0, 0), max_speed=700, rotation=0, image=lambda: images.HEALTH_PICKUP) -> None:
 #         super().__init__(position, velocity, max_speed, rotation, image)
 
 #     def update(self, delta_time):
@@ -238,7 +244,7 @@ class Pickup(Entity):
 
 
 class Scrap(Pickup):
-    def __init__(self, position, velocity=Vector(0, 0), max_speed=600, rotation=0, image=images.SCRAP) -> None:
+    def __init__(self, position, velocity=Vector(0, 0), max_speed=600, rotation=0, image=lambda: images.SCRAP) -> None:
         super().__init__(position, velocity, max_speed, rotation, image)
 
     def activate(self):
@@ -253,7 +259,7 @@ from aiship import Enemy_Ship
 
 
 class Bullet(Entity):
-    def __init__(self, position, velocity, rotation=0, ship=None, damage=1, lifetime=5, image=images.BULLET) -> None:
+    def __init__(self, position, velocity, rotation=0, ship=None, damage=1, lifetime=5, image=lambda: images.BULLET) -> None:
         super().__init__(position, velocity, rotation, image)
         self.ship = ship
         self.damage = damage
@@ -292,7 +298,7 @@ class Bullet(Entity):
 
 
 class Missile(Entity):
-    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=images.MISSILE) -> None:
+    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=lambda: images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
         
         self.max_speed = max_speed

@@ -3,12 +3,12 @@ import pygame
 from game import *
 import game
 from entities import Bullet, Asteroid
-from player import add_player
 from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
 from particles import ParticleSystem
 import ui
 import menu
 import graphics
+import random
 import math
 from time import perf_counter
 
@@ -162,7 +162,7 @@ def update_objects(delta_time):
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set
     for object in filter(lambda object: type(object) != Bullet and type(object) != Asteroid, CHUNKS.entities.copy()):
-        
+
         # Update object e.g. move it
         object.update(delta_time)
 
@@ -176,7 +176,7 @@ def update_objects(delta_time):
 
     # Unload all chunks and load chunks around player
     CHUNKS.update(player)
-        
+
     # Update particles
     for particle_system in filter(lambda object: type(object) == ParticleSystem, CHUNKS.entities.copy()):
         particle_system.update(delta_time)
@@ -188,10 +188,10 @@ def main():
     delta_time = 1
 
     global CHUNKS
-    CHUNKS = init_chunks()
+    CHUNKS = game.CHUNKS
 
     global player
-    player = add_player()
+    player = game.player
 
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE

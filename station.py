@@ -9,7 +9,7 @@ import pygame
 
 
 class Station(Object):
-    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
         super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
@@ -17,18 +17,29 @@ class Station(Object):
         self.entities_to_spawn = random.randint(1, max_entities)
         self.entity_type = entity_type
 
-        self.default_image = image
-        self.selected_image = selected_image
-        self.default_scale = 0
-        self.selected_scale = 0
+        self.default_image = image()
+        self.selected_image = selected_image()
+        self.load_default_image = image
+        self.load_selected_image = selected_image
+        self.default_scale = game.ZOOM
+        self.selected_scale = game.ZOOM
+        self.scaled_default_image = pygame.transform.scale_by(self.default_image, game.ZOOM)
+        self.scaled_selected_image = pygame.transform.scale_by(self.selected_image, game.ZOOM)
 
-        self.mask = pygame.mask.from_surface(image)
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         
         self.z = -1
 
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self.default_image = self.load_default_image()
+        self.selected_image = self.load_selected_image()
+        self.scaled_default_image = pygame.transform.scale_by(self.default_image, game.ZOOM)
+        self.scaled_selected_image = pygame.transform.scale_by(self.selected_image, game.ZOOM)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -69,7 +80,7 @@ class Station(Object):
 
 
 class FriendlyStation(Station):
-    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=images.SELECTED_STATION, image=images.FRIENDLY_STATION) -> None:
+    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
 
     def update(self, delta_time):
@@ -80,5 +91,5 @@ class FriendlyStation(Station):
 
 
 class EnemyStation(Station):
-    def __init__(self, position, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=images.SELECTED_STATION, image=images.ENEMY_STATION) -> None:
+    def __init__(self, position, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.ENEMY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)

@@ -1,6 +1,6 @@
 import pygame
 import random
-import json
+from player import get_player
 from ui import Bar as UIBar
 import game
 import images
@@ -567,7 +567,7 @@ class UpgradeBar(Widget):
         self.max_value = max_value
         self.step = (max_value - min_value) / bars
         if self.step.is_integer(): self.step = int(self.step) # if step is an integer, then remove the decimal point
-        self.level = 0
+        self.level = value + "_LEVEL"
         self.padlock = images.PADLOCK
 
     def get_value(self):
@@ -575,6 +575,12 @@ class UpgradeBar(Widget):
 
     def set_value(self, value):
         setattr(game, self.value, value)
+
+    def get_level(self):
+        return getattr(game, self.level)
+
+    def upgrade_level(self):
+        setattr(game, self.level, self.get_level() + 1)
 
     def click(self, mouse):
         mx, my = mouse[0], mouse[1]
@@ -601,15 +607,15 @@ class UpgradeBar(Widget):
             if mx > x and mx < x + width and my > y and my < y + height:
                 
                 # if bar is less than level then switch to that level
-                if bar < self.level:
+                if bar < self.get_level():
                     self.set_value(self.min_value + (bar+1) * self.step)
                     Menu.update()
 
                 # if bar is the next level, upgrade to that level
-                elif bar == self.level and game.SCRAP_COUNT >= bar+1:
+                elif bar == self.get_level() and game.SCRAP_COUNT >= bar+1:
                     game.SCRAP_COUNT -= bar+1
-                    self.level += 1
-                    self.set_value(self.min_value + self.level * self.step)
+                    self.upgrade_level()
+                    self.set_value(self.min_value + self.get_level() * self.step)
                     Menu.update()
 
                 break
@@ -650,7 +656,7 @@ class UpgradeBar(Widget):
                 pygame.draw.rect(game.WIN, self.outline_colour, (x, self.get_y(), width, height), border_radius=10)
 
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
-            if bar+1 <= self.level:
+            if bar+1 <= self.get_level():
 
                 if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
                     pygame.draw.rect(game.WIN, self.select_colour, (x+2, self.get_y()+2, width-4, height-4), border_radius=10)
@@ -661,7 +667,7 @@ class UpgradeBar(Widget):
             else: # fill in with background colour
                 pygame.draw.rect(game.WIN, Menu.DEFAULT_BACKGROUND_COLOUR, (x+2, self.get_y()+2, width-4, height-4), border_radius=10)
 
-                if bar == self.level: # the first locked bar shows a price instead of a padlock
+                if bar == self.get_level(): # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
                     number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(bar+1), True, colour)
@@ -786,14 +792,24 @@ class WorldList():
 
         self.sliding = False
 
-        self.list: list[World] = [World("John's World", 349588), World("Epic world", 253466)]
+        self.init_worlds()
 
         self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap +  min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
 
-        self.buttons = [WorldButton(x, y + idx*(self.height()+self.gap())/game.HEIGHT, world.name, world.seed, function=lambda: self.start_world(world)) for idx, world in enumerate(self.list)]
+    def init_worlds(self):
+        world_dir = game.get_world_dir()
+        self.list = [World(name, seed) for name, seed in world_dir]
+        
+        x, y = self.x()/game.WIDTH, self.y()/game.HEIGHT
+        self.buttons: list[WorldButton] = []
+        for idx, world in enumerate(self.list):
+            self.buttons.append(WorldButton(x, y + idx*(self.height()+self.gap())/game.HEIGHT, world.name, world.seed, world=world, world_list=self))
 
-    def start_world(self, world):
-        # chunks = json.load(world.name)
+    def start_world(self, world: "World"):
+        Menu.change_page(loading_world)
+        game.set_name_to_top_of_world_dir(world.name)
+        self.init_worlds()
+        game.load_constants(world.name)
         main.main()
 
     def get_total_button_height(self):
@@ -831,7 +847,11 @@ class WorldList():
         total_button_scroll_height = (len(self.list)-1) * (self.height()+self.gap())
         total_scroll_height = self.get_max_scroll_height()
 
-        ratio = total_button_scroll_height / total_scroll_height
+        if total_scroll_height:
+            ratio = total_button_scroll_height / total_scroll_height
+        else:
+            ratio = 1
+
         return -ratio # Buttons scroll opposite direction to scroll bar
     
     def button_scroll_height(self):
@@ -880,7 +900,9 @@ class WorldList():
 
         self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
 
-        self.buttons.append(WorldButton(x, y + len(self.buttons)*(self.height()+self.gap())/game.HEIGHT, name, seed, function=lambda: self.start_world(world)))
+        self.buttons.append(WorldButton(x, y + len(self.buttons)*(self.height()+self.gap())/game.HEIGHT, name, seed, world=world, world_list=self))
+
+        return world
 
     def draw(self):
         # If no worlds, then don't draw list
@@ -923,8 +945,8 @@ class World():
 
 
 class WorldButton(Button):
-    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
-        super().__init__(x, y, name, font, font_size, colour, padx, pady, function, box_colour, outline_colour, hover_colour)
+    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, world=None, world_list=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
+        super().__init__(x, y, name, font, font_size, colour, padx, pady, lambda: world_list.start_world(world), box_colour, outline_colour, hover_colour)
         self.seed = str(seed)
         self.resize()
 
@@ -1007,7 +1029,7 @@ class TextInput(Widget):
         if self.selected:
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
-            elif event.unicode.isalpha() or event.unicode.isdigit() or event.unicode in "!\"#$%&'()*+, -./:;<=>?@[\]^_`{|}~":
+            elif event.unicode.isalpha() or event.unicode.isdigit() or event.unicode in "!\"#$%&'()*+, -.:;<=>?@[]^_`{|}~":
                 if len(self.text) < self.limit:
                     self.text += event.unicode
 
@@ -1070,6 +1092,7 @@ info = Page(
     Text(0.5, 0.2  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
     Text(0.5, 0.27 ,   "Fred"             , font_size=5),
+    Text(0.5, 0.28 ,   "Ed"             , font_size=1),
     Text(0.5, 0.35 ,   "CONTROLS"         , font_size=40),
     Text(0.5, 0.42 , """Change Settings: Up, Down, Drag
                         Pause: Esc
@@ -1089,8 +1112,7 @@ settings = Page(
     SettingButton(0.25, 1/6, lambda: f"SCREEN WIDTH: {game.WIDTH}"         , font_size=40, value="WIDTH"        , function_action=lambda: make_windowed(), min=192, max=game.FULLSCREEN_SIZE[0]),
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
-    SettingButton(0.75, 2/6, lambda: f"SIZE LINK: {game.SIZE_LINK}"        , font_size=40, value="SIZE_LINK"    , function_action=None),
-    SettingButton(0.25, 3/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=None, min=4, max=26),
+    SettingButton(0.75, 2/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=lambda: game.save_settings(), min=4, max=26),
     Button(0.5, 7/8, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),
@@ -1101,14 +1123,16 @@ settings = Page(
 pause = Page(
     Image( 0.5, 0.245, images.ASTRO_ATTACK_LOGO, scale=0.6),
     Button(0.5, 0.345, "Continue", font_size=40, function=lambda: setattr(Menu, "running", False)),
-    Button(0.5, 0.46, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 0.46, "Main Menu", font_size=40, function=lambda: exit_game()),
     background_colour=None,
     escape=lambda: True,
 )
 
+world_list = WorldList(0.5, 0.242, width=0.6, height=0.12, gap=0.04)
+
 single_player = Page(
     Text(0.5, 0.09, "Worlds"),
-    WorldList(0.5, 0.242, width=0.6, height=0.12, gap=0.04),
+    world_list,
     Button(0.5, 0.752, "New World", function=lambda: Menu.change_page(new_world)),
     Button(0.5, 0.875, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
@@ -1127,6 +1151,25 @@ new_world = Page(
     Button(0.5, 0.875, "Back" , font_size=40, function=lambda: Menu.change_page(single_player)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(single_player)
+)
+
+creating_world = Page(
+    Text(0.5, 0.5, "Creating world...")
+)
+
+loading_world = Page(
+    Text(0.5, 0.5, "Loading world...")
+)
+
+saving_world = Page(
+    Text(0.5, 0.5, "Saving world...")
+)
+
+name_already_chosen = Page(
+    Rectangle(0.08, 0.08, 0.84, 0.84, (40, 40, 40), outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, curve=10),
+    Text(0.5, 0.5, "World name already chosen"),
+    Button(0.5, 0.65, "OK", function=lambda: Menu.change_page(new_world)),
+    background_colour=None
 )
 
 quit_confirm = Page(
@@ -1306,21 +1349,46 @@ def create_world():
     # Get name and seed
     for widget in Menu.current_page.widgets:
         if type(widget) == NameTextInput:
+
+            # Check world name is not already used
+            for world_name, seed in game.get_world_dir():
+                if widget.text == world_name:
+                    Menu.change_page(name_already_chosen)
+                    return
+
             name = widget.text
             widget.text = ""
+
         elif type(widget) == SeedTextInput:
             seed = widget.text
             widget.text = ""
+
+    Menu.change_page(creating_world)
 
     # Generate random seed if no seed inputted
     if seed == "":
         seed = random.randint(0, 999_999)
 
-    for widget in single_player.widgets:
-        if isinstance(widget, WorldList):
-            widget.create_world(name, seed)
+    game.reset_constants()
+    game.NAME = name
+    game.SEED = seed
+    game.init_chunks()
+    game.player = get_player()
+    game.save_constants(name)
 
-    Menu.change_page(single_player)
+    game.update_world_dir(name, seed)
+
+    world = world_list.create_world(name, seed)
+
+    world_list.start_world(world)
+
+def exit_game():
+    Menu.change_page(saving_world)
+
+    # Save current game
+    game.save_constants(game.NAME)
+
+    Menu.change_page(main_menu)
 
 def page_click():
     """If there is a selected widget that shouldn't be, un-select it"""
@@ -1358,10 +1426,12 @@ def change_fullscreen():
         pygame.display.set_mode(game.WINDOW_SIZE, flags=pygame.RESIZABLE)
 
     game.WIDTH, game.HEIGHT = pygame.display.get_window_size()
+    game.save_settings()
 
 def make_windowed():
     game.FULLSCREEN = False
     pygame.display.set_mode((game.WIDTH, game.HEIGHT), flags=pygame.RESIZABLE)
+    game.save_settings()
 
 def repair_armour():
     if game.SCRAP_COUNT < 5:
