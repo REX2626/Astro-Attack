@@ -17,9 +17,25 @@ def entity_collision(object, entity, delta_time):
 
     if object.mask.overlap(entity_mask, (x_offset, y_offset)):
 
-        vector_to_asteroid = object.position - entity.position
-
         game.CHUNKS.move_entity(entity, -delta_time) # Move entity backwards, so outside of asteroid
+
+        # Move entity out of Asteroid if entity is still in Asteroid
+        # This occurs because the current delta_time could be shorter than the previous delta_time, so the entity is not moved backwards enough
+        original_velocity = entity.velocity.copy()
+        if entity.velocity.magnitude() != 0: # There was a division by zero error
+            entity.velocity.set_magnitude(1)
+        while True:
+            x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
+            y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
+
+            if not object.mask.overlap(entity_mask, (x_offset, y_offset)):
+                break
+
+            game.CHUNKS.move_entity(entity, -1)
+
+        entity.velocity = original_velocity
+
+        vector_to_asteroid = object.position - entity.position
 
         tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2) # Rotate 90 degrees
         tangent_angle = tangent_to_asteroid.get_angle()
@@ -32,6 +48,7 @@ def entity_collision(object, entity, delta_time):
 
         if hasattr(entity, "make_new_patrol_point"):
             entity.make_new_patrol_point(400, 500, object.position)
+            entity.state = 0 # Patrol state
 
         particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
 
@@ -101,9 +118,6 @@ class Ship(Entity):
 
     def update(self, delta_time):
 
-        # Move the ship by it's velocity
-        super().update(delta_time)
-
         # Inertial Dampening
         """
         -> velocity is added with the inverse velocity, making velocity 0
@@ -112,6 +126,9 @@ class Ship(Entity):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
+
+        # Move the ship by it's velocity
+        super().update(delta_time)
 
         # Rotation Dampening
         """
@@ -174,6 +191,11 @@ class Ship(Entity):
                 self.destroy()
 
     def destroy(self):
+        # If ship dies and it is a target of a kill mission, then the progress of that mission increases
+        if game.CURRENT_MISSION:
+            if game.CURRENT_MISSION[3] == game.KILL and game.CURRENT_MISSION[2] == self.__class__.__name__:
+                game.CURRENT_MISSION[0] += 1
+        
         game.CHUNKS.remove_entity(self)
         particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
         particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)

@@ -18,17 +18,21 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
-Enemy Levels:
-    enemies have specific levels
-    harder enemy levels get spawned in based on different factors (score, time played, distance from origin etc)
-    easy levels mean they will do less damage and motherships will not spawn difficult enemies
-    motherships only spawn missiles for higher levels
-    when difficulty increases, stations spawn motherships of higher levels which spawn difficult enemies
-    on low difficulty you can get patrols of easy enemies far from stations
-
-Enemies become more difficult
-
 Missions (stations will give a reward for completing a mission)
+    Add mission menu:
+        Accepting and declining buttons working
+        Reward buttons and reward screen
+        Better progress bar
+        Make it look nicer
+        Mission manager can show 3 missions - declining them cycles them - only one mission activated at a time
+
+    Mission player ui:
+        Progress bar and info on right side of screen during game
+        Maybe add a hotkey to quickly pull of mission menu
+
+    Add different types of missions
+    Make it so that missions can be randomly generated based on the difficulty
+    Randomly generate rewards
 
 Add hitboxes
 
@@ -58,8 +62,6 @@ Add special features to weapons (e.g. sniper can zoom in on enemy)
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
 Add back buttons
-
-Fix ships getting stuck in asteroids
 
 Make it so you have to be near to a station to click on it
 
@@ -397,5 +399,17 @@ Neutral stations can be traded with
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 Lower station spawning, make enemy stations spawn more than friendly
+
+Fix ships getting stuck in asteroids
+
+Enemy Levels:
+    enemies have specific levels
+    harder enemy levels get spawned in based on different factors (score, time played, distance from origin etc)
+    easy levels mean they will do less damage and motherships will not spawn difficult enemies
+    motherships only spawn missiles and have shields for higher levels
+    when difficulty increases, stations spawn motherships of higher levels which spawn difficult enemies
+    on low difficulty you can get patrols of easy enemies far from stations
+
+Enemies become more difficult
 
 Saving and loading

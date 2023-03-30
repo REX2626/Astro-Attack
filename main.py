@@ -5,6 +5,7 @@ import game
 from entities import Bullet, Asteroid
 from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
 from particles import ParticleSystem
+from station import FriendlyStation
 import ui
 import menu
 import graphics
@@ -193,6 +194,9 @@ def main():
     global player
     player = game.player
 
+    starting_station = FriendlyStation(position=game.LAST_PLAYER_POS)
+    game.CHUNKS.add_entity(starting_station)
+
     if game.SCORE > game.HIGHSCORE:
         game.HIGHSCORE = game.SCORE
     game.SCORE = 0
@@ -211,8 +215,8 @@ def main():
 
         draw_window(delta_time)
 
-        # Level increases every 10 score + position from centre
-        game.CURRENT_SHIP_LEVEL = int(game.SCORE / 10) + int(game.player.position.magnitude() / 10_000)
+        # Max lvl atm is 15. game.score increases difficulty by 1 every 50 score. Difficulty increased by 1, 10_000 units from centre
+        game.CURRENT_SHIP_LEVEL = int(min(10, game.SCORE / 50) + min(5, game.player.position.magnitude() / 10_000))
 
         if player.health <= 0:
             menu.Menu.death_screen()
