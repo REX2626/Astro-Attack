@@ -1182,7 +1182,7 @@ class Mission():
     def accept(self):
         self.in_progress = True
         self.mission_manager.any_mission_active = True
-        game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type]
+        game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type, self.reward]
     
     def decline(self):
         self.mission_manager.remove_mission(self)
@@ -1253,11 +1253,23 @@ class MissionManager(Widget):
             self.add_mission()
             self.missions.remove(mission)
 
+    def get_current_mission(self):
+        if game.CURRENT_MISSION and self.any_mission_active == False:
+            del(self.missions[0])
+            self.slot_missing = 0
+            mission = Mission(self.slot_missing, game.CURRENT_MISSION[1], game.CURRENT_MISSION[2], game.CURRENT_MISSION[3], game.CURRENT_MISSION[4])
+            mission.current_number = game.CURRENT_MISSION[0]
+            mission.in_progress = True
+            self.any_mission_active = True
+            mission.mission_manager = self
+            self.missions.insert(0, mission)
+
     def click(self, mouse):
         for mission in self.missions:
             if mission.click(mouse) is True: return True
 
     def draw(self):
+        self.get_current_mission()
         for mission in self.missions:
             if self.any_mission_active:
                 mission.active = False
