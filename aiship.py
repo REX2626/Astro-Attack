@@ -4,13 +4,12 @@ from entities import Ship, Asteroid#, HealthPickup
 from objects import random_vector
 from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
+import effects
 import images
 import game
 import random
 import math
 import pygame
-import particles
-
 
 PATROL = 0
 ATTACK = 1
@@ -243,10 +242,16 @@ class Enemy_Ship(AI_Ship):
 
     def destroy(self):
         super().destroy()
+        
+        if self in self.mother_ship.enemy_list:
+            self.mother_ship.enemy_list.remove(self)
+
         if type(self) == Enemy_Ship:
-            if self.mother_ship:
-                self.mother_ship.enemy_list.remove(self)
             game.SCORE += 1
+        elif type(self) == Drone_Enemy:
+            game.SCORE += 1
+        elif type(self) == Missile_Ship:
+            game.SCORE += 2
         elif type(self) == Mother_Ship:
             game.SCORE += 3
 
@@ -276,12 +281,8 @@ class Missile_Ship(Enemy_Ship):
         self.time_to_explode = 0
         self.exploding = False
         
-        # Boost particle effect
-        boost_distance = 20
-        boost_position = lambda ship: Vector(boost_distance * math.sin(ship.rotation), boost_distance * math.cos(ship.rotation))
+        self.particles = effects.missile_ship_trail(self)
 
-        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=150, initial_velocity=lambda ship: Vector(0, 400).get_rotate(ship.rotation)+ship.velocity)
-    
 
     def attack_entity_state(self, delta_time, entity, attack_min_dist, attack_max_dist, attack_max_speed):
         # Set max speed to a higher value
@@ -369,7 +370,7 @@ class Mother_Ship(Enemy_Ship):
 
         for _ in range(enemy_spawn_number):
 
-            random_position = self.position + random_vector(game.CHUNK_SIZE/2)
+            random_position = self.position + random_vector(game.CHUNK_SIZE/3)
 
             if self.level < 10:
                 if random.random() < 0.5:

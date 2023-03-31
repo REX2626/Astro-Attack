@@ -1,6 +1,6 @@
 from objects import Vector1D, Vector, Object, Entity, random_vector
 from weapons import DefaultGun
-import particles
+import effects
 import images
 import game
 import random
@@ -49,7 +49,7 @@ def entity_collision(object, entity, delta_time):
             entity.make_new_patrol_point(400, 500, entity.position)
             entity.state = 0 # Patrol state
 
-        particles.ParticleSystem(entity.position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.5, frequency=20, speed=100, speed_variance=20)
+        effects.asteroid_debris(entity.position)
 
 
 
@@ -92,7 +92,7 @@ class Asteroid(Object):
 
                         if self.mask.overlap(entity_mask, (x_offset, y_offset)):
                             entity.unload() # if bullet collides with asteroid then destroy bullet
-                            particles.ParticleSystem(entity.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*entity.damage+1), speed=120, speed_variance=40)
+                            effects.damage(entity.position, entity.damage)
 
 
 
@@ -177,7 +177,7 @@ class Ship(Entity):
 
         # If no shield, then damage ship
         if self.shield == 0:
-            particles.ParticleSystem(self.position, start_size=3, max_start_size=5, end_size=1, colour=(200, 0, 0), max_colour=(255, 160, 0), duration=None, lifetime=0.6, frequency=int(30*damage+1), speed=120, speed_variance=40)
+            effects.damage(self.position, damage)
 
             # Armour takes damage
             new_armour = max(0, self.armour - damage)
@@ -196,8 +196,7 @@ class Ship(Entity):
                 game.CURRENT_MISSION[0] += 1
         
         game.CHUNKS.remove_entity(self)
-        particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
-        particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
+        effects.explosion(self.position)
 
     def draw(self, win, focus_point):
         super().draw(win, focus_point)
@@ -330,12 +329,8 @@ class Missile(Entity):
         self.explode_countdown = explode_countdown
         self.time_to_explode = 0
         self.exploding = False
-        
-        # Boost particle effect
-        boost_distance = 10
-        boost_position = lambda missile: Vector(boost_distance * math.sin(missile.rotation), boost_distance * math.cos(missile.rotation))
 
-        self.particles = particles.ParticleSystem(self, entity_offset=boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=3, duration=None, lifetime=0.4, frequency=150, speed_variance=50, initial_velocity=lambda missile: Vector(0, 700).get_rotate(self.rotation)+missile.velocity)
+        self.particles = effects.missile_trail()
         self.particles.active = True
 
     def update(self, delta_time):
@@ -388,5 +383,4 @@ class Missile(Entity):
     def destroy(self):
         game.CHUNKS.remove_entity(self)
         self.particles.entity = None
-        particles.ParticleSystem(self.position, start_size=10, max_start_size=35, end_size=2, colour=(200, 0, 0), max_colour=(255, 160, 0), bloom=1.5, duration=None, lifetime=0.8, frequency=20, speed=100, speed_variance=50)
-        particles.ParticleSystem(self.position, start_size=15, max_start_size=25, end_size=1, colour=game.DARK_GREY, bloom=1.2, duration=None, lifetime=0.6, frequency=10, speed=60, speed_variance=30)
+        effects.explosion(self.position)

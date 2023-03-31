@@ -1563,11 +1563,10 @@ systems = Page(
 )
 
 death_screen = Page(
-    Text(  0.5, 1/6, "YOU DIED!"                           , colour=(255, 0, 0)    , font_size=40),
-    Text(  0.5, 2/6, lambda: f"SCORE: {game.SCORE}"        , colour=(100, 100, 255), font_size=40),
-    Text(  0.5, 3/6, lambda: f"HIGHSCORE: {game.HIGHSCORE}", colour=(255, 255, 100), font_size=40),
-    Button(0.5, 4/6, "PLAY AGAIN", font_size=40, function=lambda: main.main()),
-    Button(0.5, 5/6, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu))
+    Text(  0.5, 0.25 , "YOU DIED!"                 , colour=(255, 0, 0)    , font_size=40),
+    Text(  0.5, 0.4, lambda: f"SCORE: {game.SCORE}", colour=(100, 100, 255), font_size=40),
+    Button(0.5, 0.6 , "Respawn"   , font_size=40, function=lambda: main.main()),
+    Button(0.5, 0.75, "Main Menu" , font_size=40, function=lambda: exit_game())
 )
 
 
