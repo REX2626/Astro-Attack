@@ -1015,7 +1015,6 @@ class WorldButton(Button):
     def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, world=None, world_list=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
         super().__init__(x, y, name, font, font_size, colour, padx, pady, lambda: world_list.start_world(world), box_colour, outline_colour, hover_colour)
         self.seed = str(seed)
-        self.resize()
 
     def touching_mouse(self, mouse, rect: tuple, scroll_height):
         if mouse[0] < rect[0] or mouse[0] > rect[0] + rect[2] or mouse[1] < rect[1] or mouse[1] > rect[1] + rect[3]:
@@ -1031,9 +1030,6 @@ class WorldButton(Button):
         if self.touching_mouse(mouse, rect, scroll_height):
             self.function()
             return True # Tells the Menu that this Button has been clicked on
-        
-    def resize(self):
-        self.seed_surf = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
 
     def draw(self, surf, x_offset, y_offset, rect, scroll_height):
         # Draw button
@@ -1053,7 +1049,7 @@ class WorldButton(Button):
         surf.blit(label, position)
 
         # Draw seed
-        seed = self.seed_surf
+        seed = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
         position = self.get_x() + self.get_width(self.label)*0.2 + x_offset, self.get_y() - seed.get_height()/2 + y_offset
         surf.blit(seed, position)
 

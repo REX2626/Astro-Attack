@@ -37,8 +37,8 @@ class Station(Object):
         super().__setstate__(state)
         self.default_image = self.load_default_image()
         self.selected_image = self.load_selected_image()
-        self.scaled_default_image = pygame.transform.scale_by(self.default_image, game.ZOOM)
-        self.scaled_selected_image = pygame.transform.scale_by(self.selected_image, game.ZOOM)
+        self.scaled_default_image = pygame.transform.scale_by(self.default_image, self.default_scale)
+        self.scaled_selected_image = pygame.transform.scale_by(self.selected_image, self.selected_scale)
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, delta_time):
