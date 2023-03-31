@@ -87,6 +87,17 @@ class Chunks():
             self.get_chunk(original_chunk_pos).entities.remove(entity)
             self.get_chunk(new_chunk_pos).entities.add(entity)
 
+    # optomized
+    def set_position(self, entity: Entity, position: Vector):
+
+        original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
+        entity.position = position
+        new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
+
+        if new_chunk_pos != original_chunk_pos:
+            self.get_chunk(original_chunk_pos).entities.remove(entity)
+            self.get_chunk(new_chunk_pos).entities.add(entity)
+
 
 
 class Chunk():

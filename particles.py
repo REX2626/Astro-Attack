@@ -107,9 +107,7 @@ class ParticleSystem():
         
         if self.entity and self.entity in game.CHUNKS.entities:
             self.previous_position = self.position
-            game.CHUNKS.remove_entity(self)
-            self.position = self.entity.position + self.entity_offset(self.entity)
-            game.CHUNKS.add_entity(self)
+            game.CHUNKS.set_position(self, self.entity.position + self.entity_offset(self.entity))
 
         if not self.entity and self.time_alive > self.duration: # check if the System's life time is over
 

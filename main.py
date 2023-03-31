@@ -160,7 +160,7 @@ def update_objects(delta_time):
 
     # Loop until every object has been updated e.g. moved
     # Entity set has to be copied as entity might be deleted from the actual set
-    for object in filter(lambda object: type(object) != Bullet and type(object) != Asteroid, CHUNKS.entities.copy()):
+    for object in filter(lambda object: type(object) != Bullet and type(object) != Asteroid and type(object) != ParticleSystem, CHUNKS.entities.copy()):
 
         # Update object e.g. move it
         object.update(delta_time)
@@ -191,11 +191,6 @@ def main():
 
     global player
     player = game.player
-
-    if game.SCORE > game.HIGHSCORE:
-        game.HIGHSCORE = game.SCORE
-    game.SCORE = 0
-    game.SCRAP_COUNT = 0
 
     graphics.update_graphics_screen_size()
 

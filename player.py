@@ -1,9 +1,10 @@
 from objects import Vector, random_vector
-from entities import Ship
+from entities import Ship, Scrap
 from weapons import PlayerGun
 import images
 import particles
 import game
+import random
 import math
 import pygame
 
@@ -119,9 +120,22 @@ class Player_Ship(Ship):
         game.SCREEN_SHAKE += damage
 
     def destroy(self):
-        super().destroy()
-        self.boost_particles1.entity = None
-        self.boost_particles2.entity = None
+        self.boost_particles1.active = False
+        self.boost_particles2.active = False
+        self.smoke_particles.active = False
+
+        # Drop scrap
+        for _ in range(game.SCRAP_COUNT):
+            scrap = Scrap(self.position, random_vector(random.randint(0, 500)), rotation=random.random() * math.pi * 2)
+            game.CHUNKS.add_entity(scrap)
+        game.SCRAP_COUNT = 0
+
+        game.SCREEN_SHAKE = 0
+
+        game.CHUNKS.remove_entity(self)
+
+        game.LAST_PLAYER_POS = Vector(0, 0)
+        game.player = get_player()
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
