@@ -34,11 +34,31 @@ Missions (stations will give a reward for completing a mission)
     Make it so that missions can be randomly generated based on the difficulty
     Randomly generate rewards
 
+
+Enemy stations can only respawn reinforcements once or twice
+
+Add dict for missions for ship names (e.g. Enemy_Ship -> Enemy Ships)
+
+Add ability to decline current mission and remove ability to decline other missions while a mission is active
+
+Fix neutral fighters being always level 0
+
+Fix ships that don't spawn at station being always level 0
+
+Improve console:
+Add ctrl+v
+Allow cursor to go from left of text straight to the right of text
+Add del button, to delete text from the right
+Add spam, if a button is hold down > 1 second, repeatedly paste that button
+
+Add transparency to particles so they can fade out
+
+
+Enemy stations have weapons, can be destroyed for loot
+
 Add hitboxes
 
 Add missile and autoturret weapons
-
-Enemy stations have weapons, can be destroyed for loot
 
 Stations can be docked with
 
@@ -52,8 +72,6 @@ When bits of player ship stops working, message should come up
 Some visual to show armour, and it breaking
 
 Improve neutral ship fighting AI
-
-Fix AI colliding with Asteroids
 
 Add thruster particles to ships
 
@@ -413,3 +431,5 @@ Enemy Levels:
 Enemies become more difficult
 
 Saving and loading
+
+Fix AI colliding with Asteroids

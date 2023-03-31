@@ -308,8 +308,9 @@ class Text(Widget):
        font size is relative to screen width, if you change the screen resolution then the font size will dynamically change
        text can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
        if text is a function it has to return a string (can be single or multi-line)
+       align is a string, can be "left", "centre" or "right", this is for the x value
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, spacing=Menu.DEFAULT_TEXT_SPACING) -> None:
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, spacing=Menu.DEFAULT_TEXT_SPACING, align="centre") -> None:
         super().__init__(x, y)
 
         if isinstance(text, str):
@@ -321,9 +322,18 @@ class Text(Widget):
         self.font_size = font_size
         self.colour = colour
         self.spacing = lambda: spacing * game.HEIGHT
+        self.align = align
 
         self.labels_text = None
         self.labels_size = None
+
+    def get_blit_x(self, label: pygame.surface.Surface):
+        if self.align == "centre":
+            return self.get_x() - label.get_width()/2
+        elif self.align == "left":
+            return self.get_x()
+        elif self.align == "right":
+            return self.get_x() - label.get_width()
 
     def update_labels_info(self):
         if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
@@ -359,9 +369,9 @@ class Text(Widget):
         labels = self.get_labels()
         cum_height = 0 # cumulative height of all the labels above a certain label
         for label in labels:
-            position = self.get_x() - label.get_width()/2, self.get_y() - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
-            cum_height += label.get_height() + self.spacing()
+            position = self.get_blit_x(label), self.get_y() - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
             game.WIN.blit(label, position)
+            cum_height += label.get_height() + self.spacing()
 
 
 
@@ -1389,10 +1399,10 @@ quit_confirm = Page(
 
 station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Upgrades"),
-    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Text(0.5, 0.12, "Upgrades"),
+    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx=100),
     Button(0.2, 0.7, "Armour", function=lambda: Menu.change_page(armour)),
     Button(0.4, 0.7, "Weapon", function=lambda: Menu.change_page(weapon)),
     Button(0.6, 0.7, "Engine", function=lambda: Menu.change_page(engine)),
@@ -1401,8 +1411,8 @@ station = Page(
     Image(0.4, 0.5, images.WEAPON_ICON, scale=6),
     Image(0.6, 0.5, images.ENGINE_ICON, scale=6),
     Image(0.8, 0.5, images.RADAR_ICON, scale=6),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -1410,13 +1420,13 @@ station = Page(
 
 missions = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Missions"),
-    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Text(0.5, 0.12, "Missions"),
+    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
     MissionManager(0.5, 0.5),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -1424,13 +1434,13 @@ missions = Page(
 
 stats = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Stats"),
-    Button(0.3, 0.22, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.22, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.22, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Text(0.5, 0.12, "Stats"),
+    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
+    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
     Text(0.5, 0.5, "You are bad at this game"),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
@@ -1438,12 +1448,12 @@ stats = Page(
 
 armour = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Armour"),
+    Text(0.5, 0.12, "Armour"),
     UpgradeBar(0.19, 0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
-    UpgradeBar(0.19, 0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=20),
+    UpgradeBar(0.19, 0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
     UpgradeBar(0.19, 0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1451,13 +1461,13 @@ armour = Page(
 
 weapon = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Weapon"),
+    Text(0.5, 0.12, "Weapon"),
     Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.3, 0.7, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Button(0.7, 0.3, "Laser"  , function=lambda: Menu.change_page(laser)),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1465,12 +1475,12 @@ weapon = Page(
 
 engine = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Engine"),
+    Text(0.5, 0.12, "Engine"),
     UpgradeBar(0.19, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.19, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.19, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1478,11 +1488,11 @@ engine = Page(
 
 radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Radar"),
+    Text(0.5, 0.12, "Radar"),
     UpgradeBar(0.19, 0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     UpgradeBar(0.19, 0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
     e_press=lambda: True
@@ -1490,12 +1500,12 @@ radar = Page(
 
 default_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Default"),
+    Text(0.5, 0.12, "Default"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1503,12 +1513,12 @@ default_gun = Page(
 
 gatling_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Gatling"),
+    Text(0.5, 0.12, "Gatling"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1516,12 +1526,12 @@ gatling_gun = Page(
 
 sniper_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Sniper"),
+    Text(0.5, 0.12, "Sniper"),
     UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1529,11 +1539,11 @@ sniper_gun = Page(
 
 laser = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.11, "Laser"),
+    Text(0.5, 0.12, "Laser"),
     UpgradeBar(0.19, 0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
     UpgradeBar(0.19, 0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
-    Text(0.86, 0.11, lambda: f"{game.SCRAP_COUNT}"),
-    Image(0.9, 0.11, images.SCRAP, scale=6),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
     e_press=lambda: True
@@ -1545,17 +1555,17 @@ systems = Page(
 
     Text(0.3, 0.3, "Health", font_size=25),
     Bar(0.39, 0.298, width=0.32, height=0.1, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
-    Text(0.445, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25),
+    Text(0.405, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25, align="left"),
 
     Text(0.3, 0.45, "Armour", font_size=25),
     ArmourBar(0.39, 0.448, width=0.32, height=0.1, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=12),
-    Text(0.445, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25),
+    Text(0.405, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25, align="left"),
 
     Text(0.3, 0.6, "Shield", font_size=25),
     Bar(0.39, 0.598, width=0.32, height=0.1, value=lambda: game.player.shield, max_value=lambda: game.MAX_PLAYER_SHIELD, colour=(34, 130, 240), outline_width=5, curve=12),
-    Text(0.43, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25),
+    Text(0.405, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25, align="left"),
 
-    Text(0.86, 0.12, lambda: f"{game.SCRAP_COUNT}"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
