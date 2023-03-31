@@ -55,11 +55,10 @@ class AI_Ship(Ship):
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
                     if isinstance(entity, Asteroid):
-
                         return True
-                    else:
-                        # No Asteroid
-                        return False
+
+        # No Asteroid
+        return False
 
     def patrol_state(self, delta_time, min_dist, max_dist, max_speed=50, mother_ship=None):
         self.max_speed = max_speed
@@ -451,6 +450,8 @@ class Neutral_Ship(AI_Ship):
         self.min_patrol_dist = 1000
         self.max_patrol_dist = 4000
 
+        self.intermediate_patrol_point = None
+
         self.patrol_max_speed = 50
 
     def update(self, delta_time):
@@ -498,23 +499,74 @@ class Neutral_Ship(AI_Ship):
                 self.state = PATROL
         else:
             self.state = PATROL_TO_STATION
+
+    def find_intermediate_patrol_point(self, point_spacing, intermediate_point_distance):
+        nodes = [] # List of points along the straight line from ship to station
+
+        # Find a couple useful values
+        direction = self.target_station.position - self.position
+        distance = direction.magnitude()
+        dx = (self.target_station.position.x - self.position.x)
+        dy = (self.target_station.position.y - self.position.y)
+
+        # Calculates the vector displacement from point to point
+        point_spacing_vector = Vector(dx * (point_spacing / distance), dy * (point_spacing / distance))
+
+        point_number = distance / point_spacing
+
+        for i in range(int(point_number)):
+            # Adds points to nodes
+            nodes.append(Vector(point_spacing_vector.x * (i+1) + self.position.x, point_spacing_vector.y * (i+1) + self.position.y))
+
+        for node in nodes:
+            chunk_pos = node // game.CHUNK_SIZE
+
+            # Checks if there is an asteroid in the chunk of that node point
+            for entity in game.CHUNKS.get_chunk((chunk_pos.x, chunk_pos.y)).entities.copy():
+                if isinstance(entity, Asteroid):
+                    # If there is, then find a position intermediate_point_distance away from the asteroid along the normal line (-dx, dy = normal)
+                    d_x = intermediate_point_distance * math.cos(math.atan2(-dx, dy))
+                    d_y = intermediate_point_distance * math.sin(math.atan2(-dx, dy))
+
+                    return Vector(entity.position.x + d_x, entity.position.y + d_y) # returns point of intermediate_point
+        
+        # There is no intermediate point
+        return None
         
     def patrol_to_station(self, delta_time, max_speed=50):
         self.max_speed = max_speed
 
-        # Move and rotate towards target station
-        self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
-        self.accelerate_in_direction(self.rotation, 300 * delta_time)
+        # If the intermediate_patrol_point has not already been calculated, calculate it
+        if self.intermediate_patrol_point == None:
+            self.intermediate_patrol_point = self.find_intermediate_patrol_point(point_spacing=game.CHUNK_SIZE / 2, intermediate_point_distance=game.CHUNK_SIZE)
+        
+        # If there is an intermediate_patrol_point, fly to it. Else, fly directly to the station
+        if self.intermediate_patrol_point:
+            self.rotate_to(delta_time, self.position.get_angle_to(self.intermediate_patrol_point), self.max_rotation_speed)
+            self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
-        # Checks if it is close enough to the target station to travel to a new one
-        if self.distance_to(self.target_station) < 300:
-            self.current_station = self.target_station
-            self.target_station = None
+            # Once at the intermediate point, set it equal to none so that the ship will then, next frame, start flying straight towards the station
+            if (self.intermediate_patrol_point - self.position).magnitude() < 50:
+                self.intermediate_patrol_point = None
+
+        else:
+            # Move and rotate towards target station
+            self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
+            self.accelerate_in_direction(self.rotation, 300 * delta_time)
+
+            # Checks if it is close enough to the target station to travel to a new one
+            if self.distance_to(self.target_station) < 300:
+                self.current_station = self.target_station
+                self.target_station = None
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+            
+            if self.intermediate_patrol_point:
+                pygame.draw.circle(game.WIN, (200, 100, 0), ((self.intermediate_patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.intermediate_patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
+
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
