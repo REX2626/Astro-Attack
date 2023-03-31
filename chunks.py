@@ -147,7 +147,7 @@ class Chunk():
         elif random.random() < 0.01 and self.adjoining_empty_chunks():
             self.entities.add(
 
-                Mother_Ship(self.random_position())
+                Mother_Ship(self.random_position(), level=game.CURRENT_SHIP_LEVEL)
             )
 
 
