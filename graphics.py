@@ -75,12 +75,16 @@ for _ in range(layers):
         layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
     stars.append(layer)
 
+def update_graphics_screen_size():
+    global WIDTH, HEIGHT, stars
+    WIDTH, HEIGHT = game.WIDTH, game.HEIGHT
+    stars = list()
+    for _ in range(layers):
+        layer: list[list] = list()
+        for _ in range(100):
+            layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
+        stars.append(layer)
 
-# 100 is the number of pixels a star can go outside the screen before being destroyed
-MIN_X = -100
-MAX_X = WIDTH + 100
-MIN_Y = -100
-MAX_Y = HEIGHT + 100
 
 # Generate 6 star images, from smallest to largest
 circles = []
@@ -116,19 +120,20 @@ def draw_stars():
             star[1] += shifty
 
             # If the star is outside of the screen, remove it
-            if star[0] < MIN_X:
+            # 100 is the number of pixels a star can go outside the screen before being destroyed
+            if star[0] < -100:
                 star[0] = WIDTH + layer
                 star[1] = randint(-layer, HEIGHT+layer)
 
-            elif star[0] > MAX_X:
+            elif star[0] > WIDTH + 100:
                 star[0] = -layer
                 star[1] = randint(-layer, HEIGHT+layer)
 
-            elif star[1] < MIN_Y:
+            elif star[1] < -100:
                 star[0] = randint(-layer, WIDTH+layer)
                 star[1] = HEIGHT+layer
 
-            elif star[1] > MAX_Y:
+            elif star[1] > HEIGHT + 100:
                 star[0] = randint(-layer, WIDTH+layer)
                 star[1] = -layer
 
