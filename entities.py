@@ -46,7 +46,7 @@ def entity_collision(object, entity, delta_time):
         entity.damage(entity.velocity.magnitude()**2/100_000)
 
         if hasattr(entity, "make_new_patrol_point"):
-            entity.make_new_patrol_point(400, 500, object.position)
+            entity.make_new_patrol_point(400, 500, entity.position)
             entity.state = 0 # Patrol state
 
         effects.asteroid_debris(entity.position)

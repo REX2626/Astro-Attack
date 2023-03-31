@@ -72,7 +72,7 @@ class AI_Ship(Ship):
         else:
             target_to_mothership_distance = 0
 
-        if distance < 50 or target_to_mothership_distance > 500:
+        if distance < 50:
             for _ in range(100): # try to find new patrol point, if none have been found after 100 iterations then cry
                 self.make_new_patrol_point(min_dist, max_dist, self.position)
                 target_position = self.patrol_point
@@ -81,6 +81,11 @@ class AI_Ship(Ship):
 
                 if self.check_for_asteroid(chunk_pos) == False:
                     break
+        
+        # Makes Target around mother ship to keep it within distance of mothership
+        if target_to_mothership_distance > 500:
+            self.make_new_patrol_point(100, 400, mother_ship.position)
+            target_position = self.patrol_point
         
         self.rotate_to(delta_time, self.position.get_angle_to(target_position), self.max_rotation_speed)
         self.accelerate_in_direction(self.rotation, 300 * delta_time)
@@ -452,14 +457,16 @@ class Neutral_Ship(AI_Ship):
     def update(self, delta_time):
         super().update(delta_time)
 
+        if self.state != ATTACK and self.state != ATTACK_ENEMY:
+            self.check_nearby_stations(self.current_station)
+
         if self.state == PATROL_TO_STATION:
-            self.patrol_to_station(delta_time, current_station=self.current_station)
+            self.patrol_to_station(delta_time)
         elif self.state == PATROL:
             self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
 
-        
-    def patrol_to_station(self, delta_time, max_speed=50, current_station=None):
-        self.max_speed = max_speed
+    
+    def check_nearby_stations(self, current_station=None):
 
         if self.target_station == None:
             # Loop through entities to find friendly station entities
@@ -485,19 +492,25 @@ class Neutral_Ship(AI_Ship):
                 if self.target_station == None:
                     random_station = random.choices(stations, weights=weights, k=1)
                     self.target_station = random_station[0]
+                    self.state = PATROL_TO_STATION
             
             # If there are no other stations available, just patrol around the current one
             else:
                 self.state = PATROL
         else:
-            # Move and rotate towards target station
-            self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
-            self.accelerate_in_direction(self.rotation, 300 * delta_time)
+            self.state = PATROL_TO_STATION
+        
+    def patrol_to_station(self, delta_time, max_speed=50):
+        self.max_speed = max_speed
 
-            # Checks if it is close enough to the target station to travel to a new one
-            if self.distance_to(self.target_station) < 300:
-                self.current_station = self.target_station
-                self.target_station = None
+        # Move and rotate towards target station
+        self.rotate_to(delta_time, self.position.get_angle_to(self.target_station.position), self.max_rotation_speed)
+        self.accelerate_in_direction(self.rotation, 300 * delta_time)
+
+        # Checks if it is close enough to the target station to travel to a new one
+        if self.distance_to(self.target_station) < 300:
+            self.current_station = self.target_station
+            self.target_station = None
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
@@ -569,7 +582,12 @@ class Neutral_Ship_Fighter(Neutral_Ship):
 
         if self.mother_ship in game.CHUNKS.entities:
             self.target_station = self.mother_ship.target_station
+            if self.state != ATTACK and self.state != ATTACK_ENEMY:
+                self.state = PATROL_TO_STATION
         else:
+            self.state = PATROL
+
+        if self.target_station == None:
             self.state = PATROL
 
         if self.state == ATTACK:
