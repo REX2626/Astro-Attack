@@ -23,8 +23,7 @@ def update_playing_screen_size():
 
     game.update_screen_size()
 
-    graphics.WIDTH = game.WIDTH
-    graphics.HEIGHT = game.HEIGHT
+    graphics.update_graphics_screen_size()
 
     "Set the x and y of objects based on new width and height, with ratios"
 
@@ -197,6 +196,8 @@ def main():
         game.HIGHSCORE = game.SCORE
     game.SCORE = 0
     game.SCRAP_COUNT = 0
+
+    graphics.update_graphics_screen_size()
 
     menu.Menu.running = False
 
