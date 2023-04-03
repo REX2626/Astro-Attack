@@ -330,7 +330,7 @@ class Missile(Entity):
         self.time_to_explode = 0
         self.exploding = False
 
-        self.particles = effects.missile_trail()
+        self.particles = effects.missile_trail(self)
         self.particles.active = True
 
     def update(self, delta_time):

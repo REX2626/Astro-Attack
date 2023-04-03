@@ -600,7 +600,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
-            neutral = Neutral_Ship_Fighter(random_position, Vector(0, 0), mother_ship=self)
+            neutral = Neutral_Ship_Fighter(random_position, Vector(0, 0), level=game.CURRENT_SHIP_LEVEL, mother_ship=self)
             
             self.neutral_list.append(neutral)
             
