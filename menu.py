@@ -1154,7 +1154,7 @@ class Mission():
 
         self.accept_button = Button(self.x, self.y, "Accept", function=lambda: self.accept())
         self.decline_button = Button(self.x, self.y+0.1, "Decline", function=lambda: self.decline())
-        self.claim_reward_button = Button(self.x, self.y, "Claim Reward", function=lambda: self.claim_reward())
+        self.claim_reward_button = Button(self.x, self.y-0.1+(self.height/2), "Claim Reward", function=lambda: self.claim_reward())
 
         self.mission_manager: MissionManager = None
 
@@ -1168,14 +1168,14 @@ class Mission():
         self.mission_type = mission_type
         self.reward = reward
 
-        self.progress_text = Text(self.x, self.y-0.1+(self.height/2), text=lambda: f"{self.current_number}/{self.number}", font_size=25)
+        self.progress_text = Text(self.x, self.y-0.05, text=lambda: f"{self.current_number}/{self.number}", font_size=25)
 
-        self.progress_bar = Bar(self.x-(self.width/2), self.y+0.1+(self.height/8), width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
+        self.progress_bar = Bar(self.x-(self.width/2), self.y, width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
 
         if self.mission_type == game.KILL:
             self.title_text = Text(self.x, self.y-0.1-self.height/2, "Kill Mission")
 
-            self.info = f"Kill {self.number} {self.goal}s REWARDS: {self.reward} Scrap"
+            self.info = f"Kill {self.number} {game.ENTITY_DICT.get(self.goal)}s REWARDS: {self.reward} Scrap"
 
         self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, text=self.info, default_font_size=70)
 
@@ -1185,12 +1185,18 @@ class Mission():
         # False if one of the three missions is in progress - when false, you will not be able to accept the mission
         self.active = True
 
+        # Draw the info_text immediately since we dont want to wait for the menu to draw it
+        self.info_text.draw()
+
     def accept(self):
         self.in_progress = True
         self.mission_manager.any_mission_active = True
         game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type, self.reward]
     
     def decline(self):
+        if self.in_progress:
+            self.mission_manager.any_mission_active = False
+            game.CURRENT_MISSION = None
         self.mission_manager.remove_mission(self)
     
     def claim_reward(self):
@@ -1204,9 +1210,12 @@ class Mission():
         if not self.in_progress:
             if self.active:
                 if self.accept_button.click(mouse) is True: return True
-            if self.decline_button.click(mouse) is True: return True
-        if self.current_number >= self.number:
-            if self.claim_reward_button.click(mouse) is True: return True
+                if self.decline_button.click(mouse) is True: return True
+        else:
+            if self.current_number >= self.number:
+                if self.claim_reward_button.click(mouse) is True: return True
+            else:
+                if self.decline_button.click(mouse) is True: return True
     
     def update(self):
         # Drawing title and info
@@ -1218,13 +1227,15 @@ class Mission():
             self.current_number = game.CURRENT_MISSION[0]
             if self.current_number >= self.number:
                 self.claim_reward_button.draw()
+            else:
+                self.decline_button.draw()
             self.progress_bar.draw()
             self.progress_text.draw()
 
         else:
             if self.active:
                 self.accept_button.draw()
-            self.decline_button.draw()
+                self.decline_button.draw()
 
 class MissionManager(Widget):
     def __init__(self, x, y) -> None:

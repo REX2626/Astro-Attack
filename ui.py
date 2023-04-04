@@ -261,6 +261,16 @@ class Console():
                         if len(self.input_text) > 1:
                             if self.cursor_pos > 0:
                                 self.cursor_pos -= 1
+                                self.input_text = self.input_text.replace("|", "")
+                                text = ""
+                                for i, char in enumerate(self.input_text):
+                                    if i != self.cursor_pos:
+                                        text += char
+                                self.input_text = text
+                                self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+
+                    elif event.key == pygame.K_DELETE:
+                        if len(self.input_text) > 1:
                             self.input_text = self.input_text.replace("|", "")
                             text = ""
                             for i, char in enumerate(self.input_text):
@@ -364,16 +374,25 @@ class Console():
         else:
             self.current_selected_command = 0
             self.input_text = ""
+            self.cursor_pos = 0
 
     def left_pressed(self):
         if self.cursor_pos > 0:
             self.cursor_pos -= 1
             self.input_text = self.input_text.replace("|", "")
             self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+        elif self.cursor_pos == 0:
+            self.cursor_pos = len(self.input_text) - 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
     
     def right_pressed(self):
         if self.cursor_pos < len(self.input_text) - 1:
             self.cursor_pos += 1
+            self.input_text = self.input_text.replace("|", "")
+            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+        elif self.cursor_pos == len(self.input_text) - 1:
+            self.cursor_pos = 0
             self.input_text = self.input_text.replace("|", "")
             self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
@@ -532,8 +551,7 @@ class MissionOverview():
 
             if game.CURRENT_MISSION[3] == game.KILL:
                 self.title = "Kill Mission"
-
-                self.info = f"Kill {game.CURRENT_MISSION[1]} {game.CURRENT_MISSION[2]}s"
+                self.info = f"Kill {game.CURRENT_MISSION[1]} {game.ENTITY_DICT.get(game.CURRENT_MISSION[2])}s"
         
         else:
             self.title = "Mission"

@@ -86,6 +86,8 @@ CHUNK_SIZE = 600 # How big each chunk is
 
 SPAWN_SIZE = 4
 
+ENTITY_DICT = {"Enemy_Ship": "Enemy Ship", "Mother_Ship": "Mother Ship", "Drone_Enemy": "Drone Ship", "Missile_Ship": "Missile Ship"}
+
 # ==================
 # WORLD CONSTANTS
 # ==================
