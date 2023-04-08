@@ -76,6 +76,11 @@ def draw_window(delta_time):
 def handle_player_input(keys_pressed, delta_time):
 
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
+
+    if game.DOCKING:
+        game.LAST_PLAYER_POS = player.position
+        return
+
     # Example:
     if keys_pressed[pygame.K_w]:
         player.move_forward(delta_time)
@@ -207,6 +212,10 @@ def main():
 
         draw_window(delta_time)
 
+        if game.OPEN_STATION:
+            menu.Menu.station()
+            game.OPEN_STATION = False
+
         # Max lvl atm is 15. game.score increases difficulty by 1 every 50 score. Difficulty increased by 1, 10_000 units from centre
         game.CURRENT_SHIP_LEVEL = int(min(10, game.SCORE / 50) + min(5, game.player.position.magnitude() / 10_000))
 
@@ -228,7 +237,7 @@ def main():
                 start = perf_counter()
 
                 if player.station_highlighted:
-                    menu.Menu.station()
+                    game.DOCKING = True
 
                 else:
                     menu.Menu.systems()

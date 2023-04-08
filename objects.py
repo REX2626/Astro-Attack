@@ -313,7 +313,7 @@ class Entity(MoveableObject):
     def accelerate_in_direction(self, angle: float, magnitude: float):
         self.accelerate(Vector(-math.sin(angle)*magnitude, -math.cos(angle)*magnitude))
 
-    def accelerate_onto_pos(self, delta_time, target_position: Vector, max_acceleration: float, max_speed: float):
+    def accelerate_onto_pos(self, target_position: Vector, max_acceleration: float, max_speed: float):
         distance_to_target = (self.position - target_position).magnitude()
 
         distance_to_decelerate_from_max = (max_speed)**2 / (2 * 200) # 200 is the value for inertial dampening

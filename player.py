@@ -35,6 +35,7 @@ class Player_Ship(Ship):
         self.cursor_highlighted = False
         self.tracked_enemy: Ship = None
         self.station_highlighted = None
+        self.station_to_dock = None
         self.z = 1
 
         boost_distance = 20
@@ -61,6 +62,20 @@ class Player_Ship(Ship):
             self.track_enemy()
         else:
             self.tracked_enemy = None
+
+        if game.DOCKING:
+            
+            if self.station_to_dock == None:
+                self.station_to_dock = self.station_highlighted
+                self.max_speed = self.distance_to(self.station_to_dock) / 2  # Moves faster if further from centre of station
+            
+            self.accelerate_onto_pos(self.station_to_dock.position, 400, self.max_speed)
+            
+            if self.distance_to(self.station_to_dock) < 1:  # Docked
+                game.DOCKING = False
+                self.max_speed = game.MAX_PLAYER_SPEED
+                game.OPEN_STATION = True
+                self.station_to_dock = None
 
         self.max_shield = game.MAX_PLAYER_SHIELD
         self.shield_recharge = game.PLAYER_SHIELD_RECHARGE

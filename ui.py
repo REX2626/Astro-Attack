@@ -625,9 +625,10 @@ def highlight_station():
                 if isinstance(entity, FriendlyStation):
                     x, y = cursor_pos.x, cursor_pos.y
                     if entity.position.x - entity.width/2 <= x <= entity.position.x + entity.width/2 and entity.position.y - entity.height/2 <= y <= entity.position.y + entity.height/2:
-                        if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):
-                            game.player.station_highlighted = entity
-                            return
+                        if (game.player.position - entity.position).magnitude() < 500:  # Cannot click on station when over 500 units away
+                            if entity.mask.get_at((x-entity.position.x+entity.width/2, y-entity.position.y+entity.height/2)):
+                                game.player.station_highlighted = entity
+                                return
     game.player.station_highlighted = None
 
 bars = 20
