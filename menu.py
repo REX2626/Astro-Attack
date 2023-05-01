@@ -14,7 +14,7 @@ class Menu():
     """Menu controls the current page and checks for mouse clicks"""
 
     running = False
-    
+
     DEFAULT_BACKGROUND_COLOUR = game.DARK_GREY
     DEFAULT_BOX_COLOUR = game.MEDIUM_GREY
     DEFAULT_FONT = "bahnschrift"
@@ -29,7 +29,7 @@ class Menu():
     SLIDER_WIDTH = 0.02 # percentage (0 to 1) of screen width
     SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
     SLIDER_OUTLINE = (30, 30, 30, 150)
-    
+
     def __init__(self) -> None:
         """On start up, the default page is main_menu"""
         Menu.change_page(main_menu)
@@ -104,7 +104,7 @@ class Menu():
                     # if e_pressed return True, then go back to the game
                     if Menu.e_pressed():
                         return True
-                    
+
                 Menu.key_pressed(event)
 
                 Menu.update()
@@ -186,7 +186,7 @@ class Page():
 
     def draw(self):
         """Draws all widgets onto the Menu, widget.draw checks if a button is hovered over"""
-        
+
         if self.background_colour:
             game.WIN.fill(self.background_colour)
 
@@ -215,7 +215,7 @@ class Widget():
 
     def get_x(self):
         return self.x * game.WIDTH
-    
+
     def get_y(self):
         return self.y * game.HEIGHT
 
@@ -281,7 +281,7 @@ class AdjustableText(Widget):
                 self.line_spacing = self.font.get_sized_height()
                 self.render_words()
                 break
-            
+
             if low_letter:
                 render_list.append((x, y + (self.line_spacing - bounds.height), word))
                 low_letter = False
@@ -362,7 +362,7 @@ class Text(Widget):
 
         if text != self.labels_text or round(game.WIDTH * self.font_size / 900) != self.labels_size:
             self.update_labels_info()
-        
+
         return self.labels
 
     def draw(self):
@@ -419,7 +419,7 @@ class Button(Text):
         width, height = self.get_width(label), self.get_height(label)
         x, y = self.get_x() - label.get_width()/2, self.get_y() - label.get_height()/2
         return x, y, width, height
-    
+
     def get_max_width(self):
         """Get greatest width of all Buttons on the current_page"""
 
@@ -429,7 +429,7 @@ class Button(Text):
                 if widget.get_width(widget.label) > max_width:
                     max_width = widget.get_width(widget.label)
         return max_width
-    
+
     def get_rect(self, label):
         """If self.uniform == True, set the width to the greatest width of all Buttons on the current_page"""
         if self.uniform:
@@ -532,7 +532,7 @@ class SettingButton(Button):
 
     def mouse_moved(self, mouse):
         if hasattr(self, "sliding") and self.sliding:
-            
+
             x, _, width, _ = self.get_rect(self.label) # get button rect
             ratio = (self.max - self.min) / (width - self.get_slider_width()) # value per pixel
             left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
@@ -600,7 +600,7 @@ class Rectangle(Widget):
                 self.get_width = lambda self: game.WIDTH + self.width
             else:
                 self.get_width = lambda self: self.width
-        
+
         if abs(height) <= 1:
             self.get_height = lambda self: self.height * game.HEIGHT
 
@@ -682,7 +682,7 @@ class UpgradeBar(Widget):
 
             # if clicked on
             if mx > x and mx < x + width and my > y and my < y + height:
-                
+
                 # if bar is less than level then switch to that level
                 if bar < self.get_level():
                     self.set_value(self.min_value + (bar+1) * self.step)
@@ -780,10 +780,10 @@ class Bar():
         pygame.draw.rect(game.WIN, self.colour,
                         rect=(self.x()+self.outline_width, self.y() - self.height()/2 + self.outline_width, # bar position is middle left
                               self.width(), self.height()-self.outline_width*2),
-                        
+
                         border_radius=self.curve-self.outline_width  # - self.outline_width to be the same curve as the inside curve of the outline
                         )
-        
+
         if self.outline_width:
             pygame.draw.rect(game.WIN, self.outline_colour,
                         rect=(self.x()             , self.y() - self.height()/2, # bar position is middle left
@@ -876,7 +876,7 @@ class WorldList():
     def init_worlds(self):
         world_dir = game.get_world_dir()
         self.list = [World(name, seed) for name, seed in world_dir]
-        
+
         x, y = self.x()/game.WIDTH, self.y()/game.HEIGHT
         self.buttons: list[WorldButton] = []
         for idx, world in enumerate(self.list):
@@ -901,14 +901,14 @@ class WorldList():
 
         total_button_height = self.get_total_button_height()
         max_button_height = len(self.list)*(self.height()+self.gap()) - self.gap() + (num-1)*(self.height()+self.gap()) # length of all the buttons + 2 (i.e.num-1) buttons worth of gap at the bottom
-        
+
         scroll_bar_height = (total_button_height / max_button_height) * total_button_height # Ratio of visible button height over total button height, multiplied by available scroll height
         return scroll_bar_height
-    
+
     def get_max_scroll_height(self):
         """Gets the total height the scroll bar can scroll"""
         scroll_bar_height = self.get_scroll_bar_height()
-        
+
         total_button_height = self.get_total_button_height() # Height of buttons that are shown on screen
 
         max_scroll_height = total_button_height - scroll_bar_height # Amount of pixels the scroll bar can move
@@ -918,7 +918,7 @@ class WorldList():
         scroll_bar_height = self.get_scroll_bar_height()
 
         return (self.x() + self.width()/2, self.y() - self.height()/2 + self.scroll_height, self.gap()/2, scroll_bar_height)
-    
+
     def get_button_scroll_ratio(self):
         """Returns the ratio of button scroll to scroll bar scroll"""
         total_button_scroll_height = (len(self.list)-1) * (self.height()+self.gap())
@@ -930,10 +930,10 @@ class WorldList():
             ratio = 1
 
         return -ratio # Buttons scroll opposite direction to scroll bar
-    
+
     def button_scroll_height(self):
         """Returns scroll_bar height converted to scroll height for button"""
-        
+
         ratio = self.get_button_scroll_ratio()
 
         return self.scroll_height * ratio
@@ -1035,7 +1035,7 @@ class WorldButton(Button):
         x, y = x - self.padx, y - self.pady + scroll_height
         return (mouse[0] > x and mouse[0] < x + width and
                 mouse[1] > y and mouse[1] < y + height)
-    
+
     def click(self, mouse, rect, scroll_height):
         if self.touching_mouse(mouse, rect, scroll_height):
             self.function()
@@ -1079,18 +1079,18 @@ class TextInput(Widget):
 
     def get_width(self):
         return self.width * game.WIDTH
-    
+
     def get_height(self):
         return self.height * game.HEIGHT
-    
+
     def get_rect(self):
         return self.get_x() - self.get_width()/2, self.get_y() - self.get_height()/2, self.get_width(), self.get_height()
-    
+
     def touching_mouse(self, mouse):
         x, y, width, height = self.get_rect()
         return (mouse[0] > x and mouse[0] < x + width and
                 mouse[1] > y and mouse[1] < y + height)
-    
+
     def click(self, mouse):
         if self.touching_mouse(mouse):
             self.selected = True
@@ -1192,19 +1192,19 @@ class Mission():
         self.in_progress = True
         self.mission_manager.any_mission_active = True
         game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type, self.reward]
-    
+
     def decline(self):
         if self.in_progress:
             self.mission_manager.any_mission_active = False
             game.CURRENT_MISSION = None
         self.mission_manager.remove_mission(self)
-    
+
     def claim_reward(self):
         self.mission_manager.any_mission_active = False
         game.SCRAP_COUNT += self.reward
         game.CURRENT_MISSION = None
         self.decline() # Removes this mission after claiming reward
-    
+
     def click(self, mouse):
         # Making sure button functions are run when clicked
         if not self.in_progress:
@@ -1216,12 +1216,12 @@ class Mission():
                 if self.claim_reward_button.click(mouse) is True: return True
             else:
                 if self.decline_button.click(mouse) is True: return True
-    
+
     def update(self):
         # Drawing title and info
         self.title_text.draw()
         self.info_text.draw()
-        
+
         # If the mission is in progress - draw the progress bar and stop drawing the accept and decline button. Once the mission is done, it draws the claim reward button
         if self.in_progress:
             self.current_number = game.CURRENT_MISSION[0]
@@ -1253,7 +1253,7 @@ class MissionManager(Widget):
                            "Missile_Ship",
                            "Drone_Enemy",
                            "Mother_Ship"]
-        
+
         # Spawns in three missions
         while self.slot_missing < 3:
             self.add_mission()
@@ -1662,7 +1662,7 @@ def settings_up():
         if hasattr(widget, "selected"):
             if widget.selected:
                 widget.up()
-                
+
 def settings_down():
     for widget in Menu.current_page.widgets:
         if hasattr(widget, "selected"):

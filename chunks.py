@@ -26,7 +26,7 @@ class Chunks():
         self.add_entity(FriendlyStation(position=game.LAST_PLAYER_POS))
 
     def update(self, player):
-        
+
         # Turn coordinates into chunk coordinates
         chunk_coords = player.position // game.CHUNK_SIZE
 
@@ -37,7 +37,7 @@ class Chunks():
         # Loop through chunks in square around player's position
         for y in range(chunk_coords.y - game.LOAD_DISTANCE, chunk_coords.y + game.LOAD_DISTANCE + 1):
             for x in range(chunk_coords.x - game.LOAD_DISTANCE, chunk_coords.x + game.LOAD_DISTANCE + 1):
-                
+
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
                 if position not in self.list:
@@ -72,13 +72,13 @@ class Chunks():
     def remove_entity(self, entity: Object):
 
         self.get_chunk(entity).entities.remove(entity)
-        
+
         if entity in self.entities:
             self.entities.remove(entity)
 
     # optomized
     def move_entity(self, entity: Entity, delta_time):
-        
+
         original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
         entity.position += entity.velocity * delta_time
         new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))

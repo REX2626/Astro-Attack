@@ -36,13 +36,13 @@ class Bar():
         pygame.draw.rect(game.WIN, self.colour,
                         rect=(self.x()+self.outline_width, self.y() - self.height/2 + self.outline_width, # bar position is middle left
                               self.width, self.height-self.outline_width*2),
-                        
+
                         border_top_left_radius=self.left_curve-self.outline_width, # - self.outline_width to be the same curve as the inside curve of the outline
                         border_bottom_left_radius=self.left_curve-self.outline_width,
                         border_top_right_radius=self.right_curve-self.outline_width,
                         border_bottom_right_radius=self.right_curve-self.outline_width
                         )
-        
+
         if self.outline_width:
             pygame.draw.rect(game.WIN, self.outline_colour,
                         rect=(self.x()           , self.y() - self.height/2, # bar position is middle left
@@ -93,12 +93,12 @@ class MiniMap():
         if colour:
             pos = (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
                    ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2))
-            
+
             pygame.draw.circle(surf, colour, pos, self.entity_size)
 
     def get_entity_colour(self, entity):
 
-        # Changes colour based on type of 
+        # Changes colour based on type of
         if isinstance(entity, aiship.Enemy_Ship):
             self.entity_size = 3
             return self.enemy_colour
@@ -174,7 +174,7 @@ class Hotbar():
             x = game.CENTRE_POINT.x + self.gap/2 + (i-self.number/2)*(self.size+self.gap)
             y = game.HEIGHT - self.height
             pygame.draw.rect(game.WIN, colour, (x, y, self.size, self.size), width=6, border_radius=7)
-            
+
             image = self.images[i]
             game.WIN.blit(image, (x+self.size/2-image.get_width()/2, y+self.size/2-image.get_height()/2))
 
@@ -202,10 +202,10 @@ class Console():
                          "godmode": commands.god_mode,
                          "zoom": commands.change_max_zoom,
                          "score": commands.add_score}
-        
+
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
-        
+
         self.commands_to_run = []
 
         self.help_message = ["/spawnentity(entity_class, frequency) - spawns in entity at current location",
@@ -214,10 +214,10 @@ class Console():
                              "/score(score) - adds score to current score"
                              "/log(argument) - prints argument to console",
                              "/entitylist - prints list of entities to spawn"]
-        
+
         self.entity_list_message = ["EnemyStation, FriendlyStation, Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy,",
                                     "Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter, Scrap"]
-        
+
         self.current_selected_command = 0
 
         self.previous_commands = []
@@ -230,7 +230,7 @@ class Console():
         pygame.draw.rect(surf, (0, 0, 0, 200), (0, 0, game.WIDTH, game.HEIGHT))
         game.WIN.blit(surf, (0, 0))
         self.playing_background = game.WIN.copy()
-        
+
         # while loop to pause the game and check for inputs
         while game.CONSOLE_SCREEN == True:
             for event in pygame.event.get():
@@ -239,7 +239,7 @@ class Console():
 
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     game.CONSOLE_SCREEN = False
-                
+
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     self.enter_text()
 
@@ -248,7 +248,7 @@ class Console():
 
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                     self.down_pressed()
-                
+
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
                     self.left_pressed()
 
@@ -297,7 +297,7 @@ class Console():
 
         if self.input_text != "":
             self.input_text = self.input_text.replace("|", "")
-            
+
             # Checks if this is a function which will take in arguments
             if "(" in self.input_text:
                 # splits input into the name of the function (in input_command) and a list of the arguments (in self.arguments)
@@ -313,7 +313,7 @@ class Console():
                 # cause an error by not being able to access the local variable input_command when checking if the input_command
                 # is in self.commands
                 input_command = self.input_text
-            
+
             if self.input_text == "help":
                 self.previous_commands.insert(0, self.input_text)
 
@@ -355,7 +355,7 @@ class Console():
 
         # resets the input_text
         self.input_text = ""
-        
+
         self.cursor_pos = 0
 
     def up_pressed(self):
@@ -364,7 +364,7 @@ class Console():
 
             command = self.previous_commands[self.current_selected_command - 1]
             self.input_text = command
-    
+
     def down_pressed(self):
         if self.current_selected_command > 1:
             self.current_selected_command -= 1
@@ -385,7 +385,7 @@ class Console():
             self.cursor_pos = len(self.input_text) - 1
             self.input_text = self.input_text.replace("|", "")
             self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
-    
+
     def right_pressed(self):
         if self.cursor_pos < len(self.input_text) - 1:
             self.cursor_pos += 1
@@ -411,7 +411,7 @@ class Console():
                     self.commands[command[0]](eval(", ".join(command[1])))
                 except Exception as e:
                     self.chat_history.insert(0, [f"{e}", self.error_colour])
-        
+
         self.commands_to_run.clear()
 
         # Change colour of previously run commands
@@ -422,7 +422,7 @@ class Console():
     def log(self, argument):
         self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
         self.chat_history.insert(0, [f"{argument}", self.output_colour])
-        
+
     def draw(self):
         # the if game.CONSOLE_SCREEN: is run to ensure that this draw method is not run when canvas.draw() is run
         if game.CONSOLE_SCREEN:
@@ -442,7 +442,7 @@ class Console():
             for i, command in enumerate(self.chat_history):
                 text_surface = self.chat_history_font.render(command[0], True, command[1])
                 game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height - ((i + 1) * self.chat_history_gap)))
-            
+
             # Needed since draw() is called in the while loop
             pygame.display.update()
 
@@ -488,7 +488,7 @@ class AdjustableText():
 
             if x + bounds.width >= self.bottom_x or y + self.line_spacing >= self.bottom_y:
                 break
-            
+
             if low_letter:
                 render_list.append((x, y + (self.line_spacing - bounds.height), word))
                 low_letter = False
@@ -526,7 +526,7 @@ class MissionOverview():
         self.title = "Mission"
 
         self.font = freetype.SysFont("bahnschrift", 30)
-        
+
         self.info = "You do not have a mission currently"
         self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
 
@@ -552,7 +552,7 @@ class MissionOverview():
             if game.CURRENT_MISSION[3] == game.KILL:
                 self.title = "Kill Mission"
                 self.info = f"Kill {game.CURRENT_MISSION[1]} {game.ENTITY_DICT.get(game.CURRENT_MISSION[2])}s"
-        
+
         else:
             self.title = "Mission"
 
@@ -565,7 +565,7 @@ class MissionOverview():
         self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
         self.info_text.draw()
 
-            
+
 
 
 
@@ -650,7 +650,7 @@ def get_usage(delta_time):
         else:
             last_cpu_percent = cpu_percent
         cpu_bar = "█" * int((cpu_percent/100) * bars) + "-" * (bars - int((cpu_percent/100) * bars)) # Turns percent into bar visual
-        
+
         mem_percent = psutil.virtual_memory().percent
         mem_bar = "█" * int((mem_percent/100) * bars) + "-" * (bars - int((mem_percent/100) * bars))
 
@@ -719,7 +719,7 @@ def draw(delta_time):
     cursor_highlighting()
 
     highlight_station()
-    
+
     canvas.draw()
 
     # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results

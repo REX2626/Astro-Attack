@@ -15,11 +15,11 @@ class DefaultGun():
         self.speed = speed
         self.spread = spread
         self.image = image()
-        
+
         self.load_image = image
 
         self.time_reloading = 0
-    
+
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.image = self.load_image()
@@ -29,7 +29,7 @@ class DefaultGun():
 
     def shoot(self):
         if self.time_reloading >= self.reload_time:
-            
+
             ship = self.ship
             rotation = ship.rotation + self.spread * (random.random()*2-1) # ship rotation with some spread
             bullet_position = ship.position + Vector(0, -ship.image.get_height()/2 - images.BULLET.get_height()/2) # spawns bullet at ship's gun
@@ -50,7 +50,7 @@ class DefaultGun():
             game.CHUNKS.add_entity(bullet)
             self.time_reloading = 0
 
-    
+
     def fire_missile(self, position, velocity, max_speed, explode_distance, explode_radius, explode_damage):
         missile = entities.Missile(position, velocity, max_speed, explode_distance=explode_distance, explode_radius=explode_radius, explode_damage=explode_damage)
 
@@ -79,7 +79,7 @@ class EnemyGun(DefaultGun):
 class GatlingGun(DefaultGun):
     def __init__(self, ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=lambda: images.GATLING_BULLET) -> None:
         super().__init__(ship, damage, fire_rate, speed, spread, image)
-    
+
 
 
 class PlayerGatlingGun(GatlingGun):
@@ -93,7 +93,7 @@ class PlayerGatlingGun(GatlingGun):
         super().shoot()
 
 
-    
+
 class EnemyGatlingGun(GatlingGun):
     def __init__(self, ship) -> None:
         super().__init__(ship, damage=0.4, fire_rate=3, speed=600, image=lambda: images.RED_GATLING_BULLET)
@@ -169,14 +169,14 @@ class Laser():
                     if entity_rect.collidepoint(x, y):
                         entity_hit = entity
                         break
-            
+
             if entity_hit:
                 break
 
         return step, entity_hit
 
     def draw_beam(self):
-        
+
         beam_width = 10*game.ZOOM
         glow_radius = 100*game.ZOOM
         width, height = beam_width+glow_radius, self.range*game.ZOOM+glow_radius

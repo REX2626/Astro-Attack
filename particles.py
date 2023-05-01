@@ -104,7 +104,7 @@ class ParticleSystem():
 
         for particle in self.particles:
             particle.update(delta_time, self)
-        
+
         if self.entity and self.entity in game.CHUNKS.entities:
             self.previous_position = self.position
             game.CHUNKS.set_position(self, self.entity.position + self.entity_offset(self.entity))
@@ -114,7 +114,7 @@ class ParticleSystem():
             if not self.particles: # if there are no more particles, then the System can be destroyed
                 game.CHUNKS.remove_entity(self)
             return
-        
+
         if self.entity and not self.active: # if not active: don't spawn particles
             self.delay = 0
             return
@@ -137,13 +137,13 @@ class ParticleSystem():
                         position = self.previous_position + (i/count) * vec + (1-i/count) * (self.initial_velocity(self.entity) + random_vector(self.speed)) * delta_time
                         start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
                         self.spawn(position, start_size)
-                
+
             else:
                 for _ in range(int(count)):
                     self.spawn(self.position, self.start_size)
 
     def draw(self, WIN, player_pos):
-        
+
         for particle in self.particles:
             particle.draw(WIN, player_pos)
 

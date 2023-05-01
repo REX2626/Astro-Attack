@@ -1,4 +1,4 @@
-from objects import Vector1D, Vector, Object, Entity, random_vector
+from objects import Vector, Object, Entity, random_vector
 from weapons import DefaultGun
 import effects
 import images
@@ -60,7 +60,7 @@ class Asteroid(Object):
         if not image:
             number = random.randint(0, len(images.ASTEROIDS)-1)
         super().__init__(position, lambda: images.ASTEROIDS[number])
-        
+
         # Set Asteroid to random rotation
         self.rotation = random.random() * 360
         self.image = pygame.transform.rotate(self.image, self.rotation)
@@ -111,12 +111,12 @@ class Ship(Entity):
         self.armour = armour
         self.shield_delay = shield_delay
         self.shield_recharge = shield_recharge
-        
+
         self.shield_delay_elapsed = 0
-        self.rotation_speed = Vector1D(0)
+        self.rotation_speed = 0
 
     def update(self, delta_time):
-        
+
         # Move the ship by it's velocity
         super().update(delta_time)
 
@@ -134,7 +134,8 @@ class Ship(Entity):
         -> See above definition of dampening
         -> 3 is the size of the dampening
         """
-        self.rotation_speed -= self.rotation_speed.get_clamp(3 * delta_time)
+        # clamp self.rotation_speed dampening to 3*delta_time
+        self.rotation_speed -= math.copysign(min(abs(self.rotation_speed), 3*delta_time), self.rotation_speed)
 
         # Change rotation by rotation speed
         self.set_rotation(self.rotation + self.rotation_speed * delta_time)
@@ -161,11 +162,12 @@ class Ship(Entity):
 
     def accelerate_rotation(self, acceleration):
         self.rotation_speed += acceleration
-        self.rotation_speed.clamp(self.max_rotation_speed)
+        # clamp self.rotation_speed to self.max_rotation_speed
+        self.rotation_speed = math.copysign(min(abs(self.rotation_speed), self.max_rotation_speed), self.rotation_speed)
 
     def make_new_patrol_point(self, min_dist, max_dist, relative_pos):
         self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + relative_pos
-    
+
     def damage(self, damage, entity=None):
         """entity is the object which is damaging this ship, DON'T REMOVE"""
         self.shield_delay_elapsed = 0
@@ -194,7 +196,7 @@ class Ship(Entity):
         if game.CURRENT_MISSION:
             if game.CURRENT_MISSION[3] == game.KILL and game.CURRENT_MISSION[2] == self.__class__.__name__:
                 game.CURRENT_MISSION[0] += 1
-        
+
         game.CHUNKS.remove_entity(self)
         effects.explosion(self.position)
 
@@ -238,7 +240,7 @@ class Pickup(Entity):
     def activate(self):
         # Have set function for each pickup
         return
-    
+
     def destroy(self):
         game.CHUNKS.remove_entity(self)
 
@@ -253,7 +255,7 @@ class Pickup(Entity):
 #             super().update(delta_time)
 
 #     def activate(self):
-        
+
 #         game.player.armour += 5
 
 #         if game.player.armour > game.MAX_PLAYER_ARMOUR:
@@ -285,7 +287,7 @@ class Bullet(Entity):
         self.damage = damage
         self.lifetime = lifetime
         self.start_time = 0
-        
+
     def update(self, delta_time):
         super().update(delta_time)
 
@@ -320,7 +322,7 @@ class Bullet(Entity):
 class Missile(Entity):
     def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=lambda: images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
-        
+
         self.max_speed = max_speed
         self.max_rotation_speed = max_rotation_speed
         self.explode_distance = explode_distance
@@ -347,7 +349,7 @@ class Missile(Entity):
 
         if self.distance_to(game.player) < self.explode_distance:
             self.exploding = True
-        
+
         if self.exploding:
             self.time_to_explode += delta_time
             if self.time_to_explode > self.explode_countdown:
@@ -373,7 +375,7 @@ class Missile(Entity):
                 if distance < radius:
                     entities_to_damage.append(entity)
                     damage_values.append(1 - distance / self.explode_radius)
-        
+
         for i, entity in enumerate(entities_to_damage):
             entity.damage(self.explode_damage * damage_values[i])
 

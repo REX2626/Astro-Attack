@@ -222,7 +222,7 @@ def get_world_dir():
 def update_world_dir(name, seed):
     with open(os.path.join("_storage", "world_dir.json"), "r") as file:
         world_dir: list = json.load(file)
-    
+
     world_dir.append((name, seed))
 
     with open(os.path.join("_storage", "world_dir.json"), "w") as file:

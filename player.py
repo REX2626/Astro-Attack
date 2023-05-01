@@ -44,7 +44,7 @@ class Player_Ship(Ship):
 
         def boost_offset(player): return ship_offset(player, boost_distance)
         self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=3, duration=None, lifetime=0.5, frequency=180, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
-        
+
         def boost_offset(player): return ship_offset(player, boost_distance) + random_vector(1)
         self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=2, end_size=0, colour=(227, 97, 37), bloom=2, duration=None, lifetime=0.5, frequency=360, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
 
@@ -57,20 +57,20 @@ class Player_Ship(Ship):
 
         # If the player ship has just finished boosting, then the intertial dampening will be twice as strong
         if self.velocity.magnitude() >= self.max_speed: self.velocity -= self.velocity.get_clamp(200 * delta_time)
-        
+
         if self.tracked_enemy in game.CHUNKS.entities: # if enemy is loaded
             self.track_enemy()
         else:
             self.tracked_enemy = None
 
         if game.DOCKING:
-            
+
             if self.station_to_dock == None:
                 self.station_to_dock = self.station_highlighted
                 self.max_speed = self.distance_to(self.station_to_dock) / 2  # Moves faster if further from centre of station
-            
+
             self.accelerate_onto_pos(self.station_to_dock.position, 400, self.max_speed)
-            
+
             if self.distance_to(self.station_to_dock) < 1:  # Docked
                 game.DOCKING = False
                 self.max_speed = game.MAX_PLAYER_SPEED
@@ -165,7 +165,7 @@ class Player_Ship(Ship):
 
         if self.tracked_enemy:
             pygame.draw.circle(game.WIN, (255, 0, 0), ((self.aim_pos.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.aim_pos.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20*game.ZOOM, width=round(2*game.ZOOM))
-     
+
 
 
 def get_player():

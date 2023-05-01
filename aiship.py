@@ -82,7 +82,7 @@ class AI_Ship(Ship):
 
                 if self.check_for_asteroid(chunk_pos) == False:
                     break
-        
+
         # Makes Target around mother ship to keep it within distance of mothership
         if target_to_mothership_distance > 500:
             self.make_new_patrol_point(100, 400, mother_ship.position)
@@ -92,7 +92,7 @@ class AI_Ship(Ship):
             # If the intermediate_patrol_point has not already been calculated, calculate it
             if self.intermediate_patrol_point == None:
                 self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=target_position, point_spacing=game.CHUNK_SIZE / 2, intermediate_point_distance=game.CHUNK_SIZE)
-            
+
             # If there is an intermediate_patrol_point, fly to it. Else, fly directly to the station
             if self.intermediate_patrol_point:
                 self.rotate_to(delta_time, self.position.get_angle_to(self.intermediate_patrol_point), self.max_rotation_speed)
@@ -136,7 +136,7 @@ class AI_Ship(Ship):
                     d_y = intermediate_point_distance * math.sin(math.atan2(-dx, dy))
 
                     return Vector(entity.position.x + d_x, entity.position.y + d_y) # returns point of intermediate_point
-        
+
         # There is no intermediate point
         return None
 
@@ -180,7 +180,7 @@ class AI_Ship(Ship):
         if self.time_strafing > self.time_to_stop_strafing:
             self.acceleration_constant *= -1
             self.time_to_stop_strafing += random.randint(2, 5)
-        
+
         # Accelerate in that direction
         self.accelerate_to(final_vector, self.acceleration_constant * delta_time)
 
@@ -217,7 +217,7 @@ class AI_Ship(Ship):
             level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"] = text_surface
         else:
             text_surface: pygame.Surface = level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"]
-        
+
         game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
 
 
@@ -293,7 +293,7 @@ class Enemy_Ship(AI_Ship):
 
     def destroy(self):
         super().destroy()
-        
+
         if self in self.mother_ship.enemy_list:
             self.mother_ship.enemy_list.remove(self)
 
@@ -331,7 +331,7 @@ class Missile_Ship(Enemy_Ship):
         self.explode_countdown = explode_countdown
         self.time_to_explode = 0
         self.exploding = False
-        
+
         self.particles = effects.missile_ship_trail(self)
 
 
@@ -370,7 +370,7 @@ class Missile_Ship(Enemy_Ship):
                 if distance < radius:
                     entities_to_damage.append(entity)
                     damage_values.append(1 - distance / self.explode_radius)
-        
+
         for i, entity in enumerate(entities_to_damage):
             entity.damage(self.explode_damage * damage_values[i])
 
@@ -415,7 +415,7 @@ class Mother_Ship(Enemy_Ship):
 
             if self.check_for_asteroid(chunk_pos) == False:
                 break
-        
+
         # Spawn in enemies
         enemy_spawn_number = random.randint(2, int(4 * (self.level/10 + 1)))
 
@@ -428,7 +428,7 @@ class Mother_Ship(Enemy_Ship):
                     enemy = Drone_Enemy(random_position, Vector(0, 0), level=self.level, mother_ship=self)
                 else:
                     enemy = Enemy_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
-            
+
             else:
                 if random.random() < 0.2:
                     enemy = Missile_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
@@ -436,18 +436,18 @@ class Mother_Ship(Enemy_Ship):
                     enemy = Drone_Enemy(random_position, Vector(0, 0), level=self.level, mother_ship=self)
                 else:
                     enemy = Enemy_Ship(random_position, Vector(0, 0), level=self.level, mother_ship=self)
-            
+
             self.enemy_list.append(enemy)
-            
+
             game.CHUNKS.add_entity(enemy)
 
-    
+
     def update(self, delta_time):
         super().update(delta_time)
 
         self.time_reloading += delta_time
 
-    
+
     def attack_entity_state(self, delta_time, entity, min_dist=300, max_dist=600, max_speed=100):
         super().attack_entity_state(delta_time, entity, min_dist, max_dist, max_speed)
 
@@ -467,7 +467,7 @@ class Mother_Ship(Enemy_Ship):
                 self.weapon.fire_missile(self.position, final_vector * 100 * -delta_time, 1000, 100, 150, 5)
 
                 self.time_reloading = 0
-    
+
 
     def destroy(self):
         super().destroy()
@@ -479,13 +479,13 @@ class Mother_Ship(Enemy_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-        
+
 
     def alert_group(self):
         for enemy in self.enemy_list:
             if enemy.state != RETREAT:
                 enemy.state = ATTACK
-        
+
         self.state = ATTACK
 
 
@@ -515,7 +515,7 @@ class Neutral_Ship(AI_Ship):
         elif self.state == PATROL:
             self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
 
-    
+
     def check_nearby_stations(self, current_station=None):
 
         if self.target_station == None:
@@ -524,7 +524,7 @@ class Neutral_Ship(AI_Ship):
             for entity in game.CHUNKS.entities:
                 if type(entity).__name__ == "FriendlyStation":
                     stations.append(entity)
-            
+
             # Remove current station so it is not an option to travel to
             if current_station in stations:
                 stations.remove(current_station)
@@ -543,20 +543,20 @@ class Neutral_Ship(AI_Ship):
                     random_station = random.choices(stations, weights=weights, k=1)
                     self.target_station = random_station[0]
                     self.state = PATROL_TO_STATION
-            
+
             # If there are no other stations available, just patrol around the current one
             else:
                 self.state = PATROL
         else:
             self.state = PATROL_TO_STATION
-        
+
     def patrol_to_station(self, delta_time, max_speed=50):
         self.max_speed = max_speed
 
         # If the intermediate_patrol_point has not already been calculated, calculate it
         if self.intermediate_patrol_point == None:
             self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=self.target_station.position, point_spacing=game.CHUNK_SIZE / 2, intermediate_point_distance=game.CHUNK_SIZE)
-        
+
         # If there is an intermediate_patrol_point, fly to it. Else, fly directly to the station
         if self.intermediate_patrol_point:
             self.rotate_to(delta_time, self.position.get_angle_to(self.intermediate_patrol_point), self.max_rotation_speed)
@@ -580,7 +580,7 @@ class Neutral_Ship(AI_Ship):
         super().draw(win, focus_point)
         if game.DEBUG_SCREEN:
             pygame.draw.circle(game.WIN, (0, 255, 0), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
-            
+
             if self.intermediate_patrol_point:
                 pygame.draw.circle(game.WIN, (200, 100, 0), ((self.intermediate_patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.intermediate_patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
 
@@ -601,9 +601,9 @@ class Neutral_Ship_Cargo(Neutral_Ship):
             random_position = self.position + random_vector(game.CHUNK_SIZE/2)
 
             neutral = Neutral_Ship_Fighter(random_position, Vector(0, 0), level=game.CURRENT_SHIP_LEVEL, mother_ship=self)
-            
+
             self.neutral_list.append(neutral)
-            
+
             game.CHUNKS.add_entity(neutral)
 
     def damage(self, damage, entity=None):
@@ -616,7 +616,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
                 for neutral in self.neutral_list:
                     neutral.recent_enemy = entity
                     neutral.state = ATTACK_ENEMY
-        
+
         super().damage(damage)
 
     def alert_group(self):
@@ -682,5 +682,5 @@ class Neutral_Ship_Fighter(Neutral_Ship):
                     for neutral in self.mother_ship.neutral_list:
                         neutral.recent_enemy = entity
                         neutral.state = ATTACK_ENEMY
-        
+
         super().damage(damage)

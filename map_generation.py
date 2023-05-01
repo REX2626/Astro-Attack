@@ -6,7 +6,7 @@ def set_seed(x, y):
     f = math.floor
     frac = lambda x: x - f(x)
     random.seed(
-        f( math.pi * 190000 * 
+        f( math.pi * 190000 *
         x * y * frac(
             game.SEED * math.pi
             + frac(

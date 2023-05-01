@@ -62,7 +62,7 @@ def draw_chunks():
 
             else:
                 pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
-        
+
 
 
 # Generate list of 6 layers, each layer has 100 coordinates of stars

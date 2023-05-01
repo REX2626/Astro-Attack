@@ -30,7 +30,7 @@ class Station(Object):
 
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-        
+
         self.z = -1
 
     def __setstate__(self, state):
@@ -59,7 +59,7 @@ class Station(Object):
         random_position = self.position + random_vector(game.CHUNK_SIZE/3)
 
         entity = entity_type(random_position, Vector(0, 0), level=game.CURRENT_SHIP_LEVEL, current_station=self)
-        
+
         game.CHUNKS.add_entity(entity)
 
 

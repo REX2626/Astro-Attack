@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 import math
 import images
@@ -6,170 +7,112 @@ import random
 
 
 
-class Vector1D():
-    def __init__(self, x) -> None:
-        self.x = x
-
-    def __add__(self, arg):
-
-        # Adding Vectors
-        if type(arg) == Vector1D:
-            return Vector1D(self.x + arg.x)
-
-        # Adding Vector and number
-        else:
-            return Vector1D(self.x + arg)
-
-    def __radd__(self, arg):
-        return self.x + arg
-
-    def __sub__(self, arg):
-        return Vector1D(self.x - arg.x)
-
-    def __mul__(self, arg):
-
-        # Multiplying Vectors
-        if type(arg) == Vector1D:
-            return Vector1D(self.x * arg.x)
-
-        # Multiplying Vector by int
-        else:
-            return Vector1D(self.x * arg)
-
-    def __truediv__(self, arg):
-
-        # Vector divided by Vector
-        if type(arg) == Vector1D:
-            return Vector1D(self.x / arg.x)
-
-        # Vector divided by number
-        else:
-            return Vector1D(self.x / arg)
-
-    def magnitude(self):
-        return abs(self.x)
-
-    def set_magnitude(self, magnitude):
-        new_vector = self * magnitude / self.magnitude()
-        self.x = new_vector.x
-
-    def clamp(self, maximum):
-        if self.magnitude() > maximum:
-            self.set_magnitude(maximum)
-
-    def get_clamp(self, maximum):
-        if self.magnitude() > maximum:
-            # Set magnitude to maximum
-            return self * maximum / self.magnitude()
-        return self
-
-
-
 class Vector():
-    def __init__(self, x, y) -> None:
+    __slots__ = ("x", "y")
+    def __init__(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
 
-    def __add__(self, arg):
+    def __add__(self, arg: Vector | float) -> Vector:
 
         # Adding Vectors
-        if type(arg) == Vector:
+        if isinstance(arg, Vector):
             return Vector(self.x + arg.x, self.y + arg.y)
 
         # Adding Vector to Scalar
         else:
             return Vector(self.x + arg, self.y + arg)
 
-    def __truediv__(self, arg):
+    def __truediv__(self, arg: Vector | float) -> Vector:
 
         # Dividing Vectors
-        if type(arg) == Vector:
+        if isinstance(arg, Vector):
             return Vector(self.x / arg.x, self.y / arg.y)
-        
+
         # Dividing Vector by Scalar
         else:
             return Vector(self.x / arg, self.y / arg)
 
-    def __rtruediv__(self, arg):
-        
+    def __rtruediv__(self, arg: float) -> Vector:
+
         # arg can't be a Vector
         return Vector(self.x / arg, self.y / arg)
 
-    def __floordiv__(self, arg):
+    def __floordiv__(self, arg: float) -> Vector:
 
         # Dividing Vector by Scalar
         return Vector(int(self.x // arg), int(self.y // arg))
-    
-    def __sub__(self, arg):
+
+    def __sub__(self, arg: Vector | float) -> Vector:
 
         # Subtracting Vectors
-        if type(arg) == Vector:
+        if isinstance(arg, Vector):
             return Vector(self.x - arg.x, self.y - arg.y)
-        
+
         # Subtracting Scalar from Vector
         else:
             return Vector(self.x - arg, self.y - arg)
 
-    def __mul__(self, arg):
+    def __mul__(self, arg: Vector | float) -> Vector:
 
         # Multiplying Vectors
-        if type(arg) == Vector:
+        if isinstance(arg, Vector):
             return Vector(self.x * arg.x, self.y * arg.y)
 
         # Multiplying Vector with Scalar
         else:
             return Vector(self.x * arg, self.y * arg)
 
-    def __rmul__(self, arg):
+    def __rmul__(self, arg: float) -> Vector:
 
         # arg can't be a Vector
         return Vector(self.x * arg, self.y * arg)
 
-    def __mod__(self, arg):
+    def __mod__(self, arg: Vector) -> Vector:
         return Vector(int(self.x) % arg, int(self.y) % arg)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str((self.x, self.y))
 
-    def __round__(self):
+    def __round__(self) -> Vector:
         return Vector(round(self.x), round(self.y))
 
-    def clamp(self, maximum):
+    def clamp(self, maximum: float) -> None:
         if self.magnitude() > maximum:
             self.set_magnitude(maximum)
 
-    def get_clamp(self, maximum):
+    def get_clamp(self, maximum: float) -> Vector:
         if self.magnitude() > maximum:
             # Set magnitude to maximum
             return self * maximum / self.magnitude()
         return self
 
-    def magnitude(self):
+    def magnitude(self) -> float:
         return (self.x**2 + self.y**2) ** 0.5
 
-    def set_magnitude(self, magnitude):
+    def set_magnitude(self, magnitude: float) -> None:
         # cringe way of updating self
         # can't do "self = new_vector" as self is just a variable
         new_vector = self * magnitude / self.magnitude()
         self.x = new_vector.x
         self.y = new_vector.y
 
-    def get_angle_to(self, position):
+    def get_angle_to(self, position: Vector) -> float:
         angle = math.atan((-position.y + self.y) / (position.x - self.x))
         return angle - math.pi/2 if self.x < position.x else angle + math.pi/2
 
-    def get_angle(self):
+    def get_angle(self) -> float:
         """Get's the Vector's angle from the origin"""
         return math.atan2(self.y, self.x)
 
-    def rotate(self, angle):
+    def rotate(self, angle: float) -> None:
         x1, y1 = self.x, self.y
         # The positive and negative signs are different
         # Because y increases downwards (for our coord system)
         self.x = y1*math.sin(angle) + x1*math.cos(angle)
         self.y = y1*math.cos(angle) - x1*math.sin(angle)
 
-    def get_rotate(self, angle):
+    def get_rotate(self, angle: float) -> Vector:
         x1, y1 = self.x, self.y
         # The positive and negative signs are different
         # Because y increases downwards (for our coord system)
@@ -177,21 +120,21 @@ class Vector():
         y = y1*math.cos(angle) - x1*math.sin(angle)
         return Vector(x, y)
 
-    def rotate_about(self, angle, position):
+    def rotate_about(self, angle: float, position: Vector) -> None:
         self.x -= position.x
         self.y -= position.y
         self.rotate(angle)
         self.x += position.x
         self.y += position.y
 
-    def copy(self):
+    def copy(self) -> Vector:
         return Vector(self.x, self.y)
 
-    def in_range(self, x, y, width, height):
+    def in_range(self, x: float, y: float, width: float, height: float) -> bool:
         return self.x >= x and self.x <= x + width and self.y >= y and self.y <= y + height
-    
-    def to_tuple(self):
-        return (self.x, self.y)
+
+    def to_tuple(self) -> tuple:
+        return self.x, self.y
 
 
 
@@ -200,20 +143,20 @@ def random_vector(magnitude: float) -> Vector:
     random_direction = random.random() * 2 * math.pi    # Get random direction
 
     random_vector = Vector(magnitude * math.cos(random_direction), magnitude * math.sin(random_direction))  # Get random vector with magnitude
-    
+
     return random_vector
 
 
 
 class Object():
     def __init__(self, position, image=lambda: images.DEFAULT) -> None:
-        
+
         # Make position a vector
         if type(position) != Vector:
             self.position = Vector(position[0], position[1])
         else:
             self.position: Vector = position
-        
+
         self.image = image()
 
         self.load_image = image # a function that returns a pygame Surface
@@ -222,16 +165,16 @@ class Object():
 
         # Set the size (dimensions), original size of image, doesn't change when rotating
         self.size = Vector(self.image.get_width(), self.image.get_height())
-    
+
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.image = self.load_image()
         self.scaled_image = pygame.transform.scale_by(self.image, self.scale)
-        
+
     def update(self, delta_time):
         pass
 
-    def distance_to(self, object):
+    def distance_to(self, object: Object) -> float:
         return (self.position - object.position).magnitude()
 
     def get_zoomed_image(self):
@@ -278,7 +221,7 @@ class Entity(MoveableObject):
         self.image_rotation = 0
         self.rotated_image = self.image
         self.set_rotation(rotation)
-    
+
     def __setstate__(self, state):
         super().__setstate__(state)
         self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
@@ -286,7 +229,7 @@ class Entity(MoveableObject):
     def set_rotation(self, rotation):
         self.rotation = rotation
 
-    def rotate_to(self, delta_time, rotation, speed):   
+    def rotate_to(self, delta_time, rotation, speed):
         # Simplify rotation (if self.rotation < -math.pi or self.rotation > math.pi)
         self.rotation = (self.rotation - math.pi) % (2*math.pi) - math.pi
 
@@ -336,7 +279,7 @@ class Entity(MoveableObject):
             self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
 
             return self.rotated_image
-        
+
         if self.image_rotation != self.rotation:
             self.image_rotation = self.rotation
             self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)

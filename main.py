@@ -74,7 +74,6 @@ def draw_window(delta_time):
 
 
 def handle_player_input(keys_pressed, delta_time):
-
     """Adjust player velocity depnding on input. NOTE: Not for changing position"""
 
     if game.DOCKING:
@@ -99,7 +98,7 @@ def handle_player_input(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_RIGHT]:
         player.turn_right(delta_time)
-    
+
     if keys_pressed[pygame.K_SPACE]:
         player.boost(delta_time)
     else:
@@ -279,7 +278,7 @@ def main():
 
                 # Correct time1
                 time1 = perf_counter() - start + time1
-                
+
         time2 = perf_counter()
         delta_time = time2 - time1
 

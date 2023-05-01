@@ -153,7 +153,7 @@ Fix angle, so it is between +180 and -180
 
 CHUNKS is globalled in objects.py
 
-When updating entities, don't update every entity's chunk 
+When updating entities, don't update every entity's chunk
 In entity.update(), if the entity moved, put entity into it's new chunk
 
 Add asteroid class
