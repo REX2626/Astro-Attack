@@ -1,7 +1,5 @@
-import pygame
-
-from game import *
 import game
+from game import *
 from entities import Bullet, Asteroid
 from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
 from particles import ParticleSystem
@@ -11,6 +9,7 @@ import graphics
 import random
 import math
 from time import perf_counter
+import pygame
 
 pygame.display.set_caption("Astro Attack")
 

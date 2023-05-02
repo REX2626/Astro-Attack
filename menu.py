@@ -399,7 +399,6 @@ class Button(Text):
     def click(self, mouse):
         if self.touching_mouse(mouse):
             self.function()
-            Menu.update()
             return True # Tells the Menu that this Button has been clicked on
 
     def touching_mouse(self, mouse):
@@ -1192,12 +1191,14 @@ class Mission():
         self.in_progress = True
         self.mission_manager.any_mission_active = True
         game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type, self.reward]
+        Menu.update()
 
     def decline(self):
         if self.in_progress:
             self.mission_manager.any_mission_active = False
             game.CURRENT_MISSION = None
         self.mission_manager.remove_mission(self)
+        Menu.update()
 
     def claim_reward(self):
         self.mission_manager.any_mission_active = False

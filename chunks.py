@@ -13,7 +13,7 @@ class Chunks():
 
         self.create_initial_chunks()
 
-    def create_initial_chunks(self):
+    def create_initial_chunks(self) -> None:
         def func(_):
             pass
         generate = Chunk.generate
@@ -25,7 +25,7 @@ class Chunks():
         setattr(Chunk, "generate", generate)
         self.add_entity(FriendlyStation(position=game.LAST_PLAYER_POS))
 
-    def update(self, player):
+    def update(self, player: Entity) -> None:
 
         # Turn coordinates into chunk coordinates
         chunk_coords = player.position // game.CHUNK_SIZE
@@ -50,7 +50,7 @@ class Chunks():
             if hasattr(entity, "unload"):
                 entity.unload()
 
-    def get_chunk(self, arg: tuple[int, int] or Object) -> "Chunk":
+    def get_chunk(self, arg: tuple[int, int] | Object) -> "Chunk":
         """Returns the chunk, arg can be a chunk_coord or an object"""
 
         # Check if arg is chunk_coord or an entity
@@ -65,11 +65,11 @@ class Chunks():
 
         return self.list[position]
 
-    def add_entity(self, entity: Object):
+    def add_entity(self, entity: Object) -> None:
 
         self.get_chunk(entity).entities.add(entity)
 
-    def remove_entity(self, entity: Object):
+    def remove_entity(self, entity: Object) -> None:
 
         self.get_chunk(entity).entities.remove(entity)
 
@@ -77,8 +77,8 @@ class Chunks():
             self.entities.remove(entity)
 
     # optomized
-    def move_entity(self, entity: Entity, delta_time):
-
+    def move_entity(self, entity: Entity, delta_time: float) -> None:
+        """Moves the entity using it's velocity"""
         original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
         entity.position += entity.velocity * delta_time
         new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
@@ -88,8 +88,8 @@ class Chunks():
             self.get_chunk(new_chunk_pos).entities.add(entity)
 
     # optomized
-    def set_position(self, entity: Entity, position: Vector):
-
+    def set_position(self, entity: Entity, position: Vector) -> None:
+        """Moves the entity to `position`"""
         original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
         entity.position = position
         new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
@@ -101,12 +101,12 @@ class Chunks():
 
 
 class Chunk():
-    def __init__(self, position) -> None:
+    def __init__(self, position: Vector) -> None:
         self.position = position
         self.entities = set()
         self.generate()
 
-    def generate(self):
+    def generate(self) -> None:
 
         # elif is used so that ships don't spawn in an asteroid chunk
         # the ships make sure they don't spawn inside a chunk by
@@ -151,7 +151,7 @@ class Chunk():
             )
 
 
-    def adjoining_asteroid_chunk(self):
+    def adjoining_asteroid_chunk(self) -> bool:
 
         for y in range(self.position.y-1, self.position.y+2):
             for x in range(self.position.x-1, self.position.x+2):
@@ -165,7 +165,7 @@ class Chunk():
 
         return False
 
-    def adjoining_empty_chunks(self):
+    def adjoining_empty_chunks(self) -> bool:
 
         for y in range(self.position.y-1, self.position.y+2):
             for x in range(self.position.x-1, self.position.x+2):
@@ -178,6 +178,6 @@ class Chunk():
 
         return True
 
-    def random_position(self):
+    def random_position(self) -> Vector:
         return Vector(random.randint(self.position.x * game.CHUNK_SIZE, self.position.x * game.CHUNK_SIZE + game.CHUNK_SIZE - 1),
             random.randint(self.position.y * game.CHUNK_SIZE, self.position.y * game.CHUNK_SIZE + game.CHUNK_SIZE - 1))

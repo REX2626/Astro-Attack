@@ -65,17 +65,20 @@ class Player_Ship(Ship):
 
         if game.DOCKING:
 
-            if self.station_to_dock == None:
+            if self.station_to_dock is None:
                 self.station_to_dock = self.station_highlighted
                 self.max_speed = self.distance_to(self.station_to_dock) / 2  # Moves faster if further from centre of station
-
-            self.accelerate_onto_pos(self.station_to_dock.position, 400, self.max_speed)
 
             if self.distance_to(self.station_to_dock) < 1:  # Docked
                 game.DOCKING = False
                 self.max_speed = game.MAX_PLAYER_SPEED
                 game.OPEN_STATION = True
+                game.CHUNKS.set_position(self, self.station_to_dock.position)
+                self.velocity = Vector(0, 0)
                 self.station_to_dock = None
+
+            else:
+                self.accelerate_onto_pos(self.station_to_dock.position, 400, self.max_speed)
 
         self.max_shield = game.MAX_PLAYER_SHIELD
         self.shield_recharge = game.PLAYER_SHIELD_RECHARGE

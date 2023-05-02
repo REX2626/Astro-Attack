@@ -10,7 +10,6 @@ Game constants are loaded from save at the start of a game
 
 import os
 import json
-import dill
 import pygame
 
 pygame.init()
@@ -91,6 +90,8 @@ ENTITY_DICT = {"Enemy_Ship": "Enemy Ship", "Mother_Ship": "Mother Ship", "Drone_
 # ==================
 # WORLD CONSTANTS
 # ==================
+
+import dill
 
 global_variables = globals().copy()
 
