@@ -18,41 +18,47 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
-Missions (stations will give a reward for completing a mission)
-    Add mission menu:
-        Accepting and declining buttons working
-        Reward buttons and reward screen
-        Better progress bar
-        Make it look nicer
-        Mission manager can show 3 missions - declining them cycles them - only one mission activated at a time
 
-    Mission player ui:
-        Progress bar and info on right side of screen during game
-        Maybe add a hotkey to quickly pull of mission menu
+Fix UI false weapon selection upon game restart
 
-    Add different types of missions
-    Make it so that missions can be randomly generated based on the difficulty
-    Randomly generate rewards
+Fix minimap - add rendering order to ships and stations
 
+Fix station menu button overlapping
 
-Enemy stations can only respawn reinforcements once or twice
+Polish station menu:
+Make buttons uniform size
+Improve look of mission menu
+Add something to stats menu
 
-Improve console:
+Finish basic missions:
+Make reward proportional to mission diffculty
+Reduce the massive increase in mission kill number and reward
+Add other mission types
+
+Improve console and text input:
 Add ctrl+v
 Add spam, if a button is hold down > 1 second, repeatedly paste that button
 
+Improve neutral ship fighting AI
+Fix Neutral ships not attacking if their mothership is destroyed
+
+Add back buttons
+
+### a1.5.0 (sound, general clear up and polishing)
+
+When you take damage, bar is highlighted with damage before the health/armour/shield disappears
+
+Add special features to weapons (e.g. sniper can zoom in on enemy)
+
 Add transparency to particles so they can fade out
 
+Add thruster particles to ships
 
 Enemy stations have weapons, can be destroyed for loot
 
-Add hitboxes
+New mothership image, large and powerful
 
 Add missile and autoturret weapons
-
-Stations can be docked with
-
-New mothership image, large and powerful
 
 Weapons have a certain amount of penetration, more penetration, more damage to health
 Missile have low pen, sniper has high pen
@@ -61,25 +67,15 @@ When health is damaged, it effects how ships work, e.g. start smoking, visual sc
 When bits of player ship stops working, message should come up
 Some visual to show armour, and it breaking
 
-Improve neutral ship fighting AI
-
-Add thruster particles to ships
-
-Add special features to weapons (e.g. sniper can zoom in on enemy)
-
-When you take damage, bar is highlighted with damage before the health/armour/shield disappears
-
-Add back buttons
-
-Make it so you have to be near to a station to click on it
-
-### a1.5.0 (sound)
-
 ### a1.6.0 (bosses, ship customization, friendly ships)
 
 ### a1.7.0 (multiplayer)
 
 ### Other
+Enemy stations can only respawn reinforcements once or twice
+
+Add hitboxes
+
 Make bullets do less damage the further away they go (mainly for gatling gun)
 
 Add bullet damage effect, when bullets hits something, blue sparks explode
@@ -435,3 +431,23 @@ Fix ships that don't spawn at station being always level 0
 Console:
 Allow cursor to go from left of text straight to the right of text
 Add del button, to delete text from the right
+
+Make it so you have to be near to a station to click on it
+
+Stations can be docked with
+
+Missions (stations will give a reward for completing a mission)
+    Add mission menu:
+        Accepting and declining buttons working
+        Reward buttons and reward screen
+        Better progress bar
+        Make it look nicer
+        Mission manager can show 3 missions - declining them cycles them - only one mission activated at a time
+
+    Mission player ui:
+        Progress bar and info on right side of screen during game
+        Maybe add a hotkey to quickly pull of mission menu
+
+    Add different types of missions
+    Make it so that missions can be randomly generated based on the difficulty
+    Randomly generate rewards

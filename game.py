@@ -242,6 +242,22 @@ def set_name_to_top_of_world_dir(name):
     with open(os.path.join("_storage", "world_dir.json"), "w") as file:
         json.dump(world_dir, file)
 
+def delete_world(name):
+    # Delete world name from directory
+    with open(os.path.join("_storage", "world_dir.json"), "r") as file:
+        world_dir: list = json.load(file)
+
+    for world in world_dir:
+        if world[0] == name:
+            world_dir.remove(world)
+            break
+
+    with open(os.path.join("_storage", "world_dir.json"), "w") as file:
+        json.dump(world_dir, file)
+
+    # Delete world data from worlds
+    os.remove(os.path.join("_storage", "worlds", f"{name}.pkl"))
+
 reset_constants()
 
 # Create world_dir.json if it doesn't exist
@@ -271,7 +287,6 @@ def quit():
 
 def update_screen_size():
     """Updates objects size and position with new screen size"""
-    "Adjust any constants"
 
     global WIDTH, HEIGHT, CENTRE_POINT
     WIDTH, HEIGHT = pygame.display.get_window_size()

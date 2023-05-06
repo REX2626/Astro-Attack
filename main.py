@@ -18,15 +18,8 @@ pygame.display.set_caption("Astro Attack")
 def update_playing_screen_size():
     """Updates live objects positions"""
 
-    "Get objects position on screen by ratio e.g. 20% of the screen"
-
     game.update_screen_size()
-
     graphics.update_graphics_screen_size()
-
-    "Set the x and y of objects based on new width and height, with ratios"
-
-    "Clip the coords of any object out of bounds"
 
 
 rand_x = 0

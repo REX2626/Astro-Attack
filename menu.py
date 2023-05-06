@@ -579,6 +579,58 @@ class SettingButton(Button):
 
 
 
+class WorldSelectionButton(Button):
+    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, uniform=False) -> None:
+        self.inactive_text_colour = (150, 150, 150)
+        self.inactive_box_colour = (40, 40, 40)
+        self.inactive_hover_colour = (40, 40, 40)
+        super().__init__(x, y, text, font, font_size, colour, padx, pady, function, box_colour, outline_colour, hover_colour, uniform)
+        self.text_colour = colour
+        self.default_box_colour = box_colour
+        self.default_hover_colour = hover_colour
+
+        self.text_label_active = False
+
+    def click(self, mouse):
+        if self.touching_mouse(mouse) and world_list.world_selected:
+            self.function()
+            return True # Tells the Menu that this Button has been clicked on
+
+    @property
+    def colour(self):
+        return self.text_colour if world_list.world_selected else self.inactive_text_colour
+
+    @colour.setter
+    def colour(self, colour):
+        self.text_colour = colour
+
+    @property
+    def box_colour(self):
+        return self.default_box_colour if world_list.world_selected else self.inactive_box_colour
+
+    @box_colour.setter
+    def box_colour(self, colour):
+        self.default_box_colour = colour
+
+    @property
+    def hover_colour(self):
+        return self.default_hover_colour if world_list.world_selected else self.inactive_hover_colour
+
+    @hover_colour.setter
+    def hover_colour(self, colour):
+        self.default_hover_colour = colour
+
+    def draw(self):
+        if world_list.world_selected and not self.text_label_active:
+            self.text_label_active = True
+            self.update_label_info()
+        elif not world_list.world_selected and self.text_label_active:
+            self.text_label_active = False
+            self.update_label_info()
+        super().draw()
+
+
+
 class Rectangle(Widget):
     """A rectangular object of given width, height and colour
        x, y are floats (percentage from 0 to 1 of screen size)
@@ -864,9 +916,12 @@ class WorldList():
         self.height = lambda: game.HEIGHT * height
         self.gap = lambda: game.HEIGHT * gap
 
+        self.screen_dimensions = game.WIDTH, game.HEIGHT
+
         self.scroll_height = 0
 
         self.sliding = False
+        self.world_selected: WorldButton | None = None
 
         self.init_worlds()
 
@@ -968,6 +1023,10 @@ class WorldList():
         self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # Player can't scroll down below bottom button
         Menu.update()
 
+    def resize(self):
+        for button in self.buttons:
+            button.update_label_info()
+
     def create_world(self, name, seed):
         world = World(name, seed)
         self.list.append(world)
@@ -979,6 +1038,29 @@ class WorldList():
         self.buttons.append(WorldButton(x, y + len(self.buttons)*(self.height()+self.gap())/game.HEIGHT, name, seed, world=world, world_list=self))
 
         return world
+
+    def delete_selected_world(self):
+        name = self.world_selected.text[0]
+
+        for world in self.list:
+            if world.name == name:
+                self.list.remove(world)
+                break
+
+        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
+
+        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
+
+        idx = self.buttons.index(self.world_selected)
+        del self.buttons[idx]
+        for button in self.buttons[idx:]:
+            button.y -= (self.height() + self.gap()) / game.HEIGHT
+
+        self.world_selected = None
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # ensure scroll is within limits
+
+        game.delete_world(name)
+        Menu.update()
 
     def draw(self):
         # If no worlds, then don't draw list
@@ -993,6 +1075,10 @@ class WorldList():
             pygame.draw.rect(game.WIN, Menu.DEFAULT_HOVER_COLOUR, self.get_scroll_bar())
 
         # Draw buttons
+        if self.screen_dimensions != (game.WIDTH, game.HEIGHT):
+            self.screen_dimensions = game.WIDTH, game.HEIGHT
+            self.resize()
+
         rect = (self.x() - self.width()/2, self.y() - 1.5*self.gap(), self.width(), self.height() + min(2, (len(self.list))-1)*(self.height()+self.gap()))
         surf = pygame.Surface((rect[2], rect[3]), flags=pygame.SRCALPHA)
         x_offset = -(self.x() - self.width()/2)
@@ -1021,9 +1107,12 @@ class World():
 
 
 class WorldButton(Button):
-    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, world=None, world_list=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR) -> None:
-        super().__init__(x, y, name, font, font_size, colour, padx, pady, lambda: world_list.start_world(world), box_colour, outline_colour, hover_colour)
+    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, world=None, world_list=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
         self.seed = str(seed)
+        super().__init__(x, y, name, font, font_size, colour, padx, pady, lambda: world_list.start_world(world), box_colour, outline_colour, hover_colour)
+        self.click_outline_colour = click_outline_colour
+
+        self.selected = False
 
     def touching_mouse(self, mouse, rect: tuple, scroll_height):
         if mouse[0] < rect[0] or mouse[0] > rect[0] + rect[2] or mouse[1] < rect[1] or mouse[1] > rect[1] + rect[3]:
@@ -1037,28 +1126,42 @@ class WorldButton(Button):
 
     def click(self, mouse, rect, scroll_height):
         if self.touching_mouse(mouse, rect, scroll_height):
-            self.function()
-            return True # Tells the Menu that this Button has been clicked on
+            if self.selected:
+                self.function()
+                return True # Tells the Menu that this Button has been clicked on
+            else:
+                self.selected = True
+                world_list.world_selected = self
+                Menu.update()
+        elif self.selected:
+            if world_list.world_selected == self:
+                world_list.world_selected = None
+            self.selected = False
+            Menu.update()
+
+    def update_label_info(self):
+        super().update_label_info()
+        self.seed_label = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
 
     def draw(self, surf, x_offset, y_offset, rect, scroll_height):
         # Draw button
-        self.label = self.get_label()
         if self.touching_mouse(pygame.mouse.get_pos(), rect, scroll_height):
             self.current_box_colour = self.hover_colour
         else:
             self.current_box_colour = self.box_colour
 
-        label = self.label # This is updated in Page.draw()
+        outline_colour = self.click_outline_colour if self.selected else self.outline_colour
+        label = self.label # This is updated in when screen is resized
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(surf, self.current_box_colour, (x - self.padx + x_offset, y - self.pady + y_offset, width, height))
-        pygame.draw.rect(surf, self.outline_colour    , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
+        pygame.draw.rect(surf, outline_colour         , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
 
         # Draw name
         position = self.get_x() - self.get_width(label)*0.45 + x_offset, self.get_y() - label.get_height()/2 + y_offset # Adjust coordinates to be left of button
         surf.blit(label, position)
 
         # Draw seed
-        seed = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
+        seed = self.seed_label # updated when screen is resized
         position = self.get_x() + self.get_width(self.label)*0.2 + x_offset, self.get_y() - seed.get_height()/2 + y_offset
         surf.blit(seed, position)
 
@@ -1123,6 +1226,10 @@ class TextInput(Widget):
 
 
 class NameTextInput(TextInput):
+    def __init__(self, x, y, width, height, header="", limit=10, font_size=Menu.DEFAULT_FONT_SIZE, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
+        super().__init__(x, y, width, height, header, limit, font_size, outline_colour, click_outline_colour)
+        self.selected = True  # NameInput starts off selected
+
     def key_pressed(self, event):
         super().key_pressed(event)
         label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, game.WHITE)
@@ -1320,7 +1427,6 @@ info = Page(
     Text(0.5, 0.2  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
     Text(0.5, 0.27 ,   "Fred"             , font_size=5),
-    Text(0.5, 0.28 ,   "Ed"             , font_size=1),
     Text(0.5, 0.35 ,   "CONTROLS"         , font_size=40),
     Text(0.5, 0.42 , """Change Settings: Up, Down, Drag
                         Pause: Esc
@@ -1332,7 +1438,7 @@ info = Page(
                         Shoot: Left Click
                         Target: Right Click
                         Change Weapon: 1, 2, 3, 4""", font_size=20),
-    Button(0.5, 7/8,   "Main Menu"        , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 7/8,   "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )
 
@@ -1360,9 +1466,11 @@ world_list = WorldList(0.5, 0.242, width=0.6, height=0.12, gap=0.04)
 
 single_player = Page(
     Text(0.5, 0.09, "Worlds"),
-    world_list,
     Button(0.5, 0.752, "New World", function=lambda: Menu.change_page(new_world)),
-    Button(0.5, 0.875, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    WorldSelectionButton(0.28, 0.752, "Play", function=lambda: world_list.world_selected.function(), uniform=True),
+    WorldSelectionButton(0.72, 0.752, "Delete", function=lambda: world_list.delete_selected_world(), uniform=True),
+    Button(0.5, 0.875, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
+    world_list,
     escape=lambda: Menu.change_page(main_menu)
 )
 
@@ -1597,7 +1705,7 @@ death_screen = Page(
 ### Functions ###
 #################
 
-def get_widget(name: str, page: Page=None):
+def get_widget(name: str, page: Page | None = None) -> Widget | None:
     if not page: page = Menu.current_page
     for widget in page.widgets:
         if widget.__name__ == name:
