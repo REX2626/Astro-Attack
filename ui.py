@@ -145,7 +145,6 @@ class MiniMap():
 
 
 
-weapon_selected = 0
 class Hotbar():
     def __init__(self, height, number, size, gap) -> None:
         self.height = height
@@ -165,7 +164,7 @@ class Hotbar():
     def draw(self):
         for i in range(self.number):
 
-            if i == weapon_selected:
+            if i == game.WEAPON_SELECTED:
                 colour = (255, 125, 0)
 
             else:

@@ -939,9 +939,59 @@ class WorldList():
     def start_world(self, world: "World"):
         Menu.change_page(loading_world)
         game.set_name_to_top_of_world_dir(world.name)
-        self.init_worlds()
+        self.set_world_to_top(world)
         game.load_constants(world.name)
         main.main()
+
+    def set_world_to_top(self, world: "World"):
+        idx = self.list.index(world)
+
+        del self.list[idx]
+        self.list.insert(0, world)
+
+        extra_height = (self.height() + self.gap()) / game.HEIGHT
+        for button in self.buttons[:idx]:
+            button.y += extra_height
+
+        self.buttons.insert(0, self.buttons.pop(idx))
+        self.buttons[0].y = self.y()/game.HEIGHT
+
+        self.scroll_height = 0
+
+    def create_world(self, name, seed):
+        world = World(name, seed)
+        self.list.append(world)
+
+        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
+
+        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
+
+        self.buttons.append(WorldButton(x, y, name, seed, world=world, world_list=self))
+
+        return world
+
+    def delete_selected_world(self):
+        name = self.world_selected.text[0]
+
+        for world in self.list:
+            if world.name == name:
+                self.list.remove(world)
+                break
+
+        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
+
+        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
+
+        idx = self.buttons.index(self.world_selected)
+        del self.buttons[idx]
+        for button in self.buttons[idx:]:
+            button.y -= (self.height() + self.gap()) / game.HEIGHT
+
+        self.world_selected = None
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # ensure scroll is within limits
+
+        game.delete_world(name)
+        Menu.update()
 
     def get_total_button_height(self):
         """Gets the total height that the buttons can scroll"""
@@ -1026,41 +1076,6 @@ class WorldList():
     def resize(self):
         for button in self.buttons:
             button.update_label_info()
-
-    def create_world(self, name, seed):
-        world = World(name, seed)
-        self.list.append(world)
-
-        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
-
-        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
-
-        self.buttons.append(WorldButton(x, y + len(self.buttons)*(self.height()+self.gap())/game.HEIGHT, name, seed, world=world, world_list=self))
-
-        return world
-
-    def delete_selected_world(self):
-        name = self.world_selected.text[0]
-
-        for world in self.list:
-            if world.name == name:
-                self.list.remove(world)
-                break
-
-        x, y, width, height, gap = self.x()/game.WIDTH, self.y()/game.HEIGHT, self.width()/game.WIDTH, self.height()/game.HEIGHT, self.gap()/game.HEIGHT
-
-        self.rectangle = Rectangle(x - width/2 - gap, y - height/2 - gap, width + 2*gap, height + 2*gap + min(2, len(self.list)-1)*(height+gap), (24, 24, 24))
-
-        idx = self.buttons.index(self.world_selected)
-        del self.buttons[idx]
-        for button in self.buttons[idx:]:
-            button.y -= (self.height() + self.gap()) / game.HEIGHT
-
-        self.world_selected = None
-        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # ensure scroll is within limits
-
-        game.delete_world(name)
-        Menu.update()
 
     def draw(self):
         # If no worlds, then don't draw list

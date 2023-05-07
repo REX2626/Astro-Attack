@@ -117,19 +117,19 @@ def handle_player_input(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_1]:
         game.player.weapon = PlayerGun(game.player)
-        ui.weapon_selected = 0
+        game.WEAPON_SELECTED = 0
 
     if keys_pressed[pygame.K_2]:
         game.player.weapon = PlayerGatlingGun(game.player)
-        ui.weapon_selected = 1
+        game.WEAPON_SELECTED = 1
 
     if keys_pressed[pygame.K_3]:
         game.player.weapon = PlayerSniper(game.player)
-        ui.weapon_selected = 2
+        game.WEAPON_SELECTED = 2
 
     if keys_pressed[pygame.K_4]:
         game.player.weapon = Laser(game.player)
-        ui.weapon_selected = 3
+        game.WEAPON_SELECTED = 3
 
     if keys_pressed[pygame.K_n]:
         game.SCREEN_SHAKE += 10*delta_time

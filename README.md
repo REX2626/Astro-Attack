@@ -19,8 +19,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 
-Fix UI false weapon selection upon game restart
-
 Fix minimap - add rendering order to ships and stations
 
 Fix station menu button overlapping
@@ -451,3 +449,5 @@ Missions (stations will give a reward for completing a mission)
     Add different types of missions
     Make it so that missions can be randomly generated based on the difficulty
     Randomly generate rewards
+
+Fix UI false weapon selection upon game restart
