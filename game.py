@@ -192,10 +192,9 @@ class Pickler(dill.Pickler):
     def reducer_override(self, obj):
         """Remove Surface or Mask as they cannot be pickled"""
 
-        if isinstance(obj, object):
-            for name in dir(obj):
-                if isinstance(getattr(obj, name), (pygame.surface.Surface, pygame.mask.Mask)):
-                    delattr(obj, name)
+        for name in dir(obj):
+            if isinstance(getattr(obj, name), (pygame.surface.Surface, pygame.mask.Mask)):
+                delattr(obj, name)
 
         return NotImplemented
 

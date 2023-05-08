@@ -207,7 +207,7 @@ def main():
             menu.Menu.station()
             game.OPEN_STATION = False
 
-        # Max lvl atm is 15. game.score increases difficulty by 1 every 50 score. Difficulty increased by 1, 10_000 units from centre
+        # Max lvl atm is 15. game.SCORE increases difficulty by 1 every 50 score. Difficulty increases by 1, every 10_000 units from centre
         game.CURRENT_SHIP_LEVEL = int(min(10, game.SCORE / 50) + min(5, game.player.position.magnitude() / 10_000))
 
         if player.health <= 0:

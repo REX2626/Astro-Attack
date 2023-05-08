@@ -1372,10 +1372,10 @@ class MissionManager(Widget):
         # If true then you should not be able to accept another mission
         self.any_mission_active = False
 
-        self.class_list = ["Enemy_Ship",
-                           "Missile_Ship",
-                           "Drone_Enemy",
-                           "Mother_Ship"]
+        self.class_list = {"Enemy_Ship": 1,
+                           "Missile_Ship": 2,
+                           "Drone_Enemy": 1,
+                           "Mother_Ship": 2}
 
         # Spawns in three missions
         while self.slot_missing < 3:
@@ -1383,7 +1383,11 @@ class MissionManager(Widget):
             self.slot_missing += 1
 
     def add_mission(self):
-        mission = Mission(self.slot_missing, random.randint(5+5*game.CURRENT_SHIP_LEVEL, 10+5*game.CURRENT_SHIP_LEVEL), random.choice(self.class_list), game.KILL, random.randint(10+10*game.CURRENT_SHIP_LEVEL, 15+10*game.CURRENT_SHIP_LEVEL))
+        goal = random.choice(list(self.class_list.keys()))
+        number = random.randint(5, 15)
+        reward = number * (1+game.CURRENT_SHIP_LEVEL)**0.6 * self.class_list[goal]  # reward depends on number, difficulty and type of enemy
+        reward *= 0.9 + random.random()*0.2  # reward +- 10% to make it look a bit random
+        mission = Mission(self.slot_missing, number, goal, game.KILL, round(reward))
         mission.mission_manager = self
         self.missions.append(mission)
 
@@ -1535,9 +1539,9 @@ quit_confirm = Page(
 station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Upgrades"),
-    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx=100),
+    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     Button(0.2, 0.7, "Armour", function=lambda: Menu.change_page(armour)),
     Button(0.4, 0.7, "Weapon", function=lambda: Menu.change_page(weapon)),
     Button(0.6, 0.7, "Engine", function=lambda: Menu.change_page(engine)),
@@ -1556,9 +1560,9 @@ station = Page(
 missions = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Missions"),
-    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
+    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     MissionManager(0.5, 0.5),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
@@ -1570,15 +1574,29 @@ missions = Page(
 stats = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Stats"),
-    Button(0.3, 0.23, "Upgrades", function=lambda: Menu.change_page(station)),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions)),
-    Button(0.7, 0.23, "Stats", function=lambda: Menu.change_page(stats), padx= 100),
-    Text(0.5, 0.5, "You are bad at this game"),
+    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
+    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
+    Text(0.5, 0.5, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
     e_press=lambda: True
+)
+
+stats_skill_levels = (
+    "noob",
+    "beginner",
+    "novice",
+    "apprentice",
+    "fighter",
+    "gamer",
+    "pro",
+    "legend",
+    "hacker",
+    "god",
+    "developer"
 )
 
 armour = Page(

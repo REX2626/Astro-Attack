@@ -123,14 +123,15 @@ class MiniMap():
 
         # Draws enemies in chunks
         surf = pygame.Surface((self.width, self.height))
-        for entity in game.CHUNKS.entities:
-            if isinstance(entity, Station):
-                # Blits station image
-                station_image = images.ENEMY_STATION_ICON if isinstance(entity, EnemyStation) else images.FRIENDLY_STATION_ICON
-                surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
-                                          ((entity.position.y - entity.height/2 - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
-            else:
-                self.draw_entity(self.get_entity_colour(entity), entity, surf)
+
+        for entity in filter(lambda entity: isinstance(entity, Station), game.CHUNKS.entities):
+            # Blits station image
+            station_image = images.ENEMY_STATION_ICON if isinstance(entity, EnemyStation) else images.FRIENDLY_STATION_ICON
+            surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
+                                        ((entity.position.y - entity.height/2 - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
+
+        for entity in filter(lambda entity: not isinstance(entity, Station), game.CHUNKS.entities):
+            self.draw_entity(self.get_entity_colour(entity), entity, surf)
 
         game.WIN.blit(surf, (0, 0))
 
@@ -210,7 +211,7 @@ class Console():
         self.help_message = ["/spawnentity(entity_class, frequency) - spawns in entity at current location",
                              "/godmode(max_health, max_boost) - boosts stats",
                              "/zoom(zoom_level) - changes how far you can zoom out",
-                             "/score(score) - adds score to current score"
+                             "/score(score) - adds score to current score",
                              "/log(argument) - prints argument to console",
                              "/entitylist - prints list of entities to spawn"]
 
@@ -336,7 +337,7 @@ class Console():
 
 
             elif input_command in self.commands.keys():
-                # must insert at start since when drawing text in draw() it renders text from newest to oldes command entered
+                # must insert at start since when drawing text in draw() it renders text from newest to oldest command entered
                 self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
                 self.previous_commands.insert(0, self.input_text)
 

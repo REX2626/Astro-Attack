@@ -19,30 +19,18 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ### a1.4.0 (gameplay loop - difficulty, missions and saving)
 
-Fix minimap - add rendering order to ships and stations
+Improve neutral ship fighting AI
+Fix Neutral ships not attacking if their mothership is destroyed
 
-Fix station menu button overlapping
+### a1.5.0 (sound, general clear up and polishing)
 
-Polish station menu:
-Make buttons uniform size
-Improve look of mission menu
-Add something to stats menu
-
-Finish basic missions:
-Make reward proportional to mission diffculty
-Reduce the massive increase in mission kill number and reward
-Add other mission types
+Add back buttons
 
 Improve console and text input:
 Add ctrl+v
 Add spam, if a button is hold down > 1 second, repeatedly paste that button
 
-Improve neutral ship fighting AI
-Fix Neutral ships not attacking if their mothership is destroyed
-
-Add back buttons
-
-### a1.5.0 (sound, general clear up and polishing)
+Add more mission types
 
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
@@ -451,3 +439,13 @@ Missions (stations will give a reward for completing a mission)
     Randomly generate rewards
 
 Fix UI false weapon selection upon game restart
+
+Fix minimap - add rendering order to ships and stations
+
+Fix station menu button overlapping
+
+Added skill level to stats menu
+
+Finish basic missions:
+Make reward proportional to mission diffculty
+Reduce the massive increase in mission kill number and reward
