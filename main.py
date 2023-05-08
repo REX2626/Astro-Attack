@@ -204,7 +204,9 @@ def main():
         draw_window(delta_time)
 
         if game.OPEN_STATION:
+            start = perf_counter()
             menu.Menu.station()
+            time1 = perf_counter() - start + time1
             game.OPEN_STATION = False
 
         # Max lvl atm is 15. game.SCORE increases difficulty by 1 every 50 score. Difficulty increases by 1, every 10_000 units from centre
