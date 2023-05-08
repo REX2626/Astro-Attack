@@ -1,6 +1,6 @@
 from objects import Vector
 import entities
-from entities import Ship, Asteroid#, HealthPickup
+from entities import Ship, Asteroid
 from objects import random_vector
 from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
@@ -191,34 +191,19 @@ class AI_Ship(Ship):
         self.rotate_to(delta_time, self.position.get_angle_to(game.player.position) + math.pi, self.max_rotation_speed)
         self.accelerate_in_direction(self.rotation, 400 * delta_time)
 
-    # def find_nearest_health_pickup(self):
-    #     health_pickups = []
-    #     for entity in game.CHUNKS.entities:
-    #         if isinstance(entity, HealthPickup):
-    #             health_pickups.append(entity)
-
-    #     dist_to_health = math.inf
-    #     index = 0
-
-    #     for i, health_pickup in enumerate(health_pickups):
-    #         dist = (health_pickup.position - self.position).magnitude()
-    #         if dist < dist_to_health:
-    #             dist_to_health = dist
-    #             index = i
-
-    #     return health_pickups[index]
-
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
 
-        # Checking to see if level text has not been cached already
-        if f"Lvl: {self.level}, {game.ZOOM}" not in level_text_cache:
-            text_surface = pygame.font.SysFont("consolas", int(15 * game.ZOOM)).render(f"Lvl: {self.level}", True, (255, 255, 255))
-            level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"] = text_surface
-        else:
-            text_surface: pygame.Surface = level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"]
+        if game.DEBUG_SCREEN:
 
-        game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
+            # Checking to see if level text has not been cached already
+            if f"Lvl: {self.level}, {game.ZOOM}" not in level_text_cache:
+                text_surface = pygame.font.SysFont("consolas", int(15 * game.ZOOM)).render(f"Lvl: {self.level}", True, (255, 255, 255))
+                level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"] = text_surface
+            else:
+                text_surface: pygame.Surface = level_text_cache[f"Lvl: {self.level}, {game.ZOOM}"]
+
+            game.WIN.blit(text_surface, ((self.position.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x - (text_surface.get_width() / 2), (self.position.y - focus_point.y - 20) * game.ZOOM + game.CENTRE_POINT.y - (text_surface.get_height() / 2)))
 
 
 
@@ -262,23 +247,6 @@ class Enemy_Ship(AI_Ship):
             # Enemy ships will go into patrol state if the player gets too far while attacking
             if self.state == ATTACK and distance_to_player > 1500:
                 self.state = PATROL
-            """
-            # Enemy will stop retreating if its health goes above 1
-            if self.state == RETREAT and self.health > 1:
-                self.state = PATROL
-
-            # Check to see if the retreating enemy if far enough from the player to then collect health
-            elif self.state == RETREAT and self.health == 1 and distance_to_player > 1500:
-                self.hp = self.find_nearest_health_pickup()
-                self.rotate_to(delta_time, self.position.get_angle_to(self.hp.position) + math.pi, self.max_rotation_speed)
-                self.accelerate_in_direction(self.rotation, 400 * delta_time)
-
-                # Add health if close to a health pickup
-                if (self.hp.position - self.position).magnitude() < 50:
-                    self.hp.destroy()
-                    self.health += 5
-
-            """
 
             if self.state == RETREAT and distance_to_player > 1500:
                 self.state = PATROL
@@ -539,10 +507,9 @@ class Neutral_Ship(AI_Ship):
                     weights.append(1 / dist)
 
                 # Randomly choose one of the available stations based on the weighting
-                if self.target_station == None:
-                    random_station = random.choices(stations, weights=weights, k=1)
-                    self.target_station = random_station[0]
-                    self.state = PATROL_TO_STATION
+                random_station = random.choices(stations, weights=weights)
+                self.target_station = random_station[0]
+                self.state = PATROL_TO_STATION
 
             # If there are no other stations available, just patrol around the current one
             else:
@@ -610,19 +577,22 @@ class Neutral_Ship_Cargo(Neutral_Ship):
         if entity and isinstance(entity, Ship):
 
             if isinstance(entity, Player_Ship):
-                self.alert_group()
+                self.group_attack_player()
 
             if isinstance(entity, Enemy_Ship):
-                for neutral in self.neutral_list:
-                    neutral.recent_enemy = entity
-                    neutral.state = ATTACK_ENEMY
+                self.group_attack_enemy()
 
         super().damage(damage)
 
-    def alert_group(self):
-        for enemy in self.neutral_list:
-            if enemy.state != RETREAT:
-                enemy.state = ATTACK
+    def group_attack_player(self):
+        for neutral in self.neutral_list:
+            if neutral.state != RETREAT:
+                neutral.state = ATTACK
+
+    def group_attack_enemy(self):
+        for neutral in self.neutral_list:
+            if neutral.state != RETREAT:
+                neutral.state = ATTACK_ENEMY
 
     def destroy(self):
         super().destroy()
@@ -644,43 +614,34 @@ class Neutral_Ship_Fighter(Neutral_Ship):
 
         self.recent_enemy = None
 
-
     def update(self, delta_time):
         super().update(delta_time)
 
-        if self.mother_ship in game.CHUNKS.entities:
-            self.target_station = self.mother_ship.target_station
-            if self.state != ATTACK and self.state != ATTACK_ENEMY:
-                self.state = PATROL_TO_STATION
-        else:
-            self.state = PATROL
-
-        if self.target_station == None:
-            self.state = PATROL
-
         if self.state == ATTACK:
-            self.attack_entity_state(delta_time, entity=game.player)
+            if self.distance_to(game.player) < 1000:
+                self.attack_entity_state(delta_time, entity=game.player)
+            elif self.mother_ship in game.CHUNKS.entities:
+                self.target_station = self.mother_ship.target_station
+                self.state = PATROL_TO_STATION
+            else:
+                self.state = PATROL
+
         elif self.state == ATTACK_ENEMY:
             if self.recent_enemy in game.CHUNKS.entities:
                 self.attack_entity_state(delta_time, entity=self.recent_enemy)
-            else:
+            elif self.mother_ship in game.CHUNKS.entities:
+                self.target_station = self.mother_ship.target_station
                 self.state = PATROL_TO_STATION
-
-        if self.state == ATTACK and self.distance_to(game.player) > 1000:
-            self.state = PATROL_TO_STATION
+            else:
+                self.state = PATROL
 
     def damage(self, damage, entity=None):
         if entity and isinstance(entity, Ship):
 
             if isinstance(entity, Player_Ship):
-                self.state = ATTACK
-                if self.mother_ship:
-                    self.mother_ship.alert_group()
+                self.mother_ship.group_attack_player()
 
             elif isinstance(entity, Enemy_Ship):
-                if self.mother_ship:
-                    for neutral in self.mother_ship.neutral_list:
-                        neutral.recent_enemy = entity
-                        neutral.state = ATTACK_ENEMY
+                self.mother_ship.group_attack_enemy()
 
         super().damage(damage)

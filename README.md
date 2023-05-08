@@ -17,11 +17,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.4.0 (gameplay loop - difficulty, missions and saving)
-
-Improve neutral ship fighting AI
-Fix Neutral ships not attacking if their mothership is destroyed
-
 ### a1.5.0 (sound, general clear up and polishing)
 
 Add back buttons
@@ -449,3 +444,6 @@ Added skill level to stats menu
 Finish basic missions:
 Make reward proportional to mission diffculty
 Reduce the massive increase in mission kill number and reward
+
+Improve neutral ship fighting AI
+Fix Neutral ships not attacking if their mothership is destroyed
