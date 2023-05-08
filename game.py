@@ -18,6 +18,9 @@ pygame.init()
 # SETTINGS
 # ==================
 
+base_path = os.path.join(os.getenv("APPDATA"), "AstroAttack")
+storage = os.path.join(base_path, "_storage")
+
 display_info = pygame.display.Info()
 
 FULLSCREEN = True
@@ -34,16 +37,16 @@ settings = [
 
 def save_settings():
     settings_list = {setting: globals()[setting] for setting in settings}
-    with open(os.path.join("_storage", "settings.json"), "w") as file:
+    with open(os.path.join(storage, "settings.json"), "w") as file:
         json.dump(settings_list, file)
 
 # Create _storage directory if it does not exist
-if not os.path.isdir("_storage"):
-    os.makedirs("_storage")
+if not os.path.isdir(storage):
+    os.makedirs(storage)
 
 # If settings.json exists - load it, else create settings.json
-if os.path.isfile(os.path.join("_storage", "settings.json")):
-    with open(os.path.join("_storage", "settings.json"), "r") as file:
+if os.path.isfile(os.path.join(storage, "settings.json")):
+    with open(os.path.join(storage, "settings.json"), "r") as file:
         settings_list = json.load(file)
         for setting in settings_list:
             globals()[setting] = settings_list[setting]
@@ -206,31 +209,31 @@ def save_constants(file_name):
     for name in constants:
         constants_dict[name] = globals()[name]
 
-    with open(os.path.join("_storage", "worlds", f"{file_name}.pkl"), "wb") as file:
+    with open(os.path.join(storage, "worlds", f"{file_name}.pkl"), "wb") as file:
         Pickler(file, dill.HIGHEST_PROTOCOL).dump(constants_dict)
 
 def load_constants(file_name):
-    with open(os.path.join("_storage", "worlds", f"{file_name}.pkl"), "rb") as file:
+    with open(os.path.join(storage, "worlds", f"{file_name}.pkl"), "rb") as file:
         constants_dict = dill.load(file)
 
     for constant in constants_dict:
         globals()[constant] = constants_dict[constant]
 
 def get_world_dir():
-    with open(os.path.join("_storage", "world_dir.json"), "r+") as file:
+    with open(os.path.join(storage, "world_dir.json"), "r+") as file:
         return json.load(file)
 
 def update_world_dir(name, seed):
-    with open(os.path.join("_storage", "world_dir.json"), "r") as file:
+    with open(os.path.join(storage, "world_dir.json"), "r") as file:
         world_dir: list = json.load(file)
 
     world_dir.append((name, seed))
 
-    with open(os.path.join("_storage", "world_dir.json"), "w") as file:
+    with open(os.path.join(storage, "world_dir.json"), "w") as file:
         json.dump(world_dir, file)
 
 def set_name_to_top_of_world_dir(name):
-    with open(os.path.join("_storage", "world_dir.json"), "r") as file:
+    with open(os.path.join(storage, "world_dir.json"), "r") as file:
         world_dir: list = json.load(file)
 
     for idx, world in enumerate(world_dir):
@@ -239,12 +242,12 @@ def set_name_to_top_of_world_dir(name):
 
     world_dir.insert(0, world_dir.pop(idx))
 
-    with open(os.path.join("_storage", "world_dir.json"), "w") as file:
+    with open(os.path.join(storage, "world_dir.json"), "w") as file:
         json.dump(world_dir, file)
 
 def delete_world(name):
     # Delete world name from directory
-    with open(os.path.join("_storage", "world_dir.json"), "r") as file:
+    with open(os.path.join(storage, "world_dir.json"), "r") as file:
         world_dir: list = json.load(file)
 
     for world in world_dir:
@@ -252,22 +255,22 @@ def delete_world(name):
             world_dir.remove(world)
             break
 
-    with open(os.path.join("_storage", "world_dir.json"), "w") as file:
+    with open(os.path.join(storage, "world_dir.json"), "w") as file:
         json.dump(world_dir, file)
 
     # Delete world data from worlds
-    os.remove(os.path.join("_storage", "worlds", f"{name}.pkl"))
+    os.remove(os.path.join(storage, "worlds", f"{name}.pkl"))
 
 reset_constants()
 
 # Create world_dir.json if it doesn't exist
-if not os.path.isfile(os.path.join("_storage", "world_dir.json")):
-    with open(os.path.join("_storage", "world_dir.json"), "w") as file:
+if not os.path.isfile(os.path.join(storage, "world_dir.json")):
+    with open(os.path.join(storage, "world_dir.json"), "w") as file:
         json.dump([], file)
 
 # Create worlds directory if it does not exist
-if not os.path.isdir(os.path.join("_storage", "worlds")):
-    os.makedirs(os.path.join("_storage", "worlds"))
+if not os.path.isdir(os.path.join(storage, "worlds")):
+    os.makedirs(os.path.join(storage, "worlds"))
 
 # ==================
 # FUNCTIONS

@@ -1531,7 +1531,7 @@ quit_confirm = Page(
     Rectangle(0.35, 0.41, 0.3, 0.31, (40, 40, 40), outline_colour=Menu.DEFAULT_OUTLINE_COLOUR),
     Text(0.5, 0.46, "Quit?"),
     Button(0.5, 0.55, "No", function=lambda: Menu.change_page(main_menu), uniform=True),
-    Button(0.5, 0.65, "Yes", function=quit, uniform=True),
+    Button(0.5, 0.65, "Yes", function=game.quit, uniform=True),
     background_colour=None,
     escape=lambda: Menu.change_page(main_menu)
 )
