@@ -19,7 +19,7 @@ pygame.init()
 # ==================
 
 base_path = os.path.join(os.getenv("APPDATA"), "AstroAttack")
-storage = os.path.join(base_path, "_storage")
+storage = os.path.join(base_path, "storage")
 
 display_info = pygame.display.Info()
 
@@ -40,7 +40,7 @@ def save_settings():
     with open(os.path.join(storage, "settings.json"), "w") as file:
         json.dump(settings_list, file)
 
-# Create _storage directory if it does not exist
+# Create storage directory if it does not exist
 if not os.path.isdir(storage):
     os.makedirs(storage)
 
