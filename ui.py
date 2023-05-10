@@ -108,9 +108,6 @@ class MiniMap():
         elif isinstance(entity, Asteroid):
             self.entity_size = 10
             return self.asteroid_colour
-        # elif isinstance(entity, HealthPickup):
-        #     self.entity_size = 2
-        #     return self.health_pickup_colour
         elif isinstance(entity, Scrap):
             self.entity_size = 2
             return self.scrap_colour
@@ -455,8 +452,7 @@ class AdjustableText():
         self.bottom_x = bottom_x
         self.bottom_y = bottom_y
 
-        self.text = text
-        self.words = self.text.split(" ")
+        self.words = text.split()
         self.font_type = font
         self.default_font_size = default_font_size
         self.colour = colour
@@ -523,49 +519,53 @@ class MissionOverview():
         self.width = width
         self.height = height
 
-        self.title = "Mission"
-
         self.font = freetype.SysFont("bahnschrift", 30)
+
+        self.claim_reward_label, (*_, self.claim_reward_label_width, self.claim_reward_label_height) = self.font.render("Claim Reward", (255, 182, 36))
+        self.mission_label = self.font.render("Mission", (255, 255, 255))[0]
+        self.kill_mission_label = self.font.render("Kill Mission", (255, 255, 255))[0]
+
+        self.title_label = self.mission_label
 
         self.info = "You do not have a mission currently"
         self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
 
         self.progress_text = "0/0"
+        self.progress_label = self.font.render(self.progress_text, (255, 255, 255))[0]
         self.progress_bar = Bar(lambda: self.x() - self.width + 10, lambda: self.y() + self.height/3 + 20, self.width - 20, 50, (0, 0, 255), 2, (0, 0, 0), 5)
 
     def draw(self):
         pygame.draw.rect(game.WIN, game.DARK_GREY, (self.x() - self.width, self.y() - (self.height/2), self.width, self.height), border_radius=7)
 
         if game.CURRENT_MISSION:
-            if game.CURRENT_MISSION[0] >= game.CURRENT_MISSION[1]:
-                claim_reward_text = "Claim Reward"
-                bounds = self.font.get_rect(claim_reward_text)
-                self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()+self.height/4-bounds.height/2), claim_reward_text, (255, 182, 36))
+            if game.CURRENT_MISSION[0] >= game.CURRENT_MISSION[1]:  # If reward completed: draw "Claim Reward"
+                game.WIN.blit(self.claim_reward_label, (self.x()-self.claim_reward_label_width/2-self.width/2, self.y()+self.height/4-self.claim_reward_label_height/2))
             else:
-                self.progress_text = f"{game.CURRENT_MISSION[0]}/{game.CURRENT_MISSION[1]}"
-                bounds = self.font.get_rect(self.progress_text)
-                self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()+self.height/4-bounds.height/2), self.progress_text, (255, 255, 255))
+                progress_text = f"{game.CURRENT_MISSION[0]}/{game.CURRENT_MISSION[1]}"
+                if progress_text != self.progress_text:
+                    self.progress_text = progress_text
+                    self.progress_label = self.font.render(self.progress_text, (255, 255, 255))[0]
+                game.WIN.blit(self.progress_label, (self.x()-self.progress_label.get_width()/2-self.width/2, self.y()+self.height/4-self.progress_label.get_height()/2))
 
                 self.progress_bar.update(game.CURRENT_MISSION[0]/game.CURRENT_MISSION[1])
                 self.progress_bar.draw()
 
             if game.CURRENT_MISSION[3] == game.KILL:
-                self.title = "Kill Mission"
+                self.title_label = self.kill_mission_label
                 self.info = f"Kill {game.CURRENT_MISSION[1]} {game.ENTITY_DICT.get(game.CURRENT_MISSION[2])}s"
 
         else:
-            self.title = "Mission"
-
+            self.title_label = self.mission_label
             self.info = "You do not have a mission currently"
 
+        game.WIN.blit(self.title_label, (self.x()-self.title_label.get_width()/2-self.width/2, self.y()-self.height/2+self.title_label.get_height()/2))
 
-        bounds = self.font.get_rect(self.title)
-        self.font.render_to(game.WIN, (self.x()-bounds.width/2-self.width/2, self.y()-self.height/2+bounds.height/2), self.title, (255, 255, 255))
-
-        self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
+        self.info_text.words = self.info.split()
+        self.info_text.top_x = self.x() - self.width + 10
+        self.info_text.top_y = self.y() - self.height/4 - 50
+        self.info_text.bottom_x = self.x() - 10
+        self.info_text.bottom_y = self.y() + self.height/4 - 40
         self.info_text.draw()
-
-
 
 
 
@@ -721,8 +721,6 @@ def draw(delta_time):
     highlight_station()
 
     canvas.draw()
-
-    # NOTE: Fonts are rendered differently in pygame 2.1.2 and 2.1.3, use 2.1.3 for best results
 
     label = font.render(f"FPS: {round(get_average_fps(delta_time))}", True, (255, 255, 255))
     WIN.blit(label, (game.WIDTH - 300, 8))

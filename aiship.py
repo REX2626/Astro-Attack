@@ -129,7 +129,7 @@ class AI_Ship(Ship):
             chunk_pos = node // game.CHUNK_SIZE
 
             # Checks if there is an asteroid in the chunk of that node point
-            for entity in game.CHUNKS.get_chunk((chunk_pos.x, chunk_pos.y)).entities.copy():
+            for entity in game.CHUNKS.get_chunk((chunk_pos.x, chunk_pos.y)).entities:
                 if isinstance(entity, Asteroid):
                     # If there is, then find a position intermediate_point_distance away from the asteroid along the normal line (-dx, dy = normal)
                     d_x = intermediate_point_distance * math.cos(math.atan2(-dx, dy))
@@ -157,16 +157,10 @@ class AI_Ship(Ship):
             # Strafing
             self.strafe(delta_time, entity)
 
-    def predicted_entity_position(self, entity):
-        ship_pos = entity.position
-        ship_vel = entity.velocity
-        current_vel = self.velocity
-        bullet_speed = self.weapon.speed
-
+    def predicted_entity_position(self, entity: Ship):
         # Calculates basic time to reach player and the next position of the player ship
-        time_to_player = self.distance_to(entity) / bullet_speed
-        self.new_ship_pos = ((ship_vel - current_vel) * time_to_player) + ship_pos
-        return self.new_ship_pos
+        # new_ship_pos = (rel_vel * time_to_player) + ship_pos
+        return ((entity.velocity - self.velocity) * self.distance_to(entity) / self.weapon.speed) + entity.position
 
     def strafe(self, delta_time, entity):
 
@@ -213,7 +207,6 @@ class Enemy_Ship(AI_Ship):
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
         self.mother_ship_patrol = mother_ship
-        self.new_ship_pos = Vector(0, 0)
         self.attack_min_dist = 100
         self.attack_max_dist = 400
         self.attack_max_speed = 300
@@ -226,24 +219,11 @@ class Enemy_Ship(AI_Ship):
 
         distance_to_player = self.distance_to(game.player)
 
-        if self.mother_ship:
-            group_length = len(self.mother_ship.enemy_list)
-        else:
-            group_length = 3
-
         # Initially check if it should be retreating
-        if self.health == 1 and distance_to_player < 1500 and game.player.health > 5 and group_length <= 2:
+        if self.health == 1 and distance_to_player < 1500 and game.player.health > 5 and self.mother_ship and len(self.mother_ship.enemy_list) <= 2:
             self.state = RETREAT
             self.retreat_state(delta_time)
         else:
-            # Check if it should be attacking
-            if (distance_to_player < 600 or self.state == ATTACK) and self.state != RETREAT:
-                self.attack_entity_state(delta_time, game.player, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
-                self.enemy_spotted()
-            # Check if it should be patroling
-            elif self.state != RETREAT:
-                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
-
             # Enemy ships will go into patrol state if the player gets too far while attacking
             if self.state == ATTACK and distance_to_player > 1500:
                 self.state = PATROL
@@ -251,11 +231,18 @@ class Enemy_Ship(AI_Ship):
             if self.state == RETREAT and distance_to_player > 1500:
                 self.state = PATROL
 
+            # Check if it should be attacking
+            if (distance_to_player < 600 or self.state == ATTACK) and self.state != RETREAT:
+                self.attack_entity_state(delta_time, game.player, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
+                self.group_attack_player()
+            # Check if it should be patroling
+            elif self.state == PATROL:
+                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
 
     def damage(self, damage, entity=None):
 
         if entity and isinstance(entity, Player_Ship):
-            self.enemy_spotted()
+            self.group_attack_player()
 
         super().damage(damage)
 
@@ -278,10 +265,9 @@ class Enemy_Ship(AI_Ship):
             scrap = entities.Scrap(self.position, random_vector(random.randint(400, 600)), rotation=random.random() * math.pi * 2)
             game.CHUNKS.add_entity(scrap)
 
-
-    def enemy_spotted(self):
+    def group_attack_player(self):
         if self.mother_ship:
-            self.mother_ship.alert_group()
+            self.mother_ship.group_attack_player()
 
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
@@ -449,7 +435,7 @@ class Mother_Ship(Enemy_Ship):
             pygame.draw.circle(game.WIN, (0, 0, 255), ((self.patrol_point.x - focus_point.x) * game.ZOOM + game.CENTRE_POINT.x, (self.patrol_point.y - focus_point.y) * game.ZOOM + game.CENTRE_POINT.y), 20 * game.ZOOM)
 
 
-    def alert_group(self):
+    def group_attack_player(self):
         for enemy in self.enemy_list:
             if enemy.state != RETREAT:
                 enemy.state = ATTACK
