@@ -9,93 +9,6 @@ import pygame
 
 
 
-def entity_collision(object, entity, delta_time):
-    entity_mask = pygame.mask.from_surface(entity.image)
-
-    x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
-    y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
-
-    if object.mask.overlap(entity_mask, (x_offset, y_offset)):
-
-        game.CHUNKS.move_entity(entity, -delta_time) # Move entity backwards, so outside of asteroid
-
-        # Move entity out of Asteroid if entity is still in Asteroid
-        # This occurs because the current delta_time could be shorter than the previous delta_time, so the entity is not moved backwards enough
-        original_velocity = entity.velocity.copy()
-        entity.velocity.set_magnitude(1)
-        while True:
-            x_offset = (entity.position.x - entity.image.get_width()/2) - (object.position.x - object.image.get_width()/2)
-            y_offset = (entity.position.y - entity.image.get_height()/2) - (object.position.y - object.image.get_height()/2)
-
-            if not object.mask.overlap(entity_mask, (x_offset, y_offset)):
-                break
-
-            game.CHUNKS.move_entity(entity, -1)
-
-        entity.velocity = original_velocity
-
-        vector_to_asteroid = object.position - entity.position
-
-        tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2) # Rotate 90 degrees
-        tangent_angle = tangent_to_asteroid.get_angle()
-        entity_angle = entity.velocity.get_angle()
-        angle_difference = entity_angle - tangent_angle
-        entity_rotation = 2 * angle_difference # 1 angle difference makes it go along normal, another difference reflects it through normal
-        entity.velocity.rotate(entity_rotation)
-
-        entity.damage(entity.velocity.magnitude()**2/100_000)
-
-        if hasattr(entity, "make_new_patrol_point"):
-            entity.make_new_patrol_point(400, 500, entity.position)
-            entity.state = 0 # Patrol state
-
-        effects.asteroid_debris(entity.position)
-
-
-
-class Asteroid(Object):
-    def __init__(self, position, image=None) -> None:
-
-        # Generate random asteroid image
-        if not image:
-            number = random.randint(0, len(images.ASTEROIDS)-1)
-        super().__init__(position, lambda: images.ASTEROIDS[number])
-
-        # Set Asteroid to random rotation
-        self.rotation = random.random() * 360
-        self.image = pygame.transform.rotate(self.image, self.rotation)
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        self.image = pygame.transform.rotate(self.image, self.rotation)
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def update(self, delta_time):
-        super().update(delta_time)
-
-        chunk_pos = self.position // game.CHUNK_SIZE
-
-        for y in range(chunk_pos.y-2, chunk_pos.y+3):
-            for x in range(chunk_pos.x-2, chunk_pos.x+3):
-
-                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
-
-                    if isinstance(entity, Ship):
-                        entity_collision(self, entity, delta_time)
-
-                    elif isinstance(entity, Bullet):
-                        entity_mask = pygame.mask.from_surface(entity.image)
-
-                        x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
-                        y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
-
-                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
-                            entity.unload() # if bullet collides with asteroid then destroy bullet
-                            effects.damage(entity.position, entity.damage)
-
-
-
 class Ship(Entity):
     def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
@@ -210,6 +123,116 @@ class Ship(Entity):
             pygame.draw.circle(surf, (34, 130, 240, alpha), (30*game.ZOOM, 30*game.ZOOM), 30*game.ZOOM, width=round(2*game.ZOOM))
             pos = ((self.position - focus_point) * game.ZOOM + game.CENTRE_POINT) - 30*game.ZOOM
             win.blit(surf, pos.to_tuple())
+
+
+
+class Asteroid(Object):
+    def __init__(self, position, image=None) -> None:
+
+        # Generate random asteroid image
+        if not image:
+            number = random.randint(0, len(images.ASTEROIDS)-1)
+        super().__init__(position, lambda: images.ASTEROIDS[number])
+
+        # Set Asteroid to random rotation
+        self.rotation = random.random() * 360
+        self.image = pygame.transform.rotate(self.image, self.rotation)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.previous_delta_time = 1
+
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self.image = pygame.transform.rotate(self.image, self.rotation)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self, delta_time):
+        super().update(delta_time)
+
+        chunk_pos = self.position // game.CHUNK_SIZE
+
+        for y in range(chunk_pos.y-2, chunk_pos.y+3):
+            for x in range(chunk_pos.x-2, chunk_pos.x+3):
+
+                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+
+                    if isinstance(entity, Ship):
+                        asteroid_collision(self, entity)
+
+                    elif isinstance(entity, Bullet):
+                        entity_mask = pygame.mask.from_surface(entity.image)
+
+                        x_offset = (entity.position.x - entity.image.get_width()/2) - (self.position.x - self.image.get_width()/2)
+                        y_offset = (entity.position.y - entity.image.get_height()/2) - (self.position.y - self.image.get_height()/2)
+
+                        if self.mask.overlap(entity_mask, (x_offset, y_offset)):
+                            entity.unload() # if bullet collides with asteroid then destroy bullet
+                            effects.damage(entity.position, entity.damage)
+
+        self.previous_delta_time = delta_time
+
+
+
+def asteroid_collision(asteroid: Asteroid, entity: Entity):
+    """
+    Check if entity overlapping with asteroid
+    If overlapping:
+        Move entity backwards
+        If still overlapping:
+            Move the entity out 1 unit at a time until not overlapping
+        Rotate entity velocity so that it is reflected off the tangent to the asteroid
+        Damage entity and create damage particle effect
+    """
+    entity_mask = pygame.mask.from_surface(entity.image)
+
+    x_offset = (entity.position.x - entity.image.get_width()/2) - (asteroid.position.x - asteroid.image.get_width()/2)
+    y_offset = (entity.position.y - entity.image.get_height()/2) - (asteroid.position.y - asteroid.image.get_height()/2)
+
+    if asteroid.mask.overlap(entity_mask, (x_offset, y_offset)):
+
+        game.CHUNKS.move_entity(entity, -asteroid.previous_delta_time)  # Move the entity backwards out of the asteroid
+
+        # Check if entity still in asteroid
+        x_offset = (entity.position.x - entity.image.get_width()/2) - (asteroid.position.x - asteroid.image.get_width()/2)
+        y_offset = (entity.position.y - entity.image.get_height()/2) - (asteroid.position.y - asteroid.image.get_height()/2)
+
+        if asteroid.mask.overlap(entity_mask, (x_offset, y_offset)):
+            # Move entity out of Asteroid if entity is still in Asteroid
+            # This ensures that the entity is definitly outside of the asteroid by moving the entity 1 game unit at a time
+
+            escape_vector = entity.position - asteroid.position
+            escape_vector.set_magnitude(1)  # Normalize vector
+            original_velocity = entity.velocity.copy()
+            entity.velocity = escape_vector
+
+            while True:
+                game.CHUNKS.move_entity(entity, 1)
+
+                x_offset = (entity.position.x - entity.image.get_width()/2) - (asteroid.position.x - asteroid.image.get_width()/2)
+                y_offset = (entity.position.y - entity.image.get_height()/2) - (asteroid.position.y - asteroid.image.get_height()/2)
+
+                if not asteroid.mask.overlap(entity_mask, (x_offset, y_offset)):
+                    break
+
+            entity.velocity = original_velocity
+
+        vector_to_asteroid = asteroid.position - entity.position
+        tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2)  # Rotate 90 degrees
+        tangent_angle = tangent_to_asteroid.get_angle()
+        entity_angle = entity.velocity.get_angle()
+        angle_difference = entity_angle - tangent_angle
+        entity_rotation = 2 * angle_difference  # 1 angle difference makes it go along normal, another difference reflects it through normal
+        entity.velocity.rotate(entity_rotation)
+
+        entity.velocity.set_magnitude(entity.velocity.magnitude()*0.8)  # Set speed to 80%
+
+        entity.damage(entity.velocity.magnitude()**2/100_000)
+
+        if hasattr(entity, "make_new_patrol_point"):
+            entity.make_new_patrol_point(400, 500, entity.position)
+            entity.state = 0  # Patrol state
+
+        effects.asteroid_debris(entity.position)
 
 
 
