@@ -327,7 +327,7 @@ class Text(Widget):
         self.labels_text = None
         self.labels_size = None
 
-    def get_blit_x(self, label: pygame.surface.Surface):
+    def get_blit_x(self, label: pygame.Surface):
         if self.align == "centre":
             return self.get_x() - label.get_width()/2
         elif self.align == "left":

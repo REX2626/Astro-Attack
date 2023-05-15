@@ -51,9 +51,8 @@ class DefaultGun():
             self.time_reloading = 0
 
 
-    def fire_missile(self, position, velocity, max_speed, explode_distance, explode_radius, explode_damage):
-        missile = entities.Missile(position, velocity, max_speed, explode_distance=explode_distance, explode_radius=explode_radius, explode_damage=explode_damage)
-
+    def fire_missile(self, position, velocity, rotation):
+        missile = entities.Missile(position, velocity, rotation)
         game.CHUNKS.add_entity(missile)
 
 

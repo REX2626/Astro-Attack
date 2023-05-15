@@ -13,8 +13,6 @@ class Ship(Entity):
     def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
-        # self.rotation is stored as radians
-        self.rotation = rotation
         self.max_rotation_speed = max_rotation_speed
         self.weapon = weapon(self)
         self.max_speed = max_speed
@@ -151,8 +149,8 @@ class Asteroid(Object):
 
         chunk_pos = self.position // game.CHUNK_SIZE
 
-        for y in range(chunk_pos.y-2, chunk_pos.y+3):
-            for x in range(chunk_pos.x-2, chunk_pos.x+3):
+        for y in range(chunk_pos.y-1, chunk_pos.y+2):
+            for x in range(chunk_pos.x-1, chunk_pos.x+2):
 
                 for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
 
@@ -304,15 +302,15 @@ class Bullet(Entity):
             # If it is, then destroy alien and bullet
             for entity in game.CHUNKS.get_chunk(self).entities:
 
-                if isinstance(entity, Ship):
+                if isinstance(entity, Ship) and entity != self.ship:
                     if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
-                        if entity.shield and entity != self.ship and self.distance_to(entity) < 35 or not entity.shield and self.distance_to(entity) < 29:
+                        if (entity.shield and self.distance_to(entity) < 35) or (not entity.shield and self.distance_to(entity) < 29):
                             entity.damage(self.damage, self.ship)
                             game.CHUNKS.remove_entity(self)
                             break
 
                 elif isinstance(entity, Missile):
-                    if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
+                    if not isinstance(self.ship, Enemy_Ship):
                         if self.distance_to(entity) < 20:
                             entity.explode(entity.explode_radius)
                             game.CHUNKS.remove_entity(self)
@@ -324,7 +322,7 @@ class Bullet(Entity):
 
 
 class Missile(Entity):
-    def __init__(self, position, velocity, max_speed, rotation=0, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=lambda: images.MISSILE) -> None:
+    def __init__(self, position, velocity, rotation=0, max_speed=1000, max_rotation_speed=3, explode_distance=100, explode_radius=150, explode_damage=5, explode_countdown=0.1, image=lambda: images.MISSILE) -> None:
         super().__init__(position, velocity, rotation, image)
 
         self.max_speed = max_speed
@@ -342,7 +340,7 @@ class Missile(Entity):
     def update(self, delta_time):
         super().update(delta_time)
 
-        # Inertial Dampening
+        # Inertial Dampening - improves missile stability
         self.velocity -= self.velocity.get_clamp(1500 * delta_time)
 
         # Rotation
@@ -362,6 +360,10 @@ class Missile(Entity):
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)
         self.velocity.clamp(self.max_speed)
+
+    def unload(self):
+        game.CHUNKS.remove_entity(self)
+        self.particles.entity = None
 
     def damage(self, damage, entity=None):
         self.explode(self.explode_radius)
@@ -384,7 +386,6 @@ class Missile(Entity):
             entity.damage(self.explode_damage * damage_values[i])
 
         self.destroy()
-
 
     def destroy(self):
         game.CHUNKS.remove_entity(self)

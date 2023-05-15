@@ -71,6 +71,9 @@ class Vector():
     def __mod__(self, arg: Vector) -> Vector:
         return Vector(int(self.x) % arg, int(self.y) % arg)
 
+    def __neg__(self) -> Vector:
+        return Vector(-self.x, -self.y)
+
     def __repr__(self) -> str:
         return str((self.x, self.y))
 
@@ -216,7 +219,8 @@ class Entity(MoveableObject):
     def __init__(self, position, velocity, rotation=0, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, image)
 
-        # self.rotation is stored as radians
+        # self.rotation is stored as radians, -pi < rotation < pi
+        # 0 is upwards, +ve is anti-clockwise
         self.rotation = rotation
         self.image_rotation = 0
         self.rotated_image = self.image
@@ -230,7 +234,7 @@ class Entity(MoveableObject):
         self.rotation = rotation
 
     def rotate_to(self, delta_time, rotation, speed):
-        # Simplify rotation (if self.rotation < -math.pi or self.rotation > math.pi)
+        # Simplify rotation (-pi < self.rotation < pi)
         self.rotation = (self.rotation - math.pi) % (2*math.pi) - math.pi
 
         # Choose shortest angle to rotate
@@ -239,7 +243,7 @@ class Entity(MoveableObject):
         elif self.rotation - math.pi > rotation:
             self.rotation -= 2 * math.pi
 
-        # Change rotation (set to wanted to rotation when reached)
+        # Change rotation (set to target rotation when reached)
         if rotation < self.rotation:
             self.rotation = max(rotation, self.rotation - speed * delta_time)
         else:

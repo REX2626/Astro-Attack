@@ -7,19 +7,20 @@ import random
 
 draw_circle = pygame.draw.circle
 class Particle():
-    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, bloom: int, lifetime: float) -> None:
+    __slots__ = ("position", "velocity", "start_size", "end_size", "colour", "lifetime", "time_alive", "current_size", "size_difference")
+
+    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float, **kwargs) -> None:
         self.position = position
         self.velocity = velocity
         self.start_size = start_size
         self.end_size = end_size
         self.colour = colour
-        self.bloom = bloom
         self.lifetime = lifetime
         self.time_alive = 0
         self.current_size = start_size
         self.size_difference = end_size - start_size
 
-    def update_time(self, delta_time, system: "ParticleSystem"):
+    def update_time(self, delta_time: float, system: "ParticleSystem") -> None:
         self.time_alive += delta_time
 
         self.current_size += self.size_difference * (delta_time / self.lifetime)
@@ -27,16 +28,32 @@ class Particle():
         if self.time_alive > self.lifetime:
             system.particles.remove(self)
 
-    def update(self, delta_time, system):
-        # optomized
+    def update(self, delta_time: float, system: "ParticleSystem") -> None:
+        # optimized
         self.position = Vector(self.position.x + self.velocity.x * delta_time, self.position.y + self.velocity.y * delta_time)
         self.update_time(delta_time, system)
 
-    def draw(self, WIN, focus_point):
+    def draw(self, WIN: pygame.Surface, focus_point: Vector) -> None:
+        ZOOM = game.ZOOM
+        draw_circle(WIN, self.colour,
+                    ((self.position.x - focus_point.x) * ZOOM + game.CENTRE_POINT.x,
+                     (self.position.y - focus_point.y) * ZOOM + game.CENTRE_POINT.y),
+                      max(1, self.current_size * ZOOM))
+
+
+
+class BloomParticle(Particle):
+    __slots__ = ("bloom")
+
+    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float, bloom: float) -> None:
+        super().__init__(position, velocity, start_size, end_size, colour, lifetime)
+        self.bloom = bloom
+
+    def draw(self, WIN: pygame.Surface, focus_point: Vector) -> None:
         ZOOM = game.ZOOM
         CENTRE_POINT_X = game.CENTRE_POINT.x
         CENTRE_POINT_Y = game.CENTRE_POINT.y
-        radius = max(1, self.current_size * ZOOM*self.bloom)
+        radius = max(1, self.current_size*ZOOM*self.bloom)
         surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
 
         max_radius = int(self.current_size*ZOOM*self.bloom)
@@ -60,6 +77,8 @@ class ParticleSystem():
     entity_offset is a function that takes in the Entity and returns a Vector
     if entity: initial_velocity is a function that is called with the entity as an input
     NOTE: if entity: when entity is destroyed - set ParticleSystem.entity = None
+    bloom == 0: No bloom
+    bloom > 0: Bloom
     """
     def __init__(self, position, entity_offset=lambda x: Vector(0, 0), z=1, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
         self.entity_offset = entity_offset
@@ -71,7 +90,8 @@ class ParticleSystem():
         if not max_colour: max_colour = colour
         self.max_colour = max_colour
         self.min_colour = colour
-        self.bloom = bloom
+        self.particle = Particle if not bloom else BloomParticle
+        self.bloom = bloom + 1
         self.duration = duration
         self.lifetime = lifetime
         self.time_alive = 0
@@ -143,7 +163,6 @@ class ParticleSystem():
                     self.spawn(self.position, self.start_size)
 
     def draw(self, WIN, player_pos):
-
         for particle in self.particles:
             particle.draw(WIN, player_pos)
 
@@ -169,5 +188,5 @@ class ParticleSystem():
             initial_velocity = self.initial_velocity
 
         self.particles.append(
-            Particle(position, random_vector(speed) + initial_velocity, start_size=start_size, end_size=self.end_size, colour=colour, bloom=self.bloom, lifetime=self.lifetime)
+            self.particle(position, random_vector(speed) + initial_velocity, start_size=start_size, end_size=self.end_size, colour=colour, lifetime=self.lifetime, bloom=self.bloom)
             )

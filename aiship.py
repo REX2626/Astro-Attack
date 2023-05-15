@@ -54,7 +54,7 @@ class AI_Ship(Ship):
         for y in range(chunk_pos.y-1, chunk_pos.y+2):
             for x in range(chunk_pos.x-1, chunk_pos.x+2):
 
-                for entity in game.CHUNKS.get_chunk((x, y)).entities.copy():
+                for entity in game.CHUNKS.get_chunk((x, y)).entities:
                     if isinstance(entity, Asteroid):
                         return True
 
@@ -91,7 +91,7 @@ class AI_Ship(Ship):
         if max_dist > 2 * game.CHUNK_SIZE:
             # If the intermediate_patrol_point has not already been calculated, calculate it
             if self.intermediate_patrol_point == None:
-                self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=target_position, point_spacing=game.CHUNK_SIZE / 2, intermediate_point_distance=game.CHUNK_SIZE)
+                self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=target_position, point_spacing=game.CHUNK_SIZE/2, intermediate_point_distance=game.CHUNK_SIZE)
 
             # If there is an intermediate_patrol_point, fly to it. Else, fly directly to the station
             if self.intermediate_patrol_point:
@@ -107,29 +107,30 @@ class AI_Ship(Ship):
         self.rotate_to(delta_time, self.position.get_angle_to(target_position), self.max_rotation_speed)
         self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
-    def find_intermediate_patrol_point(self, target_point, point_spacing, intermediate_point_distance):
-        nodes = [] # List of points along the straight line from ship to station
-
+    def find_intermediate_patrol_point(self, target_point: Vector, point_spacing: float, intermediate_point_distance: float) -> Vector | None:
+        """
+        `target_point`: position Vector of end location
+        `point_spacing`: space between each intermediate point
+        `intermediate_point_distance`: distance from asteroid to intermediate point, i.e. distance off course
+        """
         # Find a couple useful values
         direction = target_point - self.position
         distance = direction.magnitude()
-        dx = (target_point.x - self.position.x)
-        dy = (target_point.y - self.position.y)
+        dx = target_point.x - self.position.x
+        dy = target_point.y - self.position.y
 
         # Calculates the vector displacement from point to point
-        point_spacing_vector = Vector(dx * (point_spacing / distance), dy * (point_spacing / distance))
+        point_spacing_x = point_spacing * (dx / distance)
+        point_spacing_y = point_spacing * (dy / distance)
 
-        point_number = distance / point_spacing
+        point_number = int(distance / point_spacing)
 
-        for i in range(int(point_number)):
-            # Adds points to nodes
-            nodes.append(Vector(point_spacing_vector.x * (i+1) + self.position.x, point_spacing_vector.y * (i+1) + self.position.y))
-
-        for node in nodes:
-            chunk_pos = node // game.CHUNK_SIZE
+        for i in range(1, point_number+1):
+            chunk_pos_x = int((i*point_spacing_x + self.position.x) // game.CHUNK_SIZE)
+            chunk_pos_y = int((i*point_spacing_y + self.position.y) // game.CHUNK_SIZE)
 
             # Checks if there is an asteroid in the chunk of that node point
-            for entity in game.CHUNKS.get_chunk((chunk_pos.x, chunk_pos.y)).entities:
+            for entity in game.CHUNKS.get_chunk((chunk_pos_x, chunk_pos_y)).entities:
                 if isinstance(entity, Asteroid):
                     # If there is, then find a position intermediate_point_distance away from the asteroid along the normal line (-dx, dy = normal)
                     d_x = intermediate_point_distance * math.cos(math.atan2(-dx, dy))
@@ -179,7 +180,6 @@ class AI_Ship(Ship):
         self.accelerate_to(final_vector, self.acceleration_constant * delta_time)
 
     def retreat_state(self, delta_time):
-
         # Ship retreats in opposite direction to player
         self.max_speed = 500
         self.rotate_to(delta_time, self.position.get_angle_to(game.player.position) + math.pi, self.max_rotation_speed)
@@ -219,25 +219,36 @@ class Enemy_Ship(AI_Ship):
 
         distance_to_player = self.distance_to(game.player)
 
-        # Initially check if it should be retreating
-        if self.health == 1 and distance_to_player < 1500 and game.player.health > 5 and self.mother_ship and len(self.mother_ship.enemy_list) <= 2:
+        # Retreat, if far away then patrol
+        if self.state == RETREAT:
+            self.retreat_state(delta_time)
+            if distance_to_player > 1500:
+                self.state = PATROL
+
+        # Check if should be retreating
+        elif (self.health <= 1 and distance_to_player < 1500 and game.player.health > 5
+            and self.mother_ship and len(self.mother_ship.enemy_list) <= 2):
+
             self.state = RETREAT
             self.retreat_state(delta_time)
+
         else:
-            # Enemy ships will go into patrol state if the player gets too far while attacking
-            if self.state == ATTACK and distance_to_player > 1500:
-                self.state = PATROL
+            # Attack state
+            if self.state == ATTACK:
 
-            if self.state == RETREAT and distance_to_player > 1500:
-                self.state = PATROL
-
-            # Check if it should be attacking
-            if (distance_to_player < 600 or self.state == ATTACK) and self.state != RETREAT:
                 self.attack_entity_state(delta_time, game.player, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
                 self.group_attack_player()
+
+                if distance_to_player > 1500:  # If too far from player then patrol
+                    self.state = PATROL
+
+            elif distance_to_player < 600:  # If close to player then attack
+                self.attack_entity_state(delta_time, game.player, self.attack_min_dist, self.attack_max_dist, self.attack_max_speed)
+                self.group_attack_player()
+
             # Check if it should be patroling
             elif self.state == PATROL:
-                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=(self.attack_max_speed / 2), mother_ship=self.mother_ship_patrol)
+                self.patrol_state(delta_time, self.patrol_min_dist, self.patrol_max_dist, max_speed=self.attack_max_speed/2, mother_ship=self.mother_ship_patrol)
 
     def damage(self, damage, entity=None):
 
@@ -356,6 +367,7 @@ class Mother_Ship(Enemy_Ship):
         self.patrol_min_dist = 1000
         self.patrol_max_dist = 1500
 
+        self.missile_max_speed = 200
         self.missile_fire_rate = 0.2
         self.reload_time = 1 / self.missile_fire_rate
         self.time_reloading = -4
@@ -402,23 +414,29 @@ class Mother_Ship(Enemy_Ship):
         self.time_reloading += delta_time
 
 
-    def attack_entity_state(self, delta_time, entity, min_dist=300, max_dist=600, max_speed=100):
+    def attack_entity_state(self, delta_time, entity: entities.Entity, min_dist=300, max_dist=600, max_speed=100):
         super().attack_entity_state(delta_time, entity, min_dist, max_dist, max_speed)
 
         # Fire Missiles
-
         if self.level > 9:
 
             if self.time_reloading >= self.reload_time:
 
-                # Get vector 90 degrees from player
-                direction_vector = entity.position - self.position
-                rotated_vector = direction_vector.get_rotate(math.pi / 2)
-                final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
+                # Get vector 90 degrees from rotation
+                velocity = Vector(math.cos(self.rotation), -math.sin(self.rotation))  # y is positive downward
+                velocity.set_magnitude(800)
 
-                # Fire 2 missiles, one on eather side of the ship
-                self.weapon.fire_missile(self.position, final_vector * 100 * delta_time, 1000, 100, 150, 5)
-                self.weapon.fire_missile(self.position, final_vector * 100 * -delta_time, 1000, 100, 150, 5)
+                # Missile starts with current ship velocity
+                velocity1 = self.velocity + velocity
+                velocity2 = self.velocity - velocity
+
+                # Missile points in direction of acceleration
+                rotation1 = self.rotation - math.pi/2
+                rotation2 = self.rotation + math.pi/2
+
+                # Fire 2 missiles, one on either side of the ship
+                self.weapon.fire_missile(self.position, velocity1, rotation1)
+                self.weapon.fire_missile(self.position, velocity2, rotation2)
 
                 self.time_reloading = 0
 
@@ -445,13 +463,13 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, target_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
 
         self.mother_ship = None
 
         self.current_station = current_station
-        self.target_station = target_station
+        self.target_station = None
 
         self.min_patrol_dist = 1000
         self.max_patrol_dist = 4000
@@ -469,10 +487,12 @@ class Neutral_Ship(AI_Ship):
         elif self.state == PATROL:
             self.patrol_state(delta_time, min_dist=self.min_patrol_dist, max_dist=self.max_patrol_dist, max_speed=self.patrol_max_speed, mother_ship=self.mother_ship)
 
+    def check_nearby_stations(self, current_station):
 
-    def check_nearby_stations(self, current_station=None):
+        if self.target_station:
+            self.state = PATROL_TO_STATION
 
-        if self.target_station == None:
+        else:
             # Loop through entities to find friendly station entities
             stations = []
             for entity in game.CHUNKS.entities:
@@ -495,29 +515,24 @@ class Neutral_Ship(AI_Ship):
                 # Randomly choose one of the available stations based on the weighting
                 random_station = random.choices(stations, weights=weights)
                 self.target_station = random_station[0]
+                self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=self.target_station.position, point_spacing=game.CHUNK_SIZE/2, intermediate_point_distance=game.CHUNK_SIZE)
                 self.state = PATROL_TO_STATION
 
             # If there are no other stations available, just patrol around the current one
             else:
                 self.state = PATROL
-        else:
-            self.state = PATROL_TO_STATION
 
     def patrol_to_station(self, delta_time, max_speed=50):
         self.max_speed = max_speed
-
-        # If the intermediate_patrol_point has not already been calculated, calculate it
-        if self.intermediate_patrol_point == None:
-            self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=self.target_station.position, point_spacing=game.CHUNK_SIZE / 2, intermediate_point_distance=game.CHUNK_SIZE)
 
         # If there is an intermediate_patrol_point, fly to it. Else, fly directly to the station
         if self.intermediate_patrol_point:
             self.rotate_to(delta_time, self.position.get_angle_to(self.intermediate_patrol_point), self.max_rotation_speed)
             self.accelerate_in_direction(self.rotation, 300 * delta_time)
 
-            # Once at the intermediate point, set it equal to none so that the ship will then, next frame, start flying straight towards the station
+            # Once at the intermediate point, re-calculate a new one
             if (self.intermediate_patrol_point - self.position).magnitude() < 50:
-                self.intermediate_patrol_point = None
+                self.intermediate_patrol_point = self.find_intermediate_patrol_point(target_point=self.target_station.position, point_spacing=game.CHUNK_SIZE/2, intermediate_point_distance=game.CHUNK_SIZE)
 
         else:
             # Move and rotate towards target station
@@ -540,8 +555,8 @@ class Neutral_Ship(AI_Ship):
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, neutral_list=None, current_station=None, target_station=None, image=lambda: images.NEUTRAL_SHIP_CARGO) -> None:
-        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, neutral_list=None, current_station=None, image=lambda: images.NEUTRAL_SHIP_CARGO) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, image)
         if neutral_list is None:
             neutral_list = []
         self.neutral_list = neutral_list
@@ -588,8 +603,8 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, mother_ship=None, current_station=None, target_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
-        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, target_station, image)
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, mother_ship=None, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
+        super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship
 

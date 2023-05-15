@@ -196,7 +196,7 @@ class Pickler(dill.Pickler):
         """Remove Surface or Mask as they cannot be pickled"""
 
         for name in dir(obj):
-            if isinstance(getattr(obj, name), (pygame.surface.Surface, pygame.mask.Mask)):
+            if isinstance(getattr(obj, name), (pygame.Surface, pygame.Mask)):
                 delattr(obj, name)
 
         return NotImplemented
