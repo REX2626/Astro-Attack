@@ -7,9 +7,10 @@ import game
 
 
 class Chunks():
+    __slots__ = ("list", "entities")
     def __init__(self) -> None:
         self.list = {}
-        self.entities: set[Object] = set() # The currently loaded entities
+        self.entities: set[Object] = set()  # The currently loaded entities
 
         self.create_initial_chunks()
 
@@ -44,7 +45,7 @@ class Chunks():
                     self.list[position] = Chunk(Vector(x, y))
 
                 # Load entities in loaded chunks
-                self.entities.update(self.get_chunk(position).entities)
+                self.entities.update(self.get_chunk_from_coord(position).entities)
 
         for entity in original_entities.difference(self.entities):
             if hasattr(entity, "unload"):
@@ -57,7 +58,28 @@ class Chunks():
         if type(arg) == tuple:
             position = arg
         else:
-            position = (arg.position // game.CHUNK_SIZE).to_tuple()
+            position = (int(arg.position.x // game.CHUNK_SIZE), int(arg.position.y // game.CHUNK_SIZE))
+
+        # Create chunk, if chunk hasn't been generated
+        if position not in self.list:
+            self.list[position] = Chunk(Vector(position[0], position[1]))
+
+        return self.list[position]
+
+    def get_chunk_from_coord(self, position: tuple[int, int]) -> "Chunk":
+        """Returns the chunk, arg is a chunk_coord"""
+
+        # Create chunk, if chunk hasn't been generated
+        if position not in self.list:
+            self.list[position] = Chunk(Vector(position[0], position[1]))
+
+        return self.list[position]
+
+    def get_chunk_from_entity(self, entity: Object) -> "Chunk":
+        """Returns the chunk, arg is an object"""
+
+        # Check if arg is chunk_coord or an entity
+        position = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
@@ -67,16 +89,16 @@ class Chunks():
 
     def add_entity(self, entity: Object) -> None:
 
-        self.get_chunk(entity).entities.add(entity)
+        self.get_chunk_from_entity(entity).entities.add(entity)
 
     def remove_entity(self, entity: Object) -> None:
 
-        self.get_chunk(entity).entities.remove(entity)
+        self.get_chunk_from_entity(entity).entities.remove(entity)
 
         if entity in self.entities:
             self.entities.remove(entity)
 
-    # optomized
+    # optimized
     def move_entity(self, entity: Entity, delta_time: float) -> None:
         """Moves the entity using it's velocity"""
         original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
@@ -84,10 +106,10 @@ class Chunks():
         new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
 
         if new_chunk_pos != original_chunk_pos:
-            self.get_chunk(original_chunk_pos).entities.remove(entity)
-            self.get_chunk(new_chunk_pos).entities.add(entity)
+            self.get_chunk_from_coord(original_chunk_pos).entities.remove(entity)
+            self.get_chunk_from_coord(new_chunk_pos).entities.add(entity)
 
-    # optomized
+    # optimized
     def set_position(self, entity: Entity, position: Vector) -> None:
         """Moves the entity to `position`"""
         original_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
@@ -95,12 +117,13 @@ class Chunks():
         new_chunk_pos = (int(entity.position.x // game.CHUNK_SIZE), int(entity.position.y // game.CHUNK_SIZE))
 
         if new_chunk_pos != original_chunk_pos:
-            self.get_chunk(original_chunk_pos).entities.remove(entity)
-            self.get_chunk(new_chunk_pos).entities.add(entity)
+            self.get_chunk_from_coord(original_chunk_pos).entities.remove(entity)
+            self.get_chunk_from_coord(new_chunk_pos).entities.add(entity)
 
 
 
 class Chunk():
+    __slots__ = ("position", "entities")
     def __init__(self, position: Vector) -> None:
         self.position = position
         self.entities = set()
@@ -112,31 +135,31 @@ class Chunk():
         # the ships make sure they don't spawn inside a chunk by
         # checking if this chunk is adjoining a chunk with an asteroid in
 
-        if self.adjoining_asteroid_chunk():
+        if self.adjoining_asteroid_chunk() or not self.adjoining_empty_chunks():
             return
 
         # Asteroid
-        elif random.random() < 0.1 and self.adjoining_empty_chunks():
+        elif random.random() < 0.1:
             self.entities.add(
 
                 Asteroid(self.random_position())
             )
 
         # Enemy Station
-        elif random.random() < 0.04 and self.adjoining_empty_chunks():
+        elif random.random() < 0.04:
             self.entities.add(
 
                 EnemyStation(self.random_position())
             )
 
         # Friendly Station
-        elif random.random() < 0.03 and self.adjoining_empty_chunks():
+        elif random.random() < 0.03:
             self.entities.add(
 
                 FriendlyStation(self.random_position())
             )
 
-        elif random.random() < 0.01 and self.adjoining_empty_chunks():
+        elif random.random() < 0.01:
             self.entities.add(
 
                 Mother_Ship(self.random_position(), level=game.CURRENT_SHIP_LEVEL)
@@ -151,7 +174,7 @@ class Chunk():
                 if (x, y) not in game.CHUNKS.list:
                     continue
 
-                for entity in game.CHUNKS.get_chunk((x, y)).entities:
+                for entity in game.CHUNKS.get_chunk_from_coord((x, y)).entities:
                     if isinstance(entity, Asteroid):
                         return True
 
@@ -165,7 +188,7 @@ class Chunk():
                 if (x, y) not in game.CHUNKS.list:
                     continue
 
-                if len(game.CHUNKS.get_chunk((x, y)).entities) > 0: # check if there are any entities in the chunk
+                if len(game.CHUNKS.get_chunk_from_coord((x, y)).entities) > 0: # check if there are any entities in the chunk
                     return False
 
         return True

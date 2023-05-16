@@ -1,5 +1,5 @@
-import random
 import game
+import random
 import math
 
 def set_seed(x, y):

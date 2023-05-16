@@ -1,7 +1,7 @@
 from objects import Vector, random_vector
 import game
-import pygame
 import random
+import pygame
 
 
 

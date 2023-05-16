@@ -1,11 +1,11 @@
-import pygame
-from pygame import freetype
-import random
 from player import get_player
 from ui import Bar as UIBar
-import game
 import images
+import game
 import main
+import random
+from pygame import freetype
+import pygame
 # menu v2
 
 

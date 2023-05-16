@@ -72,7 +72,6 @@ def handle_player_input(keys_pressed, delta_time):
         game.LAST_PLAYER_POS = player.position
         return
 
-    # Example:
     if keys_pressed[pygame.K_w]:
         player.move_forward(delta_time)
 
@@ -84,12 +83,6 @@ def handle_player_input(keys_pressed, delta_time):
 
     if keys_pressed[pygame.K_d]:
         player.move_right(delta_time)
-
-    if keys_pressed[pygame.K_LEFT]:
-        player.turn_left(delta_time)
-
-    if keys_pressed[pygame.K_RIGHT]:
-        player.turn_right(delta_time)
 
     if keys_pressed[pygame.K_SPACE]:
         player.boost(delta_time)
@@ -138,7 +131,7 @@ def handle_player_input(keys_pressed, delta_time):
     # Mouse
     mouse_position = pygame.mouse.get_pos()
     angle = math.atan2(-mouse_position[1]+game.CENTRE_POINT.y, mouse_position[0]-game.CENTRE_POINT.x) - math.pi/2
-    player.set_rotation(angle)
+    player.rotation = angle
     game.LAST_PLAYER_POS = player.position
 
 

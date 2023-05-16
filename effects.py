@@ -1,5 +1,5 @@
-import particles
 from objects import Vector
+import particles
 import game
 import math
 

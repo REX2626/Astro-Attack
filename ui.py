@@ -1,15 +1,15 @@
-import game
-import images
 from objects import Vector
-import aiship
-from entities import Asteroid, Scrap#, HealthPickup
+from entities import Asteroid, Scrap
 from station import Station, EnemyStation, FriendlyStation
+import aiship
 from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter # For commands
-import math
-import pygame
-import psutil
+import images
+import game
 import commands
+import math
+import psutil
 from pygame import freetype
+import pygame
 
 
 
@@ -84,7 +84,6 @@ class MiniMap():
         self.asteroid_colour = game.LIGHT_GREY
         self.player_colour = (255, 255, 255)
         self.neutral_colour = (5, 230, 20)
-        # self.health_pickup_colour = (0, 0, 255)
         self.scrap_colour = (255, 255, 0)
         self.entity_size = 3
         self.player_image = images.PLAYER_MINIMAP_IMAGE

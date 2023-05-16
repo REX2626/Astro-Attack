@@ -1,4 +1,4 @@
-from objects import Vector, Object, Entity, random_vector
+from objects import Vector, Object, Entity
 from weapons import DefaultGun
 import effects
 import images
@@ -10,10 +10,9 @@ import pygame
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, max_rotation_speed=3, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
-        self.max_rotation_speed = max_rotation_speed
         self.weapon = weapon(self)
         self.max_speed = max_speed
         self.health = health
@@ -24,7 +23,6 @@ class Ship(Entity):
         self.shield_recharge = shield_recharge
 
         self.shield_delay_elapsed = 0
-        self.rotation_speed = 0
 
     def update(self, delta_time):
 
@@ -39,17 +37,6 @@ class Ship(Entity):
         -> the bigger the constant, the faster the dampening
         """
         self.velocity -= self.velocity.get_clamp(200 * delta_time)
-
-        # Rotation Dampening
-        """
-        -> See above definition of dampening
-        -> 3 is the size of the dampening
-        """
-        # clamp self.rotation_speed dampening to 3*delta_time
-        self.rotation_speed -= math.copysign(min(abs(self.rotation_speed), 3*delta_time), self.rotation_speed)
-
-        # Change rotation by rotation speed
-        self.set_rotation(self.rotation + self.rotation_speed * delta_time)
 
         # Update weapon
         self.weapon.update(delta_time)
@@ -70,14 +57,6 @@ class Ship(Entity):
     def accelerate(self, acceleration: Vector):
         super().accelerate(acceleration)
         self.velocity.clamp(self.max_speed)
-
-    def accelerate_rotation(self, acceleration):
-        self.rotation_speed += acceleration
-        # clamp self.rotation_speed to self.max_rotation_speed
-        self.rotation_speed = math.copysign(min(abs(self.rotation_speed), self.max_rotation_speed), self.rotation_speed)
-
-    def make_new_patrol_point(self, min_dist, max_dist, relative_pos):
-        self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + relative_pos
 
     def damage(self, damage, entity=None):
         """entity is the object which is damaging this ship, DON'T REMOVE"""

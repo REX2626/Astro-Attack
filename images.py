@@ -4,9 +4,9 @@ This file loads all the images
 All images have the same scale, i.e. they're pixels are all 1 game unit in size
 """
 
-import pygame
 import sys
 import os
+import pygame
 
 
 

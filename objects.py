@@ -1,9 +1,9 @@
 from __future__ import annotations
-import pygame
-import math
 import images
 import game
 import random
+import math
+import pygame
 
 
 
@@ -152,35 +152,30 @@ def random_vector(magnitude: float) -> Vector:
 
 
 class Object():
-    def __init__(self, position, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, image=lambda: images.DEFAULT) -> None:
 
-        # Make position a vector
-        if type(position) != Vector:
-            self.position = Vector(position[0], position[1])
-        else:
-            self.position: Vector = position
-
+        self.position = position
         self.image = image()
 
-        self.load_image = image # a function that returns a pygame Surface
+        self.load_image = image  # a function that returns a pygame Surface
         self.scale = 1
         self.scaled_image = self.image
 
         # Set the size (dimensions), original size of image, doesn't change when rotating
         self.size = Vector(self.image.get_width(), self.image.get_height())
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict) -> None:
         self.__dict__.update(state)
         self.image = self.load_image()
         self.scaled_image = pygame.transform.scale_by(self.image, self.scale)
 
-    def update(self, delta_time):
+    def update(self, delta_time: float) -> None:
         pass
 
     def distance_to(self, object: Object) -> float:
         return (self.position - object.position).magnitude()
 
-    def get_zoomed_image(self):
+    def get_zoomed_image(self) -> pygame.Surface:
         if self.scale != game.ZOOM:
             # if self.scaled_image isn't the right scale -> recalculate the scaled_image
             self.scale = game.ZOOM
@@ -188,7 +183,7 @@ class Object():
 
         return self.scaled_image
 
-    def draw(self, win: pygame.Surface, focus_point):
+    def draw(self, win: pygame.Surface, focus_point: Vector) -> None:
         image = self.get_zoomed_image()
         offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
         win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())
@@ -196,27 +191,23 @@ class Object():
 
 
 class MoveableObject(Object):
-    def __init__(self, position, velocity, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, image)
 
-        # Make velocity a vector
-        if type(velocity) != Vector:
-            self.velocity = Vector(velocity[0], velocity[1])
-        else:
-            self.velocity: Vector = velocity
+        self.velocity = velocity
 
-    def update(self, delta_time):
+    def update(self, delta_time: float) -> None:
 
         game.CHUNKS.move_entity(self, delta_time)
 
-    def move_towards(self, target_position, speed):
+    def move_towards(self, target_position: Vector, speed: float) -> None:
 
         self.velocity = target_position - self.position
         self.velocity.set_magnitude(speed)
 
 
 class Entity(MoveableObject):
-    def __init__(self, position, velocity, rotation=0, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, rotation: float = 0, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, image)
 
         # self.rotation is stored as radians, -pi < rotation < pi
@@ -224,16 +215,12 @@ class Entity(MoveableObject):
         self.rotation = rotation
         self.image_rotation = 0
         self.rotated_image = self.image
-        self.set_rotation(rotation)
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict) -> None:
         super().__setstate__(state)
         self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
 
-    def set_rotation(self, rotation):
-        self.rotation = rotation
-
-    def rotate_to(self, delta_time, rotation, speed):
+    def rotate_to(self, delta_time: float, rotation: float, speed: float) -> None:
         # Simplify rotation (-pi < self.rotation < pi)
         self.rotation = (self.rotation - math.pi) % (2*math.pi) - math.pi
 
@@ -249,18 +236,18 @@ class Entity(MoveableObject):
         else:
             self.rotation = min(rotation, self.rotation + speed * delta_time)
 
-    def accelerate(self, acceleration: Vector):
+    def accelerate(self, acceleration: Vector) -> None:
         self.velocity += acceleration
 
-    def accelerate_to(self, target_position: Vector, magnitude: float):
+    def accelerate_to(self, target_position: Vector, magnitude: float) -> None:
         acceleration = target_position - self.position
         acceleration.set_magnitude(magnitude)
         self.accelerate(acceleration)
 
-    def accelerate_in_direction(self, angle: float, magnitude: float):
+    def accelerate_in_direction(self, angle: float, magnitude: float) -> None:
         self.accelerate(Vector(-math.sin(angle)*magnitude, -math.cos(angle)*magnitude))
 
-    def accelerate_onto_pos(self, target_position: Vector, max_acceleration: float, max_speed: float):
+    def accelerate_onto_pos(self, target_position: Vector, max_acceleration: float, max_speed: float) -> None:
         distance_to_target = (self.position - target_position).magnitude()
 
         distance_to_decelerate_from_max = (max_speed)**2 / (2 * 200) # 200 is the value for inertial dampening
@@ -272,7 +259,7 @@ class Entity(MoveableObject):
         else:
             self.accelerate_to(target_position, max_acceleration)
 
-    def get_image(self):
+    def get_image(self) -> pygame.Surface:
         if self.scale != game.ZOOM:
             # if self.scaled_image isn't the right scale -> recalculate the scaled_image
             self.scale = game.ZOOM
@@ -290,7 +277,7 @@ class Entity(MoveableObject):
 
         return self.rotated_image
 
-    def draw(self, win: pygame.Surface, focus_point):
+    def draw(self, win: pygame.Surface, focus_point: Vector) -> None:
         image = self.get_image()
         offset = game.CENTRE_POINT - Vector(image.get_width(), image.get_height()) * 0.5
         win.blit(image, (round((self.position - focus_point) * game.ZOOM + offset)).to_tuple())

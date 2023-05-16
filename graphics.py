@@ -3,11 +3,11 @@ This file contains functions to draw graphics
 This includes: chunk drawer, background star layer
 """
 
-import pygame
-from random import randint
 from objects import Object
-from game import *
 import game
+from game import *
+from random import randint
+import pygame
 
 
 

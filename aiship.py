@@ -1,7 +1,6 @@
-from objects import Vector
+from objects import Vector, random_vector
 import entities
 from entities import Ship, Asteroid
-from objects import random_vector
 from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
 import effects
@@ -23,7 +22,7 @@ level_text_cache = dict()
 
 class AI_Ship(Ship):
     def __init__(self, position: Vector, velocity: Vector=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=lambda: images.DEFAULT) -> None:
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, armour, shield_delay, shield_recharge, image)
+        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, armour, shield_delay, shield_recharge, image)
 
         self.state = state
         # Initialises start patrol point
@@ -48,6 +47,9 @@ class AI_Ship(Ship):
             self.shield_recharge = 0
 
         self.intermediate_patrol_point = None
+
+    def make_new_patrol_point(self, min_dist, max_dist, relative_pos):
+        self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + relative_pos
 
     def check_for_asteroid(self, chunk_pos):
         # Loop through chunks in a 3x3 grid centred around the original chunk you are checking
@@ -367,7 +369,6 @@ class Mother_Ship(Enemy_Ship):
         self.patrol_min_dist = 1000
         self.patrol_max_dist = 1500
 
-        self.missile_max_speed = 200
         self.missile_fire_rate = 0.2
         self.reload_time = 1 / self.missile_fire_rate
         self.time_reloading = -4

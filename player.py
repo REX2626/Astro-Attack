@@ -1,8 +1,8 @@
 from objects import Vector, random_vector
 from entities import Ship, Scrap
 from weapons import PlayerGun
-import images
 import particles
+import images
 import game
 import random
 import math
@@ -15,7 +15,7 @@ class Player_Ship(Ship):
         self,
         position: Vector, velocity: Vector,
         max_speed=game.MAX_PLAYER_SPEED,
-        rotation=0, max_rotation_speed=3,
+        rotation=0,
         weapon=PlayerGun,
         health=game.MAX_PLAYER_HEALTH,
         armour=game.MAX_PLAYER_ARMOUR,
@@ -25,9 +25,8 @@ class Player_Ship(Ship):
 
         ) -> None:
 
-        super().__init__(position, velocity, max_speed, rotation, max_rotation_speed, weapon, health, shield, armour, shield_delay, shield_recharge, image)
+        super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, armour, shield_delay, shield_recharge, image)
 
-        self.max_rotation_speed = max_rotation_speed
         self.boost_amount = boost_amount
         self.boost_change = boost_change
         self.aiming_enemy = None
@@ -118,12 +117,6 @@ class Player_Ship(Ship):
             self.boost_particles1.active = False
             self.boost_particles2.active = False
 
-    def turn_left(self, delta_time):
-        self.accelerate_rotation(delta_time * 8)
-
-    def turn_right(self, delta_time):
-        self.accelerate_rotation(delta_time * -8)
-
     def track_enemy(self):
         enemy = self.tracked_enemy
         if hasattr(self.weapon, "speed"):
@@ -174,6 +167,6 @@ class Player_Ship(Ship):
 def get_player():
 
     # Create Player_Ship
-    player = Player_Ship(position=game.LAST_PLAYER_POS, velocity=(0, 0))
+    player = Player_Ship(position=game.LAST_PLAYER_POS, velocity=Vector(0, 0))
     game.CHUNKS.add_entity(player)
     return player

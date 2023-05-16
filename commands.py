@@ -4,8 +4,8 @@ from station import FriendlyStation, EnemyStation
 from objects import Vector
 from entities import Entity, Scrap, Asteroid
 import game
-import pygame
 import random
+import pygame
 
 
 # Spawns entity
