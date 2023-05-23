@@ -16,10 +16,10 @@ def asteroid_debris(position):
     particles.ParticleSystem(position, start_size=10, end_size=0, colour=game.DARK_GREY, duration=None, lifetime=0.3, frequency=20, speed=200, speed_variance=40)
 
 def missile_trail(entity) -> particles.ParticleSystem:
-    boost_distance = 10
+    boost_distance = 12
     boost_position = lambda missile: Vector(boost_distance * math.sin(missile.rotation), boost_distance * math.cos(missile.rotation))
 
-    return particles.ParticleSystem(entity, entity_offset=boost_position, start_size=2, end_size=0, colour=(207, 207, 220), bloom=2, duration=None, lifetime=0.4, frequency=150, speed_variance=50, initial_velocity=lambda missile: Vector(0, 700).get_rotate(entity.rotation)+missile.velocity)
+    return particles.ParticleSystem(entity, entity_offset=boost_position, start_size=4, end_size=0, colour=(207, 207, 220), duration=None, lifetime=0.4, frequency=150, speed_variance=50, initial_velocity=lambda missile: Vector(0, 700).get_rotate(entity.rotation)+missile.velocity)
 
 def missile_ship_trail(entity) -> particles.ParticleSystem:
     boost_distance = 20

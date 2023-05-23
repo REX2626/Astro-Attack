@@ -1,6 +1,6 @@
 """
 This file contains functions to draw graphics
-This includes: chunk drawer, background star layer
+This includes: get_entities_to_draw, draw_chunks, draw_stars
 """
 
 from objects import Object
@@ -16,9 +16,9 @@ def get_entities_to_draw():
     \nSorts the order to draw entities based on their 'z value'"""
 
     # Get number of chunks until going off the screen
-    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 2  # Ensure every entity that can be seen is drawn
 
-    centre: Vector = game.CHUNKS.get_chunk(game.player).position
+    centre = game.CHUNKS.get_chunk(game.player).position
 
     entities: list[Object] = []
 

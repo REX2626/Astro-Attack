@@ -1,4 +1,4 @@
-from objects import Vector, random_vector
+from objects import Entity, Vector, random_vector
 import game
 import random
 import pygame
@@ -60,7 +60,7 @@ class BloomParticle(Particle):
         min_radius = int(self.current_size*ZOOM)
 
         # draw circle going from out to in
-        for radius1 in range(max_radius, min_radius, -1): # e.g. range(15, 10, -1)
+        for radius1 in range(max_radius, min_radius, -1):  # e.g. range(15, 10, -1)
             amount_done = (max_radius-radius1) / (max_radius-min_radius)
             draw_circle(surface, (*self.colour, amount_done*255), (radius, radius), radius1, width=2)
 
@@ -72,42 +72,95 @@ class BloomParticle(Particle):
 
 class ParticleSystem():
     """
-    position can be a Vector or an Entity
-    if entity: the ParticleSystem can be turned on and off by setting the active attribute to True or False
-    entity_offset is a function that takes in the Entity and returns a Vector
-    if entity: initial_velocity is a function that is called with the entity as an input
-    NOTE: if entity: when entity is destroyed - set ParticleSystem.entity = None
-    bloom == 0: No bloom
-    bloom > 0: Bloom
+    Creates a controller to spawn particles
+
+    NOTE: Automatically adds this system to game.CHUNKS
+
+    Parameters:
+
+        `position` (Vector | Entity): If Vector then System is stationary, if Entity then System follows the entity\
+                                      and can be turned on/off by setting the active attribute to True/False.\
+                                      NOTE: when the entity is destroyed, set ParticleSystem.entity = None
+
+        `entity_offset` (Function): Input - entity, Returns - Vector from the position
+
+        `z` (int): The z layer of the entity, for entity overlapping
+
+        `start_size` (float): The starting radius of the particles (without bloom)
+
+        `max_start_size` (float | None): Optional, if given the actual start size will be between start_size and max_start_size
+
+        `end_size` (float): The final radius of the particles
+
+        `colour` (tuple[int, int, int]): RGB colour of the particles
+
+        `max_colour` (tuple[int, int, int] | None): RGB colour, optional, if given the actual start colour will be between colour and max_colour
+
+        `bloom` (float): bloom > 0 for any bloom, bloom == 0 for no bloom
+
+        `duration` (float | None): None or 0 for explosion, else duration is the time in seconds the system will be active for
+
+        `lifetime` (float): Time in seconds that the particles will be alive for
+
+        `frequency` (float): Number of particles that will be spawned per second
+
+        `speed` (float): The speed of the particles
+
+        `speed_variance` (float | None): Optional, if given the speed will be up to +- speed_variance
+
+        `initial_velocity` (Vector | Function): Initial speed of particle,\
+                                                if entity then initial_velocity will be called,\
+                                                Input - entity, Returns - Vector
     """
-    def __init__(self, position, entity_offset=lambda x: Vector(0, 0), z=1, start_size=5, max_start_size=None, end_size=0, colour=(255, 255, 255), max_colour=None, bloom=0, duration=5, lifetime=2, frequency=2, speed=20, speed_variance=None, initial_velocity=Vector(0, 0)) -> None:
+    def __init__(self, position: Vector | Entity, entity_offset=lambda x: Vector(0, 0), z: int = 1,
+                 start_size: float = 5, max_start_size: float | None = None, end_size: float = 0,
+                 colour: tuple[int, int, int] = (255, 255, 255), max_colour: tuple[int, int, int] | None = None, bloom: float = 0,
+                 duration: float | None = 5, lifetime: float = 2, frequency: float = 2,
+                 speed: float = 20, speed_variance: float | None = None, initial_velocity: Vector = Vector(0, 0)) -> None:
+
         self.entity_offset = entity_offset
         self.z = z
-        if not max_start_size: max_start_size = start_size
-        self.start_size = start_size
-        self.max_start_size = max_start_size
+
+        if max_start_size:
+            self.get_start_size = lambda: start_size + random.random() * (max_start_size - start_size)
+        else:
+            self.get_start_size = lambda: start_size
         self.end_size = end_size
-        if not max_colour: max_colour = colour
-        self.max_colour = max_colour
-        self.min_colour = colour
+
+        if max_colour:
+            self.get_colour = lambda: (random.randint(colour[0], max_colour[0]),
+                                       random.randint(colour[1], max_colour[1]),
+                                       random.randint(colour[2], max_colour[2]))
+        else:
+            self.get_colour = lambda: colour
+
         self.particle = Particle if not bloom else BloomParticle
         self.bloom = bloom + 1
+
         self.duration = duration
         self.lifetime = lifetime
         self.time_alive = 0
         self.period = 1 / frequency
-        self.speed = speed
         self.delay = 0
-        self.speed_variance = speed_variance
-        self.initial_velocity = initial_velocity
 
-        if not isinstance(position, Vector): # if position is an Entity
+        if not isinstance(position, Vector):  # if position is an Entity
             self.entity = position
             self.position = self.entity.position
             self.active = False
         else:
             self.position = position
             self.entity = None
+
+        if speed_variance:
+            if self.entity:
+                self.get_velocity = lambda: random_vector(speed + (random.random()*2-1) * speed_variance) + initial_velocity(self.entity)
+            else:
+                self.get_velocity = lambda: random_vector(speed + (random.random()*2-1) * speed_variance) + initial_velocity
+        else:
+            if self.entity:
+                self.get_velocity = lambda: random_vector(speed) + initial_velocity(self.entity)
+            else:
+                self.get_velocity = lambda: random_vector(speed) + initial_velocity
 
         self.particles: list[Particle] = []
 
@@ -118,7 +171,7 @@ class ParticleSystem():
             if not self.entity:
                 self.burst()
 
-    def update(self, delta_time):
+    def update(self, delta_time: float) -> None:
         self.delay += delta_time
         self.time_alive += delta_time
 
@@ -129,64 +182,49 @@ class ParticleSystem():
             self.previous_position = self.position
             game.CHUNKS.set_position(self, self.entity.position + self.entity_offset(self.entity))
 
-        if not self.entity and self.time_alive > self.duration: # check if the System's life time is over
+        if not self.entity and self.time_alive > self.duration:  # check if the System's life time is over
 
-            if not self.particles: # if there are no more particles, then the System can be destroyed
+            if not self.particles:  # if there are no more particles, then the System can be destroyed
                 game.CHUNKS.remove_entity(self)
             return
 
-        if self.entity and not self.active: # if not active: don't spawn particles
+        if self.entity and not self.active:  # if not active: don't spawn particles
             self.delay = 0
             return
 
-        if self.delay > self.period: # if the System should stil be alive AND the spawning delay is over, then spawn in more particles
+        if self.delay > self.period:  # if the System should stil be alive AND the spawning delay is over, then spawn in more particles
 
-            count = self.delay // self.period
+            count = int(self.delay / self.period)
 
             self.delay -= self.period * count
 
             if self.entity:
                 vec = self.position - self.previous_position
-                if self.speed_variance:
-                    for i in range(1, int(count)+1):
-                        position = self.previous_position + (i/count) * vec + (1-i/count) * (self.initial_velocity(self.entity) + random_vector(self.speed + (random.random()*2-1) * self.speed_variance)) * delta_time
-                        start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
-                        self.spawn(position, start_size)
-                else:
-                    for i in range(1, int(count)+1):
-                        position = self.previous_position + (i/count) * vec + (1-i/count) * (self.initial_velocity(self.entity) + random_vector(self.speed)) * delta_time
-                        start_size = self.start_size + (self.end_size - self.start_size) * (delta_time / self.lifetime)
-                        self.spawn(position, start_size)
+                for i in range(1, count+1):
+                    velocity = self.get_velocity()
+                    position = self.previous_position + (i/count) * vec + (1-i/count) * velocity * delta_time
+                    start_size = self.get_start_size()
+                    start_size = start_size + (self.end_size - start_size) * (1-i/count) * self.period
+                    self.spawn(position, velocity, start_size)
 
             else:
-                for _ in range(int(count)):
-                    self.spawn(self.position, self.start_size)
+                for i in range(1, count+1):
+                    velocity = self.get_velocity()
+                    position = self.position + (1-i/count) * velocity * delta_time
+                    start_size = self.get_start_size()
+                    start_size = start_size + (self.end_size - start_size) * (1-i/count) * self.period
+                    self.spawn(position, velocity, start_size)
 
-    def draw(self, WIN, player_pos):
+    def draw(self, WIN: pygame.Surface, player_pos: Vector) -> None:
         for particle in self.particles:
             particle.draw(WIN, player_pos)
 
-    def burst(self):
+    def burst(self) -> None:
         for _ in range(int(1/self.period)):
-            self.spawn(self.position, self.start_size)
+            self.spawn(self.position, self.get_velocity(), self.get_start_size())
 
-    def spawn(self, position, start_size):
-        if self.speed_variance:
-            speed = self.speed + (random.random()*2-1) * self.speed_variance
-        else:
-            speed = self.speed
-
-        start_size = random.random() * (self.max_start_size - start_size) + start_size
-
-        r1, r2 = self.min_colour[0], self.max_colour[0]
-        g1, g2 = self.min_colour[1], self.max_colour[1]
-        b1, b2 = self.min_colour[2], self.max_colour[2]
-        colour = (random.randint(r1, r2), random.randint(g1, g2), random.randint(b1, b2))
-        if self.entity:
-            initial_velocity = self.initial_velocity(self.entity)
-        else:
-            initial_velocity = self.initial_velocity
+    def spawn(self, position: Vector, velocity: Vector, start_size: float) -> None:
 
         self.particles.append(
-            self.particle(position, random_vector(speed) + initial_velocity, start_size=start_size, end_size=self.end_size, colour=colour, lifetime=self.lifetime, bloom=self.bloom)
+            self.particle(position, velocity, start_size=start_size, end_size=self.end_size, colour=self.get_colour(), lifetime=self.lifetime, bloom=self.bloom)
             )

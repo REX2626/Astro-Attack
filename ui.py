@@ -76,22 +76,26 @@ class Image():
 
 class MiniMap():
     def __init__(self, position, width, height) -> None:
-        self.position = position
-        self.x, self.y = self.position
+        self.x, self.y = position
         self.width = width
         self.height = height
-        self.enemy_colour = (230, 0, 0)
-        self.asteroid_colour = game.LIGHT_GREY
+
+        self.border_width = 7
+        self.draw_width = width - 2*self.border_width
+        self.draw_height = height - 2*self.border_width
+
         self.player_colour = (255, 255, 255)
         self.neutral_colour = (5, 230, 20)
+        self.enemy_colour = (230, 0, 0)
+        self.asteroid_colour = game.LIGHT_GREY
         self.scrap_colour = (255, 255, 0)
         self.entity_size = 3
         self.player_image = images.PLAYER_MINIMAP_IMAGE
 
     def draw_entity(self, colour, entity, surf):
         if colour:
-            pos = (((entity.position.x - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
-                   ((entity.position.y - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2))
+            pos = (((entity.position.x - game.player.position.x) / (game.LOAD_DISTANCE-1) / game.CHUNK_SIZE / 2 * self.draw_width) + (self.draw_width / 2),
+                   ((entity.position.y - game.player.position.y) / (game.LOAD_DISTANCE-1) / game.CHUNK_SIZE / 2 * self.draw_height) + (self.draw_height / 2))
 
             pygame.draw.circle(surf, colour, pos, self.entity_size)
 
@@ -118,23 +122,23 @@ class MiniMap():
         ), border_radius=5)
 
         # Draws enemies in chunks
-        surf = pygame.Surface((self.width, self.height))
+        surf = pygame.Surface((self.draw_width, self.draw_height))
 
         for entity in filter(lambda entity: isinstance(entity, Station), game.CHUNKS.entities):
-            # Blits station image
+            # Blits station image, (game.LOAD_DISTANCE-1) so that entities do not vanish if near minimap edge
             station_image = images.ENEMY_STATION_ICON if isinstance(entity, EnemyStation) else images.FRIENDLY_STATION_ICON
-            surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.width) + (self.width / 2),
-                                        ((entity.position.y - entity.height/2 - game.player.position.y) / game.LOAD_DISTANCE / game.CHUNK_SIZE / 2 * self.height) + (self.height / 2)))
+            surf.blit(station_image, (((entity.position.x - entity.width/2 - game.player.position.x) / (game.LOAD_DISTANCE-1) / game.CHUNK_SIZE / 2 * self.draw_width) + (self.draw_width / 2),
+                                      ((entity.position.y - entity.height/2 - game.player.position.y) / (game.LOAD_DISTANCE-1) / game.CHUNK_SIZE / 2 * self.draw_height) + (self.draw_height / 2)))
 
         for entity in filter(lambda entity: not isinstance(entity, Station), game.CHUNKS.entities):
             self.draw_entity(self.get_entity_colour(entity), entity, surf)
 
-        game.WIN.blit(surf, (0, 0))
+        game.WIN.blit(surf, (self.border_width, self.border_width))
 
         # Draws border
         pygame.draw.rect(game.WIN, color=game.DARK_GREY, rect=(
             self.x, self.y, self.width, self.height
-        ), width=7, border_radius=5)
+        ), width=self.border_width, border_radius=5)
 
         # Draws player image
         image = pygame.transform.rotate(self.player_image, game.player.rotation / math.pi * 180)
