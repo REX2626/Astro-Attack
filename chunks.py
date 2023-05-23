@@ -2,6 +2,7 @@ from objects import Vector, Object, Entity
 from entities import Asteroid
 from station import FriendlyStation, EnemyStation
 from aiship import Mother_Ship
+from map_generation import reset_chance, chance
 import random
 import game
 
@@ -15,15 +16,10 @@ class Chunks():
         self.create_initial_chunks()
 
     def create_initial_chunks(self) -> None:
-        def func(_):
-            pass
-        generate = Chunk.generate
-        setattr(Chunk, "generate", func)
         for y in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
             for x in range(-game.SPAWN_SIZE, game.SPAWN_SIZE):
                 chunk = Chunk(Vector(x, y))
                 self.list[(x, y)] = chunk
-        setattr(Chunk, "generate", generate)
         self.add_entity(FriendlyStation(position=game.LAST_PLAYER_POS))
 
     def update(self, player: Entity) -> None:
@@ -42,7 +38,9 @@ class Chunks():
                 # If chunk hasn't been created, then create a new chunk
                 position = (x, y)
                 if position not in self.list:
-                    self.list[position] = Chunk(Vector(x, y))
+                    chunk = Chunk(Vector(position[0], position[1]))
+                    self.list[position] = chunk
+                    chunk.generate()
 
                 # Load entities in loaded chunks
                 self.entities.update(self.get_chunk_from_coord(position).entities)
@@ -62,7 +60,9 @@ class Chunks():
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
-            self.list[position] = Chunk(Vector(position[0], position[1]))
+            chunk = Chunk(Vector(position[0], position[1]))
+            self.list[position] = chunk
+            chunk.generate()
 
         return self.list[position]
 
@@ -71,7 +71,9 @@ class Chunks():
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
-            self.list[position] = Chunk(Vector(position[0], position[1]))
+            chunk = Chunk(Vector(position[0], position[1]))
+            self.list[position] = chunk
+            chunk.generate()
 
         return self.list[position]
 
@@ -83,7 +85,9 @@ class Chunks():
 
         # Create chunk, if chunk hasn't been generated
         if position not in self.list:
-            self.list[position] = Chunk(Vector(position[0], position[1]))
+            chunk = Chunk(Vector(position[0], position[1]))
+            self.list[position] = chunk
+            chunk.generate()
 
         return self.list[position]
 
@@ -127,7 +131,6 @@ class Chunk():
     def __init__(self, position: Vector) -> None:
         self.position = position
         self.entities = set()
-        self.generate()
 
     def generate(self) -> None:
 
@@ -138,31 +141,34 @@ class Chunk():
         if self.adjoining_asteroid_chunk() or not self.adjoining_empty_chunks():
             return
 
-        # Asteroid
-        elif random.random() < 0.1:
+        reset_chance(self.position)
+
+        # Asteroid - 10%
+        if chance(0.1):
             self.entities.add(
 
                 Asteroid(self.random_position())
             )
 
-        # Enemy Station
-        elif random.random() < 0.04:
+        # Enemy Station - 3.6%
+        elif chance(0.036):
             self.entities.add(
 
                 EnemyStation(self.random_position())
             )
 
-        # Friendly Station
-        elif random.random() < 0.03:
+        # Friendly Station - 2.5%
+        elif chance(0.025):
             self.entities.add(
 
                 FriendlyStation(self.random_position())
             )
 
-        elif random.random() < 0.01:
+        # Mother Ship - 1%
+        elif chance(0.01):
             self.entities.add(
 
-                Mother_Ship(self.random_position(), level=game.CURRENT_SHIP_LEVEL)
+                Mother_Ship(self.position * game.CHUNK_SIZE + game.CHUNK_SIZE/2, level=game.CURRENT_SHIP_LEVEL)
             )
 
 

@@ -1767,6 +1767,8 @@ def create_world():
     # Generate random seed if no seed inputted
     if seed == "":
         seed = random.randint(0, 999_999)
+    else:
+        seed = int(seed)
 
     game.reset_constants()
     game.NAME = name

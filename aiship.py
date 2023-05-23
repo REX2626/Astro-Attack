@@ -51,12 +51,15 @@ class AI_Ship(Ship):
     def make_new_patrol_point(self, min_dist, max_dist, relative_pos):
         self.patrol_point = random_vector(random.randint(min_dist, max_dist)) + relative_pos
 
-    def check_for_asteroid(self, chunk_pos):
+    def adjoining_asteroid_chunk(self, chunk_pos) -> bool:
         # Loop through chunks in a 3x3 grid centred around the original chunk you are checking
         for y in range(chunk_pos.y-1, chunk_pos.y+2):
             for x in range(chunk_pos.x-1, chunk_pos.x+2):
 
-                for entity in game.CHUNKS.get_chunk((x, y)).entities:
+                if (x, y) not in game.CHUNKS.list:
+                    continue
+
+                for entity in game.CHUNKS.get_chunk_from_coord((x, y)).entities:
                     if isinstance(entity, Asteroid):
                         return True
 
@@ -82,7 +85,7 @@ class AI_Ship(Ship):
 
                 chunk_pos = target_position // game.CHUNK_SIZE
 
-                if self.check_for_asteroid(chunk_pos) == False:
+                if not self.adjoining_asteroid_chunk(chunk_pos):
                     break
 
         # Makes Target around mother ship to keep it within distance of mothership
@@ -380,7 +383,7 @@ class Mother_Ship(Enemy_Ship):
 
             chunk_pos = target_position // game.CHUNK_SIZE
 
-            if self.check_for_asteroid(chunk_pos) == False:
+            if not self.adjoining_asteroid_chunk(chunk_pos):
                 break
 
         # Spawn in enemies
