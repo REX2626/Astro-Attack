@@ -2,7 +2,6 @@ from objects import Vector, Object, Entity
 from entities import Asteroid
 from station import FriendlyStation, EnemyStation
 from aiship import Mother_Ship
-from map_generation import reset_chance, chance
 import random
 import game
 
@@ -127,10 +126,11 @@ class Chunks():
 
 
 class Chunk():
-    __slots__ = ("position", "entities")
+    __slots__ = ("position", "entities", "chance_offset")
     def __init__(self, position: Vector) -> None:
         self.position = position
         self.entities = set()
+        self.chance_offset = 0
 
     def generate(self) -> None:
 
@@ -141,36 +141,39 @@ class Chunk():
         if self.adjoining_asteroid_chunk() or not self.adjoining_empty_chunks():
             return
 
-        reset_chance(self.position)
-
         # Asteroid - 10%
-        if chance(0.1):
+        if self.chance(0.1):
             self.entities.add(
 
                 Asteroid(self.random_position())
             )
 
         # Enemy Station - 3.6%
-        elif chance(0.036):
+        elif self.chance(0.036):
             self.entities.add(
 
                 EnemyStation(self.random_position())
             )
 
         # Friendly Station - 2.5%
-        elif chance(0.025):
+        elif self.chance(0.025):
             self.entities.add(
 
                 FriendlyStation(self.random_position())
             )
 
         # Mother Ship - 1%
-        elif chance(0.01):
+        elif self.chance(0.01):
             self.entities.add(
 
                 Mother_Ship(self.position * game.CHUNK_SIZE + game.CHUNK_SIZE/2, level=game.CURRENT_SHIP_LEVEL)
             )
 
+
+    def chance(self, chance: float) -> bool:
+        self.chance_offset += chance
+        random.seed(game.SEED + self.position.x*374761393 + self.position.y*668265263)
+        return self.chance_offset > random.random()
 
     def adjoining_asteroid_chunk(self) -> bool:
 

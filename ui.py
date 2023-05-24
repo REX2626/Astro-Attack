@@ -116,11 +116,6 @@ class MiniMap():
             return self.scrap_colour
 
     def draw(self):
-        # Draws black background
-        pygame.draw.rect(game.WIN, color=game.BLACK, rect=(
-            self.x, self.y, self.width, self.height
-        ), border_radius=5)
-
         # Draws enemies in chunks
         surf = pygame.Surface((self.draw_width, self.draw_height))
 

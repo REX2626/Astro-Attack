@@ -6,69 +6,6 @@ import pygame
 
 
 draw_circle = pygame.draw.circle
-class Particle():
-    __slots__ = ("position", "velocity", "start_size", "end_size", "colour", "lifetime", "time_alive", "current_size", "size_difference")
-
-    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float, **kwargs) -> None:
-        self.position = position
-        self.velocity = velocity
-        self.start_size = start_size
-        self.end_size = end_size
-        self.colour = colour
-        self.lifetime = lifetime
-        self.time_alive = 0
-        self.current_size = start_size
-        self.size_difference = end_size - start_size
-
-    def update_time(self, delta_time: float, system: "ParticleSystem") -> None:
-        self.time_alive += delta_time
-
-        self.current_size += self.size_difference * (delta_time / self.lifetime)
-
-        if self.time_alive > self.lifetime:
-            system.particles.remove(self)
-
-    def update(self, delta_time: float, system: "ParticleSystem") -> None:
-        # optimized
-        self.position = Vector(self.position.x + self.velocity.x * delta_time, self.position.y + self.velocity.y * delta_time)
-        self.update_time(delta_time, system)
-
-    def draw(self, WIN: pygame.Surface, focus_point: Vector) -> None:
-        ZOOM = game.ZOOM
-        draw_circle(WIN, self.colour,
-                    ((self.position.x - focus_point.x) * ZOOM + game.CENTRE_POINT.x,
-                     (self.position.y - focus_point.y) * ZOOM + game.CENTRE_POINT.y),
-                      max(1, self.current_size * ZOOM))
-
-
-
-class BloomParticle(Particle):
-    __slots__ = ("bloom")
-
-    def __init__(self, position: Vector, velocity: Vector, start_size: float, end_size: float, colour: tuple, lifetime: float, bloom: float) -> None:
-        super().__init__(position, velocity, start_size, end_size, colour, lifetime)
-        self.bloom = bloom
-
-    def draw(self, WIN: pygame.Surface, focus_point: Vector) -> None:
-        ZOOM = game.ZOOM
-        CENTRE_POINT_X = game.CENTRE_POINT.x
-        CENTRE_POINT_Y = game.CENTRE_POINT.y
-        radius = max(1, self.current_size*ZOOM*self.bloom)
-        surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
-
-        max_radius = int(self.current_size*ZOOM*self.bloom)
-        min_radius = int(self.current_size*ZOOM)
-
-        # draw circle going from out to in
-        for radius1 in range(max_radius, min_radius, -1):  # e.g. range(15, 10, -1)
-            amount_done = (max_radius-radius1) / (max_radius-min_radius)
-            draw_circle(surface, (*self.colour, amount_done*255), (radius, radius), radius1, width=2)
-
-        WIN.blit(surface, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X - radius, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y - radius))
-
-        draw_circle(WIN, self.colour, ((self.position.x - focus_point.x) * ZOOM + CENTRE_POINT_X, (self.position.y - focus_point.y) * ZOOM + CENTRE_POINT_Y), max(1, self.current_size * ZOOM))
-
-
 
 class ParticleSystem():
     """
@@ -112,6 +49,10 @@ class ParticleSystem():
                                                 if entity then initial_velocity will be called,\
                                                 Input - entity, Returns - Vector
     """
+
+    __slots__ = ("entity_offset", "previous_position", "z", "draw", "bloom", "duration", "lifetime", "time_alive", "period", "delay",
+                 "get_start_size", "end_size", "get_colour", "entity", "position", "active", "get_velocity", "particles")
+
     def __init__(self, position: Vector | Entity, entity_offset=lambda x: Vector(0, 0), z: int = 1,
                  start_size: float = 5, max_start_size: float | None = None, end_size: float = 0,
                  colour: tuple[int, int, int] = (255, 255, 255), max_colour: tuple[int, int, int] | None = None, bloom: float = 0,
@@ -119,7 +60,17 @@ class ParticleSystem():
                  speed: float = 20, speed_variance: float | None = None, initial_velocity: Vector = Vector(0, 0)) -> None:
 
         self.entity_offset = entity_offset
+        self.previous_position = position
         self.z = z
+
+        self.draw = self.draw_particles if not bloom else self.draw_bloom_particles
+        self.bloom = bloom + 1
+
+        self.duration = duration
+        self.lifetime = lifetime
+        self.time_alive = 0
+        self.period = 1 / frequency
+        self.delay = 0
 
         if max_start_size:
             self.get_start_size = lambda: start_size + random.random() * (max_start_size - start_size)
@@ -134,19 +85,10 @@ class ParticleSystem():
         else:
             self.get_colour = lambda: colour
 
-        self.particle = Particle if not bloom else BloomParticle
-        self.bloom = bloom + 1
-
-        self.duration = duration
-        self.lifetime = lifetime
-        self.time_alive = 0
-        self.period = 1 / frequency
-        self.delay = 0
-
+        self.active = False
         if not isinstance(position, Vector):  # if position is an Entity
             self.entity = position
             self.position = self.entity.position
-            self.active = False
         else:
             self.position = position
             self.entity = None
@@ -162,7 +104,8 @@ class ParticleSystem():
             else:
                 self.get_velocity = lambda: random_vector(speed) + initial_velocity
 
-        self.particles: list[Particle] = []
+        # [position, velocity, colour, time_alive, size_difference, start_size]
+        self.particles: list[list[list, list, tuple[int, int, int], float, float, float]] = []
 
         game.CHUNKS.add_entity(self)
 
@@ -171,12 +114,12 @@ class ParticleSystem():
             if not self.entity:
                 self.burst()
 
+
     def update(self, delta_time: float) -> None:
         self.delay += delta_time
         self.time_alive += delta_time
 
-        for particle in self.particles:
-            particle.update(delta_time, self)
+        self.update_particles(delta_time)
 
         if self.entity and self.entity in game.CHUNKS.entities:
             self.previous_position = self.position
@@ -215,9 +158,62 @@ class ParticleSystem():
                     start_size = start_size + (self.end_size - start_size) * (1-i/count) * self.period
                     self.spawn(position, velocity, start_size)
 
-    def draw(self, WIN: pygame.Surface, player_pos: Vector) -> None:
+    def update_particles(self, delta_time: float) -> None:
+        # [position, velocity, colour, time_alive, size_difference, start_size]
         for particle in self.particles:
-            particle.draw(WIN, player_pos)
+            # Move particle
+            particle[0][0] += particle[1][0] * delta_time
+            particle[0][1] += particle[1][1] * delta_time
+            particle[3] += delta_time  # Add time to time_alive
+
+        # self.particles is sorted from oldest to newest, so when we reach a particle
+        # that hasn't expired we can stop looking through the list
+        for particle in self.particles:
+            if particle[3] > self.lifetime:  # If particle's time_alive expires, then destroy particle
+                self.particles.remove(particle)
+            else:
+                break
+
+
+    def draw_particles(self, WIN: pygame.Surface, focus_point: Vector) -> None:
+        ZOOM = game.ZOOM
+        CENTRE_POINT_X = game.CENTRE_POINT.x
+        CENTRE_POINT_Y = game.CENTRE_POINT.y
+        FOCUS_POINT_X = focus_point.x
+        FOCUS_POINT_Y = focus_point.y
+
+        # [position, velocity, colour, time_alive, size_difference, start_size]
+        for particle in self.particles:
+            draw_circle(WIN, particle[2],
+                           ((particle[0][0] - FOCUS_POINT_X) * ZOOM + CENTRE_POINT_X,
+                            (particle[0][1] - FOCUS_POINT_Y) * ZOOM + CENTRE_POINT_Y),
+                             max(1, (particle[5] + particle[4] * particle[3] / self.lifetime) * ZOOM))  # radius is start_size + (size_difference * time_alive/life_time)
+
+    def draw_bloom_particles(self, WIN: pygame.Surface, focus_point: Vector) -> None:
+        ZOOM = game.ZOOM
+        CENTRE_POINT_X = game.CENTRE_POINT.x
+        CENTRE_POINT_Y = game.CENTRE_POINT.y
+        FOCUS_POINT_X = focus_point.x
+        FOCUS_POINT_Y = focus_point.y
+
+        # [position, velocity, colour, time_alive, size_difference, start_size]
+        for position, velocity, colour, time_alive, size_difference, start_size in self.particles:
+            SIZE = (start_size + size_difference * time_alive / self.lifetime) * ZOOM
+            radius = max(1, SIZE*self.bloom)
+            surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
+
+            max_radius = int(SIZE*self.bloom)
+            min_radius = int(SIZE)
+
+            # draw circle going from in to out
+            spread = (max_radius - min_radius) / 255  # 255 is max opaque
+            for radius1 in range(min_radius, max_radius):  # e.g. range(10, 15)
+                draw_circle(surface, (*colour, (max_radius-radius1) / spread), (radius, radius), radius1, width=2)
+
+            WIN.blit(surface, ((position[0] - FOCUS_POINT_X) * ZOOM + CENTRE_POINT_X - radius, (position[1] - FOCUS_POINT_Y) * ZOOM + CENTRE_POINT_Y - radius))
+
+            draw_circle(WIN, colour, ((position[0] - FOCUS_POINT_X) * ZOOM + CENTRE_POINT_X, (position[1] - FOCUS_POINT_Y) * ZOOM + CENTRE_POINT_Y), max(1, SIZE))
+
 
     def burst(self) -> None:
         for _ in range(int(1/self.period)):
@@ -225,6 +221,7 @@ class ParticleSystem():
 
     def spawn(self, position: Vector, velocity: Vector, start_size: float) -> None:
 
+        # [position, velocity, colour, time_alive, size_difference, start_size]
         self.particles.append(
-            self.particle(position, velocity, start_size=start_size, end_size=self.end_size, colour=self.get_colour(), lifetime=self.lifetime, bloom=self.bloom)
-            )
+            [[position.x, position.y], [velocity.x, velocity.y], self.get_colour(), 0, self.end_size - start_size, start_size]
+        )
