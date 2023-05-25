@@ -605,6 +605,40 @@ def highlight_station():
                                 return
     game.player.station_highlighted = None
 
+def update_closest_station():
+    """Updates the current closest station"""
+    closest_station = None
+    distance = math.inf
+    chunk_pos = game.player.position // game.CHUNK_SIZE
+    for cy in range(chunk_pos.y-1, chunk_pos.y+2):
+        for cx in range(chunk_pos.x-1, chunk_pos.x+2):
+            for entity in game.CHUNKS.get_chunk((cx, cy)).entities:
+                if isinstance(entity, FriendlyStation):
+                    dist = game.player.distance_to(entity)
+                    if dist < 500 and dist < distance:
+                        distance = dist
+                        closest_station = entity
+
+    if closest_station:
+        # Draw E popup
+        size = 50
+        x = 0
+        y = 360
+        border = 7
+
+        # Draw background
+        pygame.draw.rect(game.WIN, game.MEDIUM_GREY, (x+border, y+border, size-2*border, size-2*border))
+
+        # Draw outline
+        pygame.draw.rect(game.WIN, game.DARK_GREY, (x, y, size, size), width=border, border_radius=5)
+
+        # Draw letter E
+        label = font.render("E", True, (255, 255, 255))
+        game.WIN.blit(label, (x+size/2-label.get_width()/2, y+size/2-label.get_height()/2))
+
+    game.player.closest_station = closest_station
+
+
 bars = 20
 time_elapsed = 0
 last_cpu_percent = 0
@@ -692,7 +726,7 @@ def draw(delta_time):
 
     cursor_highlighting()
 
-    highlight_station()
+    update_closest_station()
 
     canvas.draw()
 

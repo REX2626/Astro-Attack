@@ -105,6 +105,11 @@ class Menu():
                     if Menu.e_pressed():
                         return True
 
+                elif event.key == pygame.K_TAB:
+                    # if tab_pressed return True, then go back to the game
+                    if Menu.tab_pressed():
+                        return True
+
                 Menu.key_pressed(event)
 
                 Menu.update()
@@ -137,6 +142,11 @@ class Menu():
     def e_pressed():
         if Menu.current_page.e_press:
             if Menu.current_page.e_press():
+                return True # return to playing
+
+    def tab_pressed():
+        if Menu.current_page.tab_press:
+            if Menu.current_page.tab_press():
                 return True # return to playing
 
     def up_pressed():
@@ -174,11 +184,12 @@ class Page():
        up is a function that is called when the up key is pressed
        down is a function that is called when the down key is pressed
     """
-    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, e_press=None, up=None, down=None) -> None:
+    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, e_press=None, tab_press=None, up=None, down=None) -> None:
         self.background_colour = background_colour
         self.click = click
         self.escape = escape
         self.e_press = e_press
+        self.tab_press = tab_press
         self.up = up
         self.down = down
 
@@ -1372,18 +1383,25 @@ class MissionManager(Widget):
         # If true then you should not be able to accept another mission
         self.any_mission_active = False
 
-        self.class_list = {"Enemy_Ship": 1,
-                           "Missile_Ship": 2,
-                           "Drone_Enemy": 1,
-                           "Mother_Ship": 2}
+        self.class_list = {"Drone_Enemy": 1,
+                           "Enemy_Ship": 1,
+                           "Mother_Ship": 2,
+                           "Missile_Ship": 2}
 
         # Spawns in three missions
         while self.slot_missing < 3:
             self.add_mission()
             self.slot_missing += 1
 
+    def get_enemy(self):
+        class_list = list(self.class_list)
+        if game.CURRENT_SHIP_LEVEL < 10:
+            class_list.remove("Missile_Ship")
+
+        return random.choice(class_list)
+
     def add_mission(self):
-        goal = random.choice(list(self.class_list.keys()))
+        goal = self.get_enemy()
         number = random.randint(5, 15)
         reward = number * (1+game.CURRENT_SHIP_LEVEL)**0.6 * self.class_list[goal]  # reward depends on number, difficulty and type of enemy
         reward *= 0.9 + random.random()*0.2  # reward +- 10% to make it look a bit random
@@ -1451,7 +1469,8 @@ info = Page(
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
-                        Systems & Station: E
+                        Systems: TAB
+                        Station: E
                         Look: Mouse
                         Zoom: Scroll
                         Shoot: Left Click
@@ -1722,7 +1741,7 @@ systems = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
-    e_press=lambda: True
+    tab_press=lambda: True
 )
 
 death_screen = Page(

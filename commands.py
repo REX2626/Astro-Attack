@@ -21,7 +21,7 @@ def spawn_entity(arguments):
 
 # boosts stats by a lot
 def god_mode(arguments=(10_000, 10_000)):
-    print(arguments)
+
     max_hp, max_boost = arguments
 
     game.MAX_PLAYER_HEALTH = max_hp

@@ -64,7 +64,7 @@ class Station(Object):
 
 
     def get_zoomed_image(self):
-        if game.player.station_highlighted == self:
+        if game.player.closest_station == self:
             if self.selected_scale != game.ZOOM:
                 # if self.scaled_image isn't the right scale -> recalculate the scaled_image
                 self.selected_scale = game.ZOOM
@@ -86,7 +86,7 @@ class FriendlyStation(Station):
     def update(self, delta_time):
         super().update(delta_time)
         if self.distance_to(game.player) < 500:
-            game.player.health = min(game.MAX_PLAYER_HEALTH, game.player.health + delta_time)
+            game.player.health = min(game.MAX_PLAYER_HEALTH, game.player.health + 2*delta_time)
 
 
 

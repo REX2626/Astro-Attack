@@ -253,14 +253,18 @@ class Entity(MoveableObject):
     def accelerate_onto_pos(self, target_position: Vector, max_acceleration: float, max_speed: float) -> None:
         distance_to_target = (self.position - target_position).magnitude()
 
-        distance_to_decelerate_from_max = (max_speed)**2 / (2 * 200) # 200 is the value for inertial dampening
-        #distance_to_decelerate = -(self.velocity.magnitude())**2 / (2 * max_acceleration)
+        acceleration = target_position - self.position
+        acceleration.set_magnitude(max_acceleration)
+        new_velocity = self.velocity + acceleration
+        new_velocity.clamp(max_speed)
 
-        if distance_to_target < distance_to_decelerate_from_max:
+        distance_to_decelerate = (new_velocity.x**2 + new_velocity.y**2) / (2 * 200) # 200 is the value for inertial dampening
+
+        if distance_to_target < distance_to_decelerate:
             # Let inertial dampening slow the entity down
             return
         else:
-            self.accelerate_to(target_position, max_acceleration)
+            self.velocity = new_velocity
 
     def get_image(self) -> pygame.Surface:
         if self.scale != game.ZOOM:

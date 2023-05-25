@@ -87,14 +87,7 @@ def handle_player_input(keys_pressed, delta_time):
     if keys_pressed[pygame.K_SPACE]:
         player.boost(delta_time)
     else:
-        player.max_speed = game.MAX_PLAYER_SPEED # Reset max speed so that the high velocity is not maintained after a boost
-        player.boost_particles1.active = False
-        player.boost_particles2.active = False
-
-        # Increase player.boost_amount
-        player.boost_amount = min(game.MAX_BOOST_AMOUNT,
-                                    player.boost_amount + (player.boost_change * delta_time) / 2)
-                                    # Caps the boost amount to a specific max value
+        player.no_boost(delta_time)
 
     if pygame.mouse.get_pressed()[0]: # left click
         player.shoot()
@@ -220,13 +213,15 @@ def main():
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
 
+                if player.closest_station:
+                    game.DOCKING = True
+                    game.player.no_boost(delta_time)
+
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
+
                 start = perf_counter()
 
-                if player.station_highlighted:
-                    game.DOCKING = True
-
-                else:
-                    menu.Menu.systems()
+                menu.Menu.systems()
 
                 time1 = perf_counter() - start + time1
 

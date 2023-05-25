@@ -33,7 +33,7 @@ class Player_Ship(Ship):
         self.aim_pos = Vector(0, 0)
         self.cursor_highlighted = False
         self.tracked_enemy: Ship = None
-        self.station_highlighted = None
+        self.closest_station = None
         self.station_to_dock = None
         self.z = 1
 
@@ -65,8 +65,8 @@ class Player_Ship(Ship):
         if game.DOCKING:
 
             if self.station_to_dock is None:
-                self.station_to_dock = self.station_highlighted
-                self.max_speed = self.distance_to(self.station_to_dock) / 2  # Moves faster if further from centre of station
+                self.station_to_dock = self.closest_station
+                self.max_speed = 200
 
             if self.distance_to(self.station_to_dock) < 1:  # Docked
                 game.DOCKING = False
@@ -77,7 +77,7 @@ class Player_Ship(Ship):
                 self.station_to_dock = None
 
             else:
-                self.accelerate_onto_pos(self.station_to_dock.position, 400, self.max_speed)
+                self.accelerate_onto_pos(self.station_to_dock.position, 500*delta_time, self.max_speed)
 
         self.max_shield = game.MAX_PLAYER_SHIELD
         self.shield_recharge = game.PLAYER_SHIELD_RECHARGE
@@ -117,6 +117,16 @@ class Player_Ship(Ship):
             self.boost_particles1.active = False
             self.boost_particles2.active = False
 
+    def no_boost(self, delta_time):
+        self.max_speed = game.MAX_PLAYER_SPEED # Reset max speed so that the high velocity is not maintained after a boost
+        self.boost_particles1.active = False
+        self.boost_particles2.active = False
+
+        # Increase boost_amount
+        self.boost_amount = min(game.MAX_BOOST_AMOUNT,
+                                    self.boost_amount + (self.boost_change * delta_time) / 2)
+                                    # Caps the boost amount to a specific max value
+
     def track_enemy(self):
         enemy = self.tracked_enemy
         if hasattr(self.weapon, "speed"):
@@ -146,6 +156,7 @@ class Player_Ship(Ship):
         game.CHUNKS.remove_entity(self)
 
         game.LAST_PLAYER_POS = Vector(0, 0)
+        game.WEAPON_SELECTED = 0
         game.player = get_player()
 
     def draw(self, win: pygame.Surface, focus_point):
