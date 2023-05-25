@@ -189,8 +189,9 @@ class Console():
 
         self.commands_colour = (255, 204, 0)
         self.old_commands_colour = (105, 89, 26)
-        self.output_colour = (13, 11, 255)
+        self.output_colour = (30, 80, 240)
         self.miscellaneous_colour = (186, 186, 186)
+        self.entity_list_colour = (100, 180, 180)
         self.error_colour = (199, 46, 12)
 
         self.commands = {"spawnentity": commands.spawn_entity,
@@ -203,15 +204,15 @@ class Console():
 
         self.commands_to_run = []
 
-        self.help_message = ["/spawnentity(entity_class, frequency) - spawns in entity at current location",
-                             "/godmode(max_health, max_boost) - boosts stats",
-                             "/zoom(zoom_level) - changes how far you can zoom out",
-                             "/score(score) - adds score to current score",
-                             "/log(argument) - prints argument to console",
+        self.help_message = ["/spawnentity (entity_class) (frequency) - spawns entity at current location",
+                             "/godmode (max_health) (max_boost) - boosts stats",
+                             "/zoom (zoom_level) - changes how far you can zoom out",
+                             "/score (score) - adds score to current score",
+                             "/log (argument) - prints argument to console",
                              "/entitylist - prints list of entities to spawn"]
 
-        self.entity_list_message = ["EnemyStation, FriendlyStation, Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy,",
-                                    "Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter, Scrap"]
+        self.entity_list_message = ["EnemyStation, FriendlyStation, Neutral_Ship_Cargo, Enemy_Ship,",
+                                    "Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter, Scrap"]
 
         self.current_selected_command = 0
 
@@ -253,26 +254,12 @@ class Console():
                 elif event.type == pygame.KEYDOWN:
                     # removes last item from input_text string when backspace is pressed
                     if event.key == pygame.K_BACKSPACE:
-                        if len(self.input_text) > 1:
-                            if self.cursor_pos > 0:
-                                self.cursor_pos -= 1
-                                self.input_text = self.input_text.replace("|", "")
-                                text = ""
-                                for i, char in enumerate(self.input_text):
-                                    if i != self.cursor_pos:
-                                        text += char
-                                self.input_text = text
-                                self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+                        if self.cursor_pos > 0:
+                            self.cursor_pos -= 1
+                            self.input_text = self.input_text[:self.cursor_pos] + self.input_text[self.cursor_pos+1:]
 
                     elif event.key == pygame.K_DELETE:
-                        if len(self.input_text) > 1:
-                            self.input_text = self.input_text.replace("|", "")
-                            text = ""
-                            for i, char in enumerate(self.input_text):
-                                if i != self.cursor_pos:
-                                    text += char
-                            self.input_text = text
-                            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+                        self.input_text = self.input_text[:self.cursor_pos+1] + self.input_text[self.cursor_pos+2:]
 
                     # add pressed character to input_text
                     else:
@@ -281,8 +268,6 @@ class Console():
                         end_len = len(self.input_text)
                         if start_len != end_len:
                             self.cursor_pos += 1
-                        self.input_text = self.input_text.replace("|", "")
-                        self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
             # must draw here since this is the only game loop running
             self.draw()
@@ -293,21 +278,9 @@ class Console():
         if self.input_text != "":
             self.input_text = self.input_text.replace("|", "")
 
-            # Checks if this is a function which will take in arguments
-            if "(" in self.input_text:
-                # splits input into the name of the function (in input_command) and a list of the arguments (in self.arguments)
-                split_text = self.input_text.split("(")
-                input_command = split_text[0]
-                split_text[1] = split_text[1][:-1]
-                if split_text[1] == "":
-                    arguments = ""
-                else:
-                    arguments = split_text[1].split(", ")
-            else:
-                # This is needed so that if the command is written in python or not in the self.commands it will not
-                # cause an error by not being able to access the local variable input_command when checking if the input_command
-                # is in self.commands
-                input_command = self.input_text
+            split_text = self.input_text.split()
+            input_command = split_text[0]
+            arguments = split_text[1:]
 
             if self.input_text == "help":
                 self.previous_commands.insert(0, self.input_text)
@@ -320,18 +293,18 @@ class Console():
                 self.previous_commands.insert(0, self.input_text)
 
                 for message in self.entity_list_message:
-                    self.chat_history.insert(0, [message, self.miscellaneous_colour])
+                    self.chat_history.insert(0, [message, self.entity_list_colour])
 
-            elif input_command in self.console_commands.keys():
+            elif input_command in self.console_commands:
                 self.previous_commands.insert(0, self.input_text)
 
                 try:
-                    self.console_commands[input_command](eval(", ".join(arguments)))
-                except Exception as e:
-                    self.chat_history.insert(0, [f"{e}", self.error_colour])
+                    self.console_commands[input_command](eval(",".join(arguments)))
+                except Exception as exception:
+                    self.chat_history.insert(0, [str(exception), self.error_colour])
 
 
-            elif input_command in self.commands.keys():
+            elif input_command in self.commands:
                 # must insert at start since when drawing text in draw() it renders text from newest to oldest command entered
                 self.chat_history.insert(0, ["/" + self.input_text, self.commands_colour])
                 self.previous_commands.insert(0, self.input_text)
@@ -393,19 +366,22 @@ class Console():
 
     def run_commands(self):
         # loops through the dictionary
-        for command in self.commands_to_run:
+        for command, args in self.commands_to_run:
             # runs command corresponding to the key (in this case, the array of keys are in self.commands_to_run)
 
-            # if there is no argument then just run the function
-            if command[1] == "":
-                self.commands[command[0]]()
-
             # if there are arguments eval the list of arguments
+            if args:
+                try:
+                    self.commands[command](eval(",".join(args)))
+                except Exception as exception:
+                    self.chat_history.insert(0, [str(exception), self.error_colour])
+
+            # if there is no argument then just run the function
             else:
                 try:
-                    self.commands[command[0]](eval(", ".join(command[1])))
-                except Exception as e:
-                    self.chat_history.insert(0, [f"{e}", self.error_colour])
+                    self.commands[command]()
+                except Exception as exception:
+                    self.chat_history.insert(0, [str(exception), self.error_colour])
 
         self.commands_to_run.clear()
 

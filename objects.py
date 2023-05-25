@@ -74,6 +74,9 @@ class Vector():
     def __neg__(self) -> Vector:
         return Vector(-self.x, -self.y)
 
+    def __bool__(self) -> Vector:
+        return bool(self.x) or bool(self.y)
+
     def __repr__(self) -> str:
         return str((self.x, self.y))
 

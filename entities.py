@@ -121,6 +121,7 @@ class Asteroid(Object):
     def __setstate__(self, state):
         super().__setstate__(state)
         self.image = pygame.transform.rotate(self.image, self.rotation)
+        self.scaled_image = pygame.transform.rotate(self.scaled_image, self.rotation)
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, delta_time):
@@ -201,7 +202,8 @@ def asteroid_collision(asteroid: Asteroid, entity: Entity):
         entity_rotation = 2 * angle_difference  # 1 angle difference makes it go along normal, another difference reflects it through normal
         entity.velocity.rotate(entity_rotation)
 
-        entity.velocity.set_magnitude(entity.velocity.magnitude()*0.8)  # Set speed to 80%
+        if entity.velocity:
+            entity.velocity.set_magnitude(entity.velocity.magnitude()*0.8)  # Set speed to 80%
 
         entity.damage(entity.velocity.magnitude()**2/100_000)
 
