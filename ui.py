@@ -101,7 +101,7 @@ class MiniMap():
 
     def get_entity_colour(self, entity):
 
-        # Changes colour based on type of
+        # Changes colour based on type
         if isinstance(entity, aiship.Enemy_Ship):
             self.entity_size = 3
             return self.enemy_colour
