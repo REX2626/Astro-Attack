@@ -687,7 +687,7 @@ class UpgradeBar(Widget):
        value is the variable that the bar is upgrading, it is a string and has to be a variable of game (e.g. game.WIDTH, value="WIDTH")
        bar_width and bar_height are floats, which is the percentage (0 to 1) of the screen width and height
        bars is the number of bars"""
-    def __init__(self, x, y, text, value, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), select_colour=(230, 110, 0), select_outline_colour=(25, 235, 20), button_width=0.1, bar_width=0.05, height=0.05, gap=5, bars=10, min_value=20, max_value=60) -> None:
+    def __init__(self, y, text, value, x=0.23, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), select_colour=(230, 110, 0), select_outline_colour=(20, 235, 25), button_width=0.1, bar_width=0.08, height=0.05, gap=5, bars=5, min_value=20, max_value=60) -> None:
         super().__init__(x, y)
         self.text = text
         self.value = value
@@ -809,9 +809,9 @@ class UpgradeBar(Widget):
                 if bar == self.get_level(): # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
-                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(bar+1), True, colour)
-                    game.WIN.blit(number, (x + width*0.3 - number.get_width()/2, self.get_y() + height/2 - number.get_height()/2))
-                    game.WIN.blit(scrap , (x + width*0.7 - scrap.get_width()/2 , self.get_y() + height/2 - scrap.get_height()/2))
+                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(2**bar), True, colour)
+                    game.WIN.blit(number, (x + width*0.35 - number.get_width()/2, self.get_y() + height/2 - number.get_height()/2))
+                    game.WIN.blit(scrap , (x + width*0.65 - scrap.get_width()/2 , self.get_y() + height/2 - scrap.get_height()/2))
 
                 else: # all of the locked bars show padlocks
                     game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.get_y() + height/2 - padlock.get_height()/2))
@@ -1621,9 +1621,9 @@ stats_skill_levels = (
 armour = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
-    UpgradeBar(0.19, 0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
-    UpgradeBar(0.19, 0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
-    UpgradeBar(0.19, 0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
+    UpgradeBar(0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
+    UpgradeBar(0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
+    UpgradeBar(0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1636,8 +1636,8 @@ weapon = Page(
     Text(0.5, 0.12, "Weapon"),
     Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
-    Button(0.3, 0.7, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
-    Button(0.7, 0.3, "Laser"  , function=lambda: Menu.change_page(laser)),
+    Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
+    Button(0.7, 0.5, "Laser"  , function=lambda: Menu.change_page(laser)),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1648,9 +1648,9 @@ weapon = Page(
 engine = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Engine"),
-    UpgradeBar(0.19, 0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
-    UpgradeBar(0.19, 0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
-    UpgradeBar(0.19, 0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
+    UpgradeBar(0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
+    UpgradeBar(0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
+    UpgradeBar(0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1661,8 +1661,8 @@ engine = Page(
 radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
-    UpgradeBar(0.19, 0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
-    UpgradeBar(0.19, 0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
+    UpgradeBar(0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
+    UpgradeBar(0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1673,9 +1673,9 @@ radar = Page(
 default_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Default"),
-    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
-    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
-    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
+    UpgradeBar(0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
+    UpgradeBar(0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
+    UpgradeBar(0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1686,9 +1686,9 @@ default_gun = Page(
 gatling_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Gatling"),
-    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
-    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
-    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
+    UpgradeBar(0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
+    UpgradeBar(0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
+    UpgradeBar(0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1699,9 +1699,9 @@ gatling_gun = Page(
 sniper_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Sniper"),
-    UpgradeBar(0.19, 0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
-    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
-    UpgradeBar(0.19, 0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
+    UpgradeBar(0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
+    UpgradeBar(0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
+    UpgradeBar(0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
@@ -1712,8 +1712,8 @@ sniper_gun = Page(
 laser = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Laser"),
-    UpgradeBar(0.19, 0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
-    UpgradeBar(0.19, 0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
+    UpgradeBar(0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
+    UpgradeBar(0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
