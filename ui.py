@@ -14,8 +14,11 @@ import pygame
 
 
 class Bar():
-    """x, y are functions
-    width and height are for the outline"""
+    """
+    x, y are functions
+
+    width and height are for the outline
+    """
     def __init__(self, x, y, width, height, colour, outline_width=0, outline_colour=game.WHITE, curve=0, flatten_left=False, flatten_right=False) -> None:
         self.x = x
         self.y = y
