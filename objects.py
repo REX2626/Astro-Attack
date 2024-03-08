@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Iterator
 import images
 import game
 import random
@@ -83,6 +84,10 @@ class Vector():
     def __round__(self) -> Vector:
         return Vector(round(self.x), round(self.y))
 
+    def __iter__(self) -> Iterator[float]:
+        yield self.x
+        yield self.y
+
     def clamp(self, maximum: float) -> None:
         if self.magnitude() > maximum:
             self.set_magnitude(maximum)
@@ -132,6 +137,9 @@ class Vector():
         self.rotate(angle)
         self.x += position.x
         self.y += position.y
+
+    def dist_to(self, other: Vector) -> float:
+        return (self - other).magnitude()
 
     def copy(self) -> Vector:
         return Vector(self.x, self.y)

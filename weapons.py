@@ -1,3 +1,4 @@
+from __future__ import annotations
 from objects import Vector
 import entities
 import images
@@ -8,7 +9,7 @@ import pygame
 
 
 class DefaultGun():
-    def __init__(self, ship: "entities.Ship", damage=1, fire_rate=1, speed=game.BULLET_SPEED, spread=0, image=lambda: images.BULLET) -> None:
+    def __init__(self, ship: entities.Ship, damage=1, fire_rate=1, speed=game.BULLET_SPEED, spread=0, image=lambda: images.BULLET) -> None:
         self.ship = ship
         self.damage = damage
         self.reload_time = 1 / fire_rate
@@ -124,7 +125,7 @@ class EnemySniper(Sniper):
 
 
 class Laser():
-    def __init__(self, ship: "entities.Ship", damage=game.PLAYER_LASER_DAMAGE, charge=10, recharge=1, range=game.PLAYER_LASER_RANGE) -> None:
+    def __init__(self, ship: entities.Ship, damage=game.PLAYER_LASER_DAMAGE, charge=10, recharge=1, range=game.PLAYER_LASER_RANGE) -> None:
         self.ship = ship
         self.damage = damage
         self.charge = charge

@@ -11,34 +11,78 @@ import pygame
 
 
 
-def get_entities_to_draw():
+def get_entities_to_draw() -> list[Object]:
     """Returns the entities that are visible on the screen
     \nSorts the order to draw entities based on their 'z value'"""
 
+    # TODO: Have a different radius for width and height of screen
+    # TODO: Optimize culling more, check both axis
+
     # Get number of chunks until going off the screen
-    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 2  # Ensure every entity that can be seen is drawn
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2))  # Ensure every entity that can be seen is drawn
 
     centre = game.CHUNKS.get_chunk(game.player).position
 
     entities: list[Object] = []
 
-    for y in range(centre.y - radius, centre.y + radius + 1):
-        for x in range(centre.x - radius, centre.x + radius + 1):
+    # Aggresive, only draw if player can see entity
+    if game.ENTITY_CULLING:
+        for y in range(centre.y - radius, centre.y + radius + 1):
+            for x in range(centre.x - radius, centre.x + radius + 1):
 
+                chunk = game.CHUNKS.get_chunk((x, y))
+                entities.extend(chunk.entities)
+
+        # Get visible entities around edge of the screen
+
+        y = centre.y + radius + 1
+        for x in range(centre.x - radius - 1, centre.x + radius + 2):
             chunk = game.CHUNKS.get_chunk((x, y))
-            entities.extend(chunk.entities)
+            for entity in chunk.entities:
+                if (game.player.position.y - entity.position.y - entity.size[1]) / game.ZOOM < HEIGHT/2:
+                    entities.append(entity)
+
+        y = centre.y - radius - 1
+        for x in range(centre.x - radius - 1, centre.x + radius + 2):
+            chunk = game.CHUNKS.get_chunk((x, y))
+            for entity in chunk.entities:
+                if (entity.position.y - entity.size[1] - game.player.position.y) / game.ZOOM < HEIGHT/2:
+                    entities.append(entity)
+
+        x = centre.x + radius + 1
+        for y in range(centre.y - radius, centre.y + radius + 1):
+            chunk = game.CHUNKS.get_chunk((x, y))
+            for entity in chunk.entities:
+                if (entity.position.x - entity.size[0] - game.player.position.x) / game.ZOOM < WIDTH/2:
+                    entities.append(entity)
+
+        x = centre.x - radius - 1
+        for y in range(centre.y - radius, centre.y + radius + 1):
+            chunk = game.CHUNKS.get_chunk((x, y))
+            for entity in chunk.entities:
+                if (game.player.position.x - entity.position.x - entity.size[0]) / game.ZOOM < WIDTH/2:
+                    entities.append(entity)
+
+    # Passive, draw all entities in chunks around screen
+    else:
+        radius += 2
+        for y in range(centre.y - radius, centre.y + radius + 1):
+            for x in range(centre.x - radius, centre.x + radius + 1):
+
+                chunk = game.CHUNKS.get_chunk((x, y))
+                entities.extend(chunk.entities)
 
     return sorted(entities, key=z_sort)
 
 
-def z_sort(entity):
+def z_sort(entity: Object) -> int:
     if hasattr(entity, "z"):
         return entity.z
     return 0
 
 
 
-def draw_chunks():
+def draw_chunks() -> None:
 
     # Developer Tools
     # Chunk drawer
@@ -75,7 +119,7 @@ for _ in range(layers):
         layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
     stars.append(layer)
 
-def update_graphics_screen_size():
+def update_graphics_screen_size() -> None:
     global WIDTH, HEIGHT, stars
     WIDTH, HEIGHT = game.WIDTH, game.HEIGHT
     stars = list()
@@ -99,7 +143,7 @@ draw_circle = WIN.blit
 
 
 # This function has been OPTIMIZED
-def draw_stars():
+def draw_stars() -> None:
     # Layered Stars
     # Bigger stars move more
 

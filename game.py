@@ -27,12 +27,14 @@ FULLSCREEN = True
 WIDTH = display_info.current_w
 HEIGHT = display_info.current_h
 LOAD_DISTANCE = 5 # Chunks loaded from player
+ENTITY_CULLING = False
 
 settings = [
     "WIDTH",
     "HEIGHT",
     "FULLSCREEN",
-    "LOAD_DISTANCE"
+    "LOAD_DISTANCE",
+    "ENTITY_CULLING"
 ]
 
 def save_settings():
