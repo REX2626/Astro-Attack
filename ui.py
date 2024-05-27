@@ -269,6 +269,10 @@ class Console():
                     elif event.key == pygame.K_v and event.mod & pygame.KMOD_CTRL:
                         self.input_text += pygame.scrap.get_text()
 
+                    # ctrl + c copies text to clipboard
+                    elif event.key == pygame.K_c and event.mod & pygame.KMOD_CTRL:
+                        pygame.scrap.put_text(self.input_text)
+
                     # add pressed character to input_text
                     else:
                         start_len = len(self.input_text)
