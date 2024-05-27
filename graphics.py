@@ -17,51 +17,58 @@ def get_entities_to_draw() -> list[Object]:
 
     # TODO: Have a different radius for width and height of screen
     # TODO: Optimize culling more, check both axis
+    # NOTE: Aggressive entity culling currently experimental
 
     # Get number of chunks until going off the screen
     radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2))  # Ensure every entity that can be seen is drawn
 
     centre = game.CHUNKS.get_chunk(game.player).position
 
-    entities: list[Object] = []
+    entities: set[Object] = set()
 
     # Aggresive, only draw if player can see entity
     if game.ENTITY_CULLING:
-        for y in range(centre.y - radius, centre.y + radius + 1):
-            for x in range(centre.x - radius, centre.x + radius + 1):
+        # XXXXX
+        # XXXXX
+        # OO@OO
+        # XXXXX
+        # XXXXX
+
+        # Chunks that are definitely in the screen
+        for y in range(centre.y - radius + 1, centre.y + radius):
+            for x in range(centre.x - radius + 1, centre.x + radius):
 
                 chunk = game.CHUNKS.get_chunk((x, y))
-                entities.extend(chunk.entities)
+                entities.update(chunk.entities)
 
         # Get visible entities around edge of the screen
-
-        y = centre.y + radius + 1
         for x in range(centre.x - radius - 1, centre.x + radius + 2):
-            chunk = game.CHUNKS.get_chunk((x, y))
-            for entity in chunk.entities:
-                if (game.player.position.y - entity.position.y - entity.size[1]) / game.ZOOM < HEIGHT/2:
-                    entities.append(entity)
+            for y in range(centre.y + radius, centre.y + radius + 2):
+                chunk = game.CHUNKS.get_chunk((x, y))
+                for entity in chunk.entities:
+                    if not hasattr(entity, "size") or (game.player.position.y - entity.position.y - entity.size.y/2) * game.ZOOM < HEIGHT/2:
+                        entities.add(entity)
 
-        y = centre.y - radius - 1
         for x in range(centre.x - radius - 1, centre.x + radius + 2):
-            chunk = game.CHUNKS.get_chunk((x, y))
-            for entity in chunk.entities:
-                if (entity.position.y - entity.size[1] - game.player.position.y) / game.ZOOM < HEIGHT/2:
-                    entities.append(entity)
+            for y in range(centre.y - radius - 1, centre.y - radius + 1):
+                chunk = game.CHUNKS.get_chunk((x, y))
+                for entity in chunk.entities:
+                    if not hasattr(entity, "size") or (entity.position.y - entity.size.y/2 - game.player.position.y) * game.ZOOM < HEIGHT/2:
+                        entities.add(entity)
 
-        x = centre.x + radius + 1
-        for y in range(centre.y - radius, centre.y + radius + 1):
-            chunk = game.CHUNKS.get_chunk((x, y))
-            for entity in chunk.entities:
-                if (entity.position.x - entity.size[0] - game.player.position.x) / game.ZOOM < WIDTH/2:
-                    entities.append(entity)
+        for y in range(centre.y - radius + 1, centre.y + radius):
+            for x in range(centre.x + radius, centre.x + radius + 2):
+                chunk = game.CHUNKS.get_chunk((x, y))
+                for entity in chunk.entities:
+                    if not hasattr(entity, "size") or (entity.position.x - entity.size.x/2 - game.player.position.x) * game.ZOOM < WIDTH/2:
+                        entities.add(entity)
 
-        x = centre.x - radius - 1
-        for y in range(centre.y - radius, centre.y + radius + 1):
-            chunk = game.CHUNKS.get_chunk((x, y))
-            for entity in chunk.entities:
-                if (game.player.position.x - entity.position.x - entity.size[0]) / game.ZOOM < WIDTH/2:
-                    entities.append(entity)
+        for y in range(centre.y - radius + 1, centre.y + radius):
+            for x in range(centre.x - radius - 1, centre.x - radius + 1):
+                chunk = game.CHUNKS.get_chunk((x, y))
+                for entity in chunk.entities:
+                    if not hasattr(entity, "size") or (game.player.position.x - entity.position.x - entity.size.x/2) * game.ZOOM < WIDTH/2:
+                        entities.add(entity)
 
     # Passive, draw all entities in chunks around screen
     else:
@@ -70,7 +77,7 @@ def get_entities_to_draw() -> list[Object]:
             for x in range(centre.x - radius, centre.x + radius + 1):
 
                 chunk = game.CHUNKS.get_chunk((x, y))
-                entities.extend(chunk.entities)
+                entities.update(chunk.entities)
 
     return sorted(entities, key=z_sort)
 
