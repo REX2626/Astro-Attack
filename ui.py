@@ -291,7 +291,8 @@ class Console():
             self.input_text = self.input_text.replace("|", "")
 
             split_text = self.input_text.split()
-            input_command = split_text[0]
+            if split_text: input_command = split_text[0]
+            else: input_command = ""
             arguments = split_text[1:]
 
             if self.input_text == "help":
