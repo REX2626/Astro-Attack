@@ -22,7 +22,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 Add back buttons
 
 Improve console and text input:
-Add ctrl+v
 Add spam, if a button is hold down > 1 second, repeatedly paste that button
 
 Add more mission types
@@ -447,3 +446,7 @@ Reduce the massive increase in mission kill number and reward
 
 Improve neutral ship fighting AI
 Fix Neutral ships not attacking if their mothership is destroyed
+
+### a1.5.0 (sound, general clear up and polishing)
+Improve console and text input:
+Add ctrl+v

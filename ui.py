@@ -236,33 +236,38 @@ class Console():
                 if event.type == pygame.QUIT:
                     game.quit()
 
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    game.CONSOLE_SCREEN = False
-
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    self.enter_text()
-
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                    self.up_pressed()
-
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                    self.down_pressed()
-
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                    self.left_pressed()
-
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                    self.right_pressed()
-
                 elif event.type == pygame.KEYDOWN:
+
+                    if event.key == pygame.K_ESCAPE:
+                        game.CONSOLE_SCREEN = False
+
+                    elif event.key == pygame.K_RETURN:
+                        self.enter_text()
+
+                    elif event.key == pygame.K_UP:
+                        self.up_pressed()
+
+                    elif event.key == pygame.K_DOWN:
+                        self.down_pressed()
+
+                    elif event.key == pygame.K_LEFT:
+                        self.left_pressed()
+
+                    elif event.key == pygame.K_RIGHT:
+                        self.right_pressed()
+
                     # removes last item from input_text string when backspace is pressed
-                    if event.key == pygame.K_BACKSPACE:
+                    elif event.key == pygame.K_BACKSPACE:
                         if self.cursor_pos > 0:
                             self.cursor_pos -= 1
                             self.input_text = self.input_text[:self.cursor_pos] + self.input_text[self.cursor_pos+1:]
 
                     elif event.key == pygame.K_DELETE:
                         self.input_text = self.input_text[:self.cursor_pos+1] + self.input_text[self.cursor_pos+2:]
+
+                    # ctrl + v pastes clipboard
+                    elif event.key == pygame.K_v and event.mod & pygame.KMOD_CTRL:
+                        self.input_text += pygame.scrap.get_text()
 
                     # add pressed character to input_text
                     else:
