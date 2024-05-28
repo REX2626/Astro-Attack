@@ -449,4 +449,6 @@ Fix Neutral ships not attacking if their mothership is destroyed
 
 ### a1.5.0 (sound, general clear up and polishing)
 Improve console and text input:
+Add ctrl+x
+Add ctrl+c
 Add ctrl+v
