@@ -251,10 +251,16 @@ class Console():
                         self.down_pressed()
 
                     elif event.key == pygame.K_LEFT:
-                        self.left_pressed()
+                        if event.mod & pygame.KMOD_CTRL:
+                            self.ctrl_left_pressed()
+                        else:
+                            self.left_pressed()
 
                     elif event.key == pygame.K_RIGHT:
-                        self.right_pressed()
+                        if event.mod & pygame.KMOD_CTRL:
+                            self.ctrl_right_pressed()
+                        else:
+                            self.right_pressed()
 
                     # removes last item from input_text string when backspace is pressed
                     elif event.key == pygame.K_BACKSPACE:
@@ -362,25 +368,41 @@ class Console():
             self.input_text = ""
             self.cursor_pos = 0
 
-    def left_pressed(self):
-        if self.cursor_pos > 0:
+    def left_pressed(self) -> None:
+        self.input_text = self.input_text.replace("|", "")
+        if self.cursor_pos == 0:
+            self.cursor_pos = len(self.input_text)
+            self.input_text = self.input_text[:self.cursor_pos] + "|"
+        else:
             self.cursor_pos -= 1
-            self.input_text = self.input_text.replace("|", "")
-            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
-        elif self.cursor_pos == 0:
-            self.cursor_pos = len(self.input_text) - 1
-            self.input_text = self.input_text.replace("|", "")
             self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
 
-    def right_pressed(self):
-        if self.cursor_pos < len(self.input_text) - 1:
-            self.cursor_pos += 1
-            self.input_text = self.input_text.replace("|", "")
-            self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
-        elif self.cursor_pos == len(self.input_text) - 1:
+    def right_pressed(self) -> None:
+        self.input_text = self.input_text.replace("|", "")
+        if self.cursor_pos == len(self.input_text):
             self.cursor_pos = 0
-            self.input_text = self.input_text.replace("|", "")
+            self.input_text = "|" + self.input_text[self.cursor_pos:]
+        else:
+            self.cursor_pos += 1
             self.input_text = self.input_text[:self.cursor_pos] + "|" + self.input_text[self.cursor_pos:]
+
+    def ctrl_left_pressed(self) -> None:
+        self.input_text = self.input_text.replace("|", "")
+        if self.cursor_pos == 0:
+            self.cursor_pos = len(self.input_text)
+            self.input_text = self.input_text + "|"
+        else:
+            self.cursor_pos = 0
+            self.input_text = "|" + self.input_text
+
+    def ctrl_right_pressed(self) -> None:
+        self.input_text = self.input_text.replace("|", "")
+        if self.cursor_pos == len(self.input_text):
+            self.cursor_pos = 0
+            self.input_text = "|" + self.input_text
+        else:
+            self.cursor_pos = len(self.input_text)
+            self.input_text = self.input_text + "|"
 
     def run_commands(self):
         # loops through the dictionary

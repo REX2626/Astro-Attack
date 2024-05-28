@@ -452,3 +452,4 @@ Improve console and text input:
 Add ctrl+x
 Add ctrl+c
 Add ctrl+v
+Add ctrl + arrows
