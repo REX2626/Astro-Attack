@@ -22,6 +22,7 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 Add back buttons
 
 Improve console and text input:
+Text moves when left key is pressed for first time
 Add spam, if a button is hold down > 1 second, repeatedly paste that button
 
 Add more mission types
