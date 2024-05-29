@@ -468,7 +468,7 @@ class Console():
 
             # Renders input text
             text_surface = self.text_input_font.render("/" + self.input_text, True, game.BLACK)
-            game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height))
+            game.WIN.blit(text_surface, (self.left_text_padding, height - self.text_input_height + (0 if "|" in self.input_text else 2)))
 
             # Loops through all previous commands and displays them above
             for i, command in enumerate(self.chat_history):

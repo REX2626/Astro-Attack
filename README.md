@@ -21,9 +21,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 Add back buttons
 
-Improve console and text input:
-Text moves when left key is pressed for first time
-
 Switch to pygame-ce, text location has shifted, pygame.scrap can be simplified
 
 Outline of space stations is thin at bottom
@@ -460,3 +457,4 @@ Add ctrl+c
 Add ctrl+v
 Add ctrl + arrows
 Add spam, if a button is hold down > 0.5 second, repeatedly paste that button
+Text moves when left key is pressed for first time
