@@ -1510,7 +1510,7 @@ settings = Page(
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=lambda: game.save_settings(), min=4, max=26),
-    SettingButton(0.25, 3/6, lambda: f"ENTITY_CULLING: {"AGGRESIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
+    SettingButton(0.25, 3/6, lambda: f"RENDERING: {"AGGRESIVE" if game.RENDERING else "PASSIVE"}", font_size=40, value="RENDERING", function_action=lambda: game.save_settings()),
     Button(0.5, 7/8, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),

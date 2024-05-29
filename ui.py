@@ -7,9 +7,12 @@ import images
 import game
 import commands
 import math
+import time
 import psutil
 from pygame import freetype
 import pygame
+
+pygame.scrap.init()
 
 
 
@@ -230,13 +233,27 @@ class Console():
         game.WIN.blit(surf, (0, 0))
         self.playing_background = game.WIN.copy()
 
+        # If a button is held for more than 0.5 second, spam it every 0.08 seconds
+        button_spam_time = math.inf
+        button_pressed_event = None
+
         # while loop to pause the game and check for inputs
         while game.CONSOLE_SCREEN == True:
-            for event in pygame.event.get():
+            events = pygame.event.get()
+
+            if time.perf_counter() - button_spam_time > 0.08:
+                events.append(button_pressed_event)
+                button_spam_time = time.perf_counter()
+
+            for event in events:
                 if event.type == pygame.QUIT:
                     game.quit()
 
                 elif event.type == pygame.KEYDOWN:
+
+                    if button_pressed_event != event:
+                        button_spam_time = time.perf_counter() + 0.42
+                        button_pressed_event = event
 
                     if event.key == pygame.K_ESCAPE:
                         game.CONSOLE_SCREEN = False
@@ -273,16 +290,16 @@ class Console():
 
                     # ctrl + x copies text to clipboard then deletes text
                     elif event.key == pygame.K_x and event.mod & pygame.KMOD_CTRL:
-                        pygame.scrap.put_text(self.input_text)
+                        pygame.scrap.put(pygame.SCRAP_TEXT, self.input_text.encode())
                         self.input_text = ""
 
                     # ctrl + c copies text to clipboard
                     elif event.key == pygame.K_c and event.mod & pygame.KMOD_CTRL:
-                        pygame.scrap.put_text(self.input_text)
+                        pygame.scrap.put(pygame.SCRAP_TEXT, self.input_text.encode())
 
                     # ctrl + v pastes clipboard
                     elif event.key == pygame.K_v and event.mod & pygame.KMOD_CTRL:
-                        self.input_text += pygame.scrap.get_text()
+                        self.input_text += pygame.scrap.get(pygame.SCRAP_TEXT).decode()
 
                     # add pressed character to input_text
                     else:
@@ -291,6 +308,10 @@ class Console():
                         end_len = len(self.input_text)
                         if start_len != end_len:
                             self.cursor_pos += 1
+
+                elif event.type == pygame.KEYUP:
+                    button_spam_time = math.inf
+                    button_pressed_event = None
 
             # must draw here since this is the only game loop running
             self.draw()
