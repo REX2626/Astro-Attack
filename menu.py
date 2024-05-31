@@ -816,7 +816,9 @@ class UpgradeBar(Widget):
 
     def get_label(self) -> pygame.Surface:
         """Gets a text label"""
-        return pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, Menu.DEFAULT_COLOUR)
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        self.label_height = font.get_height()
+        return font.render(self.text, True, Menu.DEFAULT_COLOUR)
 
     def draw(self) -> None:
         padlock = pygame.transform.scale_by(self.padlock, game.WIDTH/1200)
@@ -834,7 +836,7 @@ class UpgradeBar(Widget):
 
         pygame.draw.rect(game.WIN, self.button_colour, (self.x+2, self.y+2, button_width-4, height-4), border_radius=10)
         label = self.get_label()
-        game.WIN.blit(label, (self.x + button_width/2 - label.get_width()/2, self.y + height/2 - label.get_height()/2))
+        game.WIN.blit(label, (self.x + button_width/2 - label.get_width()/2, self.y + height/2 - self.label_height/2))
 
 
         # draw bars
@@ -1287,12 +1289,14 @@ class TextInput(RectWidget):
             pygame.draw.rect(game.WIN, self.outline_colour, self.get_rect(), width=round(game.WIDTH/300))
 
         # Draw header
-        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.header, True, game.WHITE)
-        game.WIN.blit(label, (self.x - self.width/2, self.y - self.height/2 - label.get_height()))
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        label = font.render(self.header, True, game.WHITE)
+        game.WIN.blit(label, (self.x - self.width/2, self.y - self.height/2 - font.get_height()))
 
         # Draw input text
-        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, game.WHITE)
-        game.WIN.blit(label, (self.x - self.width/2 + round(game.WIDTH/300), self.y - label.get_height()/2))
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        label = font.render(self.text, True, game.WHITE)
+        game.WIN.blit(label, (self.x - self.width/2 + round(game.WIDTH/300), self.y - font.get_height()/2))
 
 
 
@@ -1608,7 +1612,7 @@ station = Page(
     Image(0.4, 0.5, images.WEAPON_ICON, scale=6),
     Image(0.6, 0.5, images.ENGINE_ICON, scale=6),
     Image(0.8, 0.5, images.RADAR_ICON, scale=6),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1622,7 +1626,7 @@ missions = Page(
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     MissionManager(),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1636,7 +1640,7 @@ stats = Page(
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     Text(0.5, 0.5, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1663,7 +1667,7 @@ armour = Page(
     UpgradeBar(0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     UpgradeBar(0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
     UpgradeBar(0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1677,7 +1681,7 @@ weapon = Page(
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Button(0.7, 0.5, "Laser"  , function=lambda: Menu.change_page(laser)),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1690,7 +1694,7 @@ engine = Page(
     UpgradeBar(0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1702,7 +1706,7 @@ radar = Page(
     Text(0.5, 0.12, "Radar"),
     UpgradeBar(0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     UpgradeBar(0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1715,7 +1719,7 @@ default_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
     UpgradeBar(0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1728,7 +1732,7 @@ gatling_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
     UpgradeBar(0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1741,7 +1745,7 @@ sniper_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1753,7 +1757,7 @@ laser = Page(
     Text(0.5, 0.12, "Laser"),
     UpgradeBar(0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
     UpgradeBar(0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1766,17 +1770,17 @@ systems = Page(
 
     Text(0.3, 0.3, "Health", font_size=25),
     Bar(0.39, 0.298, width=0.32, height=0.1, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
-    Text(0.405, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25, align="left"),
+    Text(0.405, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25, align=pygame.FONT_LEFT),
 
     Text(0.3, 0.45, "Armour", font_size=25),
     ArmourBar(0.39, 0.448, width=0.32, height=0.1, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=12),
-    Text(0.405, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25, align="left"),
+    Text(0.405, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25, align=pygame.FONT_LEFT),
 
     Text(0.3, 0.6, "Shield", font_size=25),
     Bar(0.39, 0.598, width=0.32, height=0.1, value=lambda: game.player.shield, max_value=lambda: game.MAX_PLAYER_SHIELD, colour=(34, 130, 240), outline_width=5, curve=12),
-    Text(0.405, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25, align="left"),
+    Text(0.405, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25, align=pygame.FONT_LEFT),
 
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
