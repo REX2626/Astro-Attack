@@ -475,3 +475,5 @@ Add ctrl+v
 Add ctrl + arrows
 Add spam, if a button is hold down > 0.5 second, repeatedly paste that button
 Text moves when left key is pressed for first time
+
+Changed from pygame 2.4.0 to pygame-ce 2.4.1

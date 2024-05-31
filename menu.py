@@ -4,6 +4,7 @@ import images
 import game
 import main
 import random
+from typing import Callable
 from pygame import freetype
 import pygame
 # menu v2
@@ -360,21 +361,28 @@ class Text(Widget):
 
     (`x`, `y`) is the centre of the first line of the Text
 
-    `font_size` is relative to screen width, if you change the screen resolution then the font size will dynamically change
-
     `text` can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
 
-    NOTE: if text is a function it has to return a string (can be single or multi-line)
+    `font_size` is relative to screen width, if you change the screen resolution then the font size will dynamically change
 
-    `align` is a string, can be "left", "centre" or "right", this is for the x value
+    `align` can be pygame.FONT_LEFT, pygame.FONT_RIGHT, pygame.FONT_CENTER, this is for the x value
+
+    NOTE: if text is a function it has to return a string (can be single or multi-line)
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, spacing=Menu.DEFAULT_TEXT_SPACING, align="centre") -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str | Callable[[], str],
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            spacing: float = Menu.DEFAULT_TEXT_SPACING,
+            align: int = pygame.FONT_CENTER
+        ) -> None:
         super().__init__(x, y)
 
-        if isinstance(text, str):
-            self.text = [sentence.lstrip() for sentence in text.split("\n")]
-        else: # if text is a function
-            self.text = text
+        self.text = text
 
         self.font = font
         self.font_size = font_size
@@ -383,56 +391,60 @@ class Text(Widget):
         self.align = align
 
         self.height = None
-        self.labels_text = None
-        self.labels_size = None
+        self.label_text = None
+        self.label_size = None
 
     def get_blit_x(self, label: pygame.Surface) -> float:
-        if self.align == "centre":
+        if self.align == pygame.FONT_CENTER:
             return self.x - label.get_width()/2
-        elif self.align == "left":
+        elif self.align == pygame.FONT_LEFT:
             return self.x
-        elif self.align == "right":
+        elif self.align == pygame.FONT_RIGHT:
             return self.x - label.get_width()
 
-    def update_labels_info(self) -> list[pygame.Surface]:
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+    def update_label_info(self) -> pygame.Surface:
+        """
+        Creates a new text label with the required info
+        """
+        if callable(self.text):
             text = self.text()
         else:
             text = self.text
-        self.labels_text = text
 
-        self.labels_size = round(game.WIDTH * self.font_size / 900)
+        text = "\n".join([sentence.lstrip() for sentence in text.split("\n")])  # Remove whitespace before each line
+
+        self.label_text = text
+        self.label_size = round(game.WIDTH * self.font_size / 900)
 
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
+        font.align = self.align
+
         self.height = font.get_height()
+        self.label = font.render(text, True, self.colour)
 
-        if isinstance(text, list):
-            self.labels = [font.render(sentence, True, self.colour) for sentence in text]
-        else: # if text is a function
-            self.labels = [font.render(sentence.lstrip(), True, self.colour) for sentence in text.split("\n")] # split sentence up into lines, then turn each line into a label
+        return self.label
 
-        return self.labels
-
-    def get_labels(self) -> list[pygame.Surface]:
-        """Creates a list of label for every sentence of the text"""
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = [sentence.lstrip() for sentence in self.text().split("\n")]
+    def get_label(self) -> pygame.Surface:
+        """
+        Returns a text label, updates label if necessary
+        """
+        if callable(self.text):
+            text = self.text()
         else:
             text = self.text
 
-        if text != self.labels_text or round(game.WIDTH * self.font_size / 900) != self.labels_size:
-            self.update_labels_info()
+        if text != self.label_text or round(game.WIDTH * self.font_size / 900) != self.label_size:
+            self.update_label_info()
 
-        return self.labels
+        return self.label
 
     def draw(self) -> None:
-        labels = self.get_labels()
-        cum_height = 0 # cumulative height of all the labels above a certain label
-        for label in labels:
-            # position = self.get_blit_x(label), self.y - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
-            position = self.get_blit_x(label), self.y - self.height/2 + cum_height # Adjust coordinates to be centre of Widget
-            game.WIN.blit(label, position)
-            cum_height += label.get_height() + self.spacing()
+        """
+        Draws the text label to the screen
+        """
+        label = self.get_label()
+        position = self.get_blit_x(label), self.y - self.height/2  # Adjust coordinates to be centre of Widget
+        game.WIN.blit(label, position)
 
 
 
@@ -444,7 +456,22 @@ class Button(Text):
 
     (`padx`, `pady`) is the padding, i.e. how much the button extends past the text, i.e. padx=1 means 1 pixel on the left AND 1 pixel on the right
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, uniform=False) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str,
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            padx: int = Menu.DEFAULT_PADX,
+            pady: int = Menu.DEFAULT_PADY,
+            function: None | Callable = None,
+            box_colour: Colour = Menu.DEFAULT_BOX_COLOUR,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            hover_colour: Colour = Menu.DEFAULT_HOVER_COLOUR,
+            uniform: bool = False
+        ) -> None:
         super().__init__(x, y, text, font, font_size, colour)
         self.padx = padx
         self.pady = pady
@@ -456,15 +483,12 @@ class Button(Text):
         self.hover_colour = hover_colour
         self.uniform = uniform
 
-        self.height = None
-        self.label_text = None
-        self.label_size = None
         self.update_label_info()
 
     def click(self, mouse: Coord) -> bool:
         if self.touching_mouse(mouse):
             self.function()
-            return True # Tells the Menu that this Button has been clicked on
+            return True  # Tells the Menu that this Button has been clicked on
 
     def touching_mouse(self, mouse: Coord) -> bool:
         label = self.label
@@ -474,14 +498,15 @@ class Button(Text):
                 mouse[1] > y and mouse[1] < y + height)
 
     def get_width(self, label: pygame.Surface) -> float:
-        return label.get_width() + self.padx*2 # padding*2 as there is padding on both sides
+        return label.get_width() + self.padx*2  # padding*2 as there is padding on both sides
 
-    def get_height(self, label: pygame.Surface) -> float:
-        return self.height + self.pady*2 # padding*2 as there is padding on both sides
+    def get_height(self) -> float:
+        return self.height + self.pady*2  # padding*2 as there is padding on both sides
 
     def get_max_width(self) -> float:
-        """Get greatest width of all Buttons on the current_page"""
-
+        """
+        Get greatest width of all Buttons on the current_page
+        """
         max_width = 0
         for widget in Menu.current_page.widgets:
             if isinstance(widget, Button) and widget.uniform:
@@ -490,54 +515,33 @@ class Button(Text):
         return max_width
 
     def get_rect(self, label: pygame.Surface) -> Rect:
-        """If self.uniform == True, set the width to the greatest width of all Buttons on the current_page"""
+        """
+        If self.uniform is True, set the width to the greatest width of all Buttons on the current_page
+        """
         if self.uniform:
-            width, height = self.get_max_width(), self.get_height(label)
+            width, height = self.get_max_width(), self.get_height()
             width_difference = width - self.get_width(label)
             x, y = self.x - label.get_width()/2 - width_difference/2, self.y - self.height/2
             return x, y, width, height
 
-        width, height = self.get_width(label), self.get_height(label)
+        width, height = self.get_width(label), self.get_height()
         x, y = self.x - label.get_width()/2, self.y - self.height/2
         return x, y, width, height
 
-    def update_label_info(self) -> None:
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text[0]
-        self.label_text = text
-
-        self.label_size = round(game.WIDTH * self.font_size / 900)
-
-        font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
-        self.label = font.render(text, True, self.colour)
-        self.height = font.get_height()
-
-    def get_label(self) -> pygame.Surface:
-        """For buttons which currently only use the first line of text to create the button"""
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text[0]
-
-        if text != self.label_text or round(game.WIDTH * self.font_size / 900) != self.label_size:
-            self.update_label_info()
-
-        return self.label
-
     def draw(self) -> None:
+        """
+        Draws the button to the screen
+        """
         if self.touching_mouse(pygame.mouse.get_pos()):
             self.current_box_colour = self.hover_colour
         else:
             self.current_box_colour = self.box_colour
 
-        label = self.label # This is updated in Page.draw()
+        label = self.label  # This is updated in Page.draw()
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
-        pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
-        # position = self.x - label.get_width()/2, self.y - label.get_height()/2 # Adjust coordinates to be centre of Widget
-        position = self.x - label.get_width()/2, self.y - self.height/2 # Adjust coordinates to be centre of Widget
+        pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
+        position = self.x - label.get_width()/2, self.y - self.height/2  # Adjust coordinates to be centre of Widget
         game.WIN.blit(label, position)
 
 
@@ -1517,7 +1521,7 @@ settings = Page(
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=lambda: game.save_settings(), min=4, max=26),
-    SettingButton(0.25, 3/6, lambda: f"RENDER: {"AGGRESIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
+    SettingButton(0.25, 3/6, lambda: f"RENDER: {"AGGRESSIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
     Button(0.5, 7/8, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),
