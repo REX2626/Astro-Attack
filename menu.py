@@ -1,10 +1,11 @@
+from __future__ import annotations
 from player import get_player
 from ui import Bar as UIBar
 import images
 import game
 import main
 import random
-from typing import Callable
+from typing import Any, Callable
 from pygame import freetype
 import pygame
 # menu v2
@@ -41,7 +42,7 @@ class Menu():
         """On start up, the default page is main_menu"""
         Menu.change_page(main_menu)
 
-    def change_page(page: "Page") -> None:
+    def change_page(page: Page) -> None:
         """Draw the new page, and then wait for a mouse click"""
         pygame.mouse.set_visible(True)
         Menu.current_page = page
@@ -142,43 +143,43 @@ class Menu():
             if hasattr(widget, "scroll"):
                 widget.scroll(y)
 
-    def escape_pressed():
+    def escape_pressed() -> None:
         if Menu.current_page.escape:
             if Menu.current_page.escape(): return True  # return True allows for a propagation which relieves Menu's control
 
-    def e_pressed():
+    def e_pressed() -> None:
         if Menu.current_page.e_press:
             if Menu.current_page.e_press():
                 return True  # return to playing
 
-    def tab_pressed():
+    def tab_pressed() -> None:
         if Menu.current_page.tab_press:
             if Menu.current_page.tab_press():
                 return True  # return to playing
 
-    def up_pressed():
+    def up_pressed() -> None:
         if Menu.current_page.up:
             Menu.current_page.up()
 
-    def down_pressed():
+    def down_pressed() -> None:
         if Menu.current_page.down:
             Menu.current_page.down()
 
-    def key_pressed(event: pygame.event.Event) -> None:
+    def key_pressed(event: pygame.Event) -> None:
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "key_pressed"):
                 widget.key_pressed(event)
 
-    def pause():
+    def pause() -> None:
         Menu.change_page(pause)
 
-    def systems():
+    def systems() -> None:
         Menu.change_page(systems)
 
-    def station():
+    def station() -> None:
         Menu.change_page(station)
 
-    def death_screen():
+    def death_screen() -> None:
         Menu.change_page(death_screen)
 
 
@@ -191,7 +192,16 @@ class Page():
        up is a function that is called when the up key is pressed
        down is a function that is called when the down key is pressed
     """
-    def __init__(self, *widgets, background_colour=Menu.DEFAULT_BACKGROUND_COLOUR, click=None, escape=None, e_press=None, tab_press=None, up=None, down=None) -> None:
+    def __init__(self,
+            *widgets: Widget,
+            background_colour: Colour = Menu.DEFAULT_BACKGROUND_COLOUR,
+            click: Callable | None = None,
+            escape: Callable | None = None,
+            e_press: Callable | None = None,
+            tab_press: Callable | None = None,
+            up: Callable | None = None,
+            down: Callable | None = None
+        ) -> None:
         self.background_colour = background_colour
         self.click = click
         self.escape = escape
@@ -200,7 +210,7 @@ class Page():
         self.up = up
         self.down = down
 
-        self.widgets: tuple[Widget] = widgets
+        self.widgets = widgets
 
     def draw(self) -> None:
         """Draws all widgets onto the Menu, widget.draw checks if a button is hovered over"""
@@ -259,7 +269,7 @@ class RectWidget(Widget):
         return self._width * game.WIDTH
 
     @width.setter
-    def width(self, new_width):
+    def width(self, new_width: float) -> None:
         self._width = new_width
 
     @property
@@ -267,7 +277,7 @@ class RectWidget(Widget):
         return self._height * game.HEIGHT
 
     @height.setter
-    def height(self, new_height):
+    def height(self, new_height: float) -> None:
         self._height = new_height
 
 
@@ -291,7 +301,16 @@ class Image(Widget):
 
 
 class AdjustableText(Widget):
-    def __init__(self, top_x, top_y, bottom_x, bottom_y, text="Text", font=Menu.DEFAULT_FONT, default_font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR) -> None:
+    def __init__(self,
+            top_x: int,
+            top_y: int,
+            bottom_x: int,
+            bottom_y: int,
+            text: str,
+            font: str = Menu.DEFAULT_FONT,
+            default_font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR
+        ) -> None:
         self.top_x = top_x
         self.top_y = top_y
         self.bottom_x = bottom_x
@@ -562,7 +581,26 @@ class SettingButton(Button):
 
     `uniform` makes all of the setting buttons on the page the same width
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, value=None, function_action=None, min=1, max=100, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR, uniform=True) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str,
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            padx: int = Menu.DEFAULT_PADX,
+            pady: int = Menu.DEFAULT_PADY,
+            value: str = None,
+            function_action: None | Callable = None,
+            min: float = 1,
+            max: float = 100,
+            box_colour: Colour = Menu.DEFAULT_BOX_COLOUR,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            hover_colour: Colour = Menu.DEFAULT_HOVER_COLOUR,
+            click_outline_colour: Colour = Menu.DEFAULT_CLICK_OUTLINE_COLOUR,
+            uniform: bool = True
+        ) -> None:
         super().__init__(x, y, text, font, font_size, colour, padx, pady, function_action, box_colour, outline_colour, hover_colour)
         self.original_outline_colour = self.outline_colour
         self.click_outline_colour = click_outline_colour
@@ -574,7 +612,7 @@ class SettingButton(Button):
             self.min = min
             self.max = max
 
-        def function():
+        def function() -> None:
             self.selected = True
             self.current_box_colour = self.hover_colour
             self.outline_colour = self.click_outline_colour
@@ -588,7 +626,7 @@ class SettingButton(Button):
             Menu.update()
         self.function = function
 
-    def get_value(self):
+    def get_value(self) -> Any:
         return getattr(game, self.value)
 
     def get_slider_width(self) -> float:
@@ -654,7 +692,22 @@ class SettingButton(Button):
 
 
 class WorldSelectionButton(Button):
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, uniform=False) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str,
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            padx: int = Menu.DEFAULT_PADX,
+            pady: int = Menu.DEFAULT_PADY,
+            function: Callable = None,
+            box_colour: Colour = Menu.DEFAULT_BOX_COLOUR,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            hover_colour: Colour = Menu.DEFAULT_HOVER_COLOUR,
+            uniform: bool = False
+        ) -> None:
         self.inactive_text_colour = (150, 150, 150)
         self.inactive_box_colour = (40, 40, 40)
         self.inactive_hover_colour = (40, 40, 40)
@@ -675,7 +728,7 @@ class WorldSelectionButton(Button):
         return self.text_colour if world_list.world_selected else self.inactive_text_colour
 
     @colour.setter
-    def colour(self, colour):
+    def colour(self, colour: Colour) -> None:
         self.text_colour = colour
 
     @property
@@ -683,7 +736,7 @@ class WorldSelectionButton(Button):
         return self.default_box_colour if world_list.world_selected else self.inactive_box_colour
 
     @box_colour.setter
-    def box_colour(self, colour):
+    def box_colour(self, colour: Colour) -> None:
         self.default_box_colour = colour
 
     @property
@@ -691,7 +744,7 @@ class WorldSelectionButton(Button):
         return self.default_hover_colour if world_list.world_selected else self.inactive_hover_colour
 
     @hover_colour.setter
-    def hover_colour(self, colour):
+    def hover_colour(self, colour: Colour) -> None:
         self.default_hover_colour = colour
 
     def draw(self) -> None:
@@ -715,9 +768,16 @@ class Rectangle(RectWidget):
 
     `curve` is the radius of the corners
     """
-    def __init__(self, x: float, y: float, width: float, height: float,
-                 colour: Colour, outline_colour: Colour | None = None,
-                 curve: int = 0) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            colour: Colour,
+            outline_colour: Colour | None = None,
+            curve: int = 0
+        ) -> None:
         super().__init__(x, y, width, height)
         self.colour = colour
         self.outline_colour = outline_colour
@@ -742,7 +802,26 @@ class UpgradeBar(Widget):
 
     bars is the number of bars
     """
-    def __init__(self, y, text, value, x=0.23, font_size=15, button_colour=(10, 20, 138), bar_colour=(255, 130, 0), outline_colour=(255, 255, 255), select_colour=(230, 110, 0), select_outline_colour=(20, 235, 25), button_width=0.1, bar_width=0.08, height=0.05, gap=5, bars=5, min_value=20, max_value=60) -> None:
+    def __init__(
+            self,
+            y: float,
+            text: str,
+            value: str,
+            x: float = 0.23,
+            font_size: int = 15,
+            button_colour: Colour = (10, 20, 138),
+            bar_colour: Colour = (255, 130, 0),
+            outline_colour: Colour = (255, 255, 255),
+            select_colour: Colour = (230, 110, 0),
+            select_outline_colour: Colour = (20, 235, 25),
+            button_width: float = 0.1,
+            bar_width: float = 0.08,
+            height: float = 0.05,
+            gap: int = 5,
+            bars: int = 5,
+            min_value: float = 20,
+            max_value: float = 60
+        ) -> None:
         super().__init__(x, y)
         self.text = text
         self.value = value
@@ -764,16 +843,16 @@ class UpgradeBar(Widget):
         self.level = value + "_LEVEL"
         self.padlock = images.PADLOCK
 
-    def get_value(self):
+    def get_value(self) -> Any:
         return getattr(game, self.value)
 
-    def set_value(self, value):
+    def set_value(self, value: Any) -> None:
         setattr(game, self.value, value)
 
-    def get_level(self):
+    def get_level(self) -> int:
         return getattr(game, self.level)
 
-    def upgrade_level(self):
+    def upgrade_level(self) -> None:
         setattr(game, self.level, self.get_level() + 1)
 
     def click(self, mouse: Coord) -> None:
@@ -876,7 +955,18 @@ class UpgradeBar(Widget):
 
 class Bar(Widget):
     """x, y, width, height are proportional to screen size"""
-    def __init__(self, x, y, width, height, value, max_value, colour, outline_width=0, outline_colour=game.BLACK, curve=0) -> None:
+    def __init__(self,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            value: Callable,
+            max_value: Callable,
+            colour: Colour,
+            outline_width: int = 0,
+            outline_colour: Colour = game.BLACK,
+            curve: int = 0
+        ) -> None:
         super().__init__(x, y)
         self.width = lambda: width * game.WIDTH - outline_width*2
         self.height = lambda: height * game.HEIGHT
@@ -913,7 +1003,21 @@ class Bar(Widget):
 
 
 class ArmourBar(Bar):
-    def __init__(self, x, y, width, height, value, max_value, price, number, colour, outline_width=0, outline_colour=game.BLACK, curve=0) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            value: Callable,
+            max_value: Callable,
+            price: int,
+            number: int,
+            colour: Colour,
+            outline_width: int = 0,
+            outline_colour: Colour = game.BLACK,
+            curve: int = 0
+        ) -> None:
         super().__init__(x, y, width, height, value, max_value, colour, outline_width, outline_colour, curve)
         self.number = number
         self.price = price
@@ -975,7 +1079,7 @@ class WorldList(RectWidget):
     """
     0 <= (x, y, width, height, gap) <= 1
     """
-    def __init__(self, x, y, width, height, gap) -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, gap: int) -> None:
         super().__init__(x, y, width, height)
         self._gap = gap
 
@@ -1005,14 +1109,14 @@ class WorldList(RectWidget):
         for idx, world in enumerate(self.list):
             self.buttons.append(WorldButton(self._x, self._y + idx*(self._height + self._gap), world.name, world.seed, world=world, world_list=self))
 
-    def start_world(self, world: "World") -> None:
+    def start_world(self, world: World) -> None:
         Menu.change_page(loading_world)
         game.set_name_to_top_of_world_dir(world.name)
         self.set_world_to_top(world)
         game.load_constants(world.name)
         main.main()
 
-    def set_world_to_top(self, world: "World") -> None:
+    def set_world_to_top(self, world: World) -> None:
         idx = self.list.index(world)
 
         del self.list[idx]
@@ -1027,7 +1131,7 @@ class WorldList(RectWidget):
 
         self.scroll_height = 0
 
-    def create_world(self, name: str, seed: int) -> "World":
+    def create_world(self, name: str, seed: int) -> World:
         world = World(name, seed)
         self.list.append(world)
 
@@ -1186,7 +1290,23 @@ class World():
 
 
 class WorldButton(Button):
-    def __init__(self, x, y, name="Text", seed="Seed", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, world=None, world_list=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
+    def __init__(self,
+            x: float,
+            y: float,
+            name: str,
+            seed: int,
+            world: World,
+            world_list: WorldList,
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            padx: int = Menu.DEFAULT_PADX,
+            pady: int = Menu.DEFAULT_PADY,
+            box_colour: Colour = Menu.DEFAULT_BOX_COLOUR,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            hover_colour: Colour = Menu.DEFAULT_HOVER_COLOUR,
+            click_outline_colour: Colour = Menu.DEFAULT_CLICK_OUTLINE_COLOUR
+        ) -> None:
         self.seed = str(seed)  # must be before super().__init__ because Button label requires self.seed
         super().__init__(x, y, name, font, font_size, colour, padx, pady, lambda: world_list.start_world(world), box_colour, outline_colour, hover_colour)
         self.click_outline_colour = click_outline_colour
@@ -1248,7 +1368,17 @@ class WorldButton(Button):
 
 
 class TextInput(RectWidget):
-    def __init__(self, x, y, width, height, header="", limit=10, font_size=Menu.DEFAULT_FONT_SIZE, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
+    def __init__(self,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            header: str = "",
+            limit: int = 10,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            click_outline_colour: Colour = Menu.DEFAULT_CLICK_OUTLINE_COLOUR
+        ) -> None:
         super().__init__(x, y, width, height)
         self.header = header
         self.limit = limit
@@ -1273,7 +1403,7 @@ class TextInput(RectWidget):
         else:
             self.selected = False
 
-    def key_pressed(self, event: pygame.event.Event) -> None:
+    def key_pressed(self, event: pygame.Event) -> None:
         if self.selected:
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
@@ -1301,11 +1431,21 @@ class TextInput(RectWidget):
 
 
 class NameTextInput(TextInput):
-    def __init__(self, x, y, width, height, header="", limit=10, font_size=Menu.DEFAULT_FONT_SIZE, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, click_outline_colour=Menu.DEFAULT_CLICK_OUTLINE_COLOUR) -> None:
+    def __init__(self,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            header: str = "",
+            limit: int = 10,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            click_outline_colour: Colour = Menu.DEFAULT_CLICK_OUTLINE_COLOUR
+        ) -> None:
         super().__init__(x, y, width, height, header, limit, font_size, outline_colour, click_outline_colour)
         self.selected = True  # NameInput starts off selected
 
-    def key_pressed(self, event: pygame.event.Event) -> None:
+    def key_pressed(self, event: pygame.Event) -> None:
         super().key_pressed(event)
         label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, game.WHITE)
         if label.get_width() > 0.78*self.width:
@@ -1314,7 +1454,7 @@ class NameTextInput(TextInput):
 
 
 class SeedTextInput(TextInput):
-    def key_pressed(self, event: pygame.event.Event) -> None:
+    def key_pressed(self, event: pygame.Event) -> None:
         super().key_pressed(event)
         # Ensure text is just digits
         if self.text and not self.text[-1].isdigit():
@@ -1323,7 +1463,7 @@ class SeedTextInput(TextInput):
 
 
 class Mission():
-    def __init__(self, slot, number, goal, mission_type, reward) -> None:
+    def __init__(self, slot: int, number: int, goal: str, mission_type: int, reward: int) -> None:
         self.slot = slot
 
         # Changes x position based on what slot it is in (there are three mission slots)
@@ -1416,6 +1556,8 @@ class Mission():
             if self.active:
                 self.accept_button.draw()
                 self.decline_button.draw()
+
+
 
 class MissionManager():
     def __init__(self) -> None:
@@ -1806,7 +1948,7 @@ def get_widget(name: str, page: Page | None = None) -> Widget | None:
         if widget.__name__ == name:
             return widget
 
-def create_world():
+def create_world() -> None:
     # Get name and seed
     for widget in Menu.current_page.widgets:
         if type(widget) == NameTextInput:
@@ -1845,7 +1987,7 @@ def create_world():
 
     world_list.start_world(world)
 
-def exit_game():
+def exit_game() -> None:
     Menu.change_page(saving_world)
 
     # Save current game
@@ -1853,7 +1995,7 @@ def exit_game():
 
     Menu.change_page(main_menu)
 
-def page_click():
+def page_click() -> None:
     """If there is a selected widget that shouldn't be, un-select it"""
     mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
@@ -1863,19 +2005,19 @@ def page_click():
             Menu.update()
             break
 
-def settings_up():
+def settings_up() -> None:
     for widget in Menu.current_page.widgets:
         if hasattr(widget, "selected"):
             if widget.selected:
                 widget.up()
 
-def settings_down():
+def settings_down() -> None:
     for widget in Menu.current_page.widgets:
         if hasattr(widget, "selected"):
             if widget.selected:
                 widget.down()
 
-def change_fullscreen():
+def change_fullscreen() -> None:
     if game.FULLSCREEN:
         # Mouse moves when resizing, this keeps mouse in same relative position
         mouse_ratio = [i / j for i, j in list(zip(pygame.mouse.get_pos(), pygame.display.get_window_size()))]
@@ -1891,12 +2033,12 @@ def change_fullscreen():
     game.WIDTH, game.HEIGHT = pygame.display.get_window_size()
     game.save_settings()
 
-def make_windowed():
+def make_windowed() -> None:
     game.FULLSCREEN = False
     pygame.display.set_mode((game.WIDTH, game.HEIGHT), flags=pygame.RESIZABLE)
     game.save_settings()
 
-def repair_armour():
+def repair_armour() -> None:
     if game.SCRAP_COUNT < 5:
         return
     else:
