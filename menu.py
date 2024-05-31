@@ -1169,7 +1169,7 @@ class WorldList(RectWidget):
             button.padx = (self.width - button.label.get_width())/2
 
             # Make all buttons the same height
-            button.pady = (self.height - button.label.get_height())/2
+            button.pady = (self.height - button.height)/2
 
             # Draw button
             button.draw(surf, x_offset, y_offset, rect, self.button_scroll_height())
