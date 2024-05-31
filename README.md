@@ -19,8 +19,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ### a1.5.0 (sound, general clear up and polishing)
 
-Add more console commands - such as kill
-
 Outline of space stations is thin at bottom
 
 Rendering setting is too big
@@ -30,8 +28,6 @@ Add more mission types
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
 Add special features to weapons (e.g. sniper can zoom in on enemy)
-
-Add transparency to particles so they can fade out
 
 Add thruster particles to ships
 
@@ -84,6 +80,8 @@ Add a check to see if world is the correct version
 Strict Rendering (only rendering objects which will defo be on screen)
 
 Think about doing rotozoom as it filters the image (AA), can be costly tho
+
+Add transparency to particles so they can fade out
 
 Add friendly AI ship
 Add some basic coding interface
@@ -466,3 +464,7 @@ pygame.scrap can be simplified - init can be removed
 multiline text can be simplified
 
 Add back buttons
+
+Add more console commands
+- kill
+- tp

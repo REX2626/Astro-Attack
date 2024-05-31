@@ -1,16 +1,12 @@
-# Import all objects in case they are used in a command
-from aiship import Neutral_Ship_Cargo, Enemy_Ship, Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter
-from station import FriendlyStation, EnemyStation
 from objects import Vector
-from entities import Entity, Scrap, Asteroid
+from entities import Entity
+from player import Player_Ship
 import game
 import random
-import pygame
 
 
 # Spawns entity
 def spawn_entity(arguments):
-
     entity_class, frequency = arguments
 
     for _ in range(frequency):
@@ -34,5 +30,16 @@ def god_mode(arguments=(10_000, 10_000)):
 def change_max_zoom(zoom=0.1):
     game.CURRENT_MIN_ZOOM = zoom
 
+
 def add_score(score=100):
     game.SCORE += score
+
+
+def kill():
+    for entity in game.CHUNKS.entities.copy():
+        if isinstance(entity, Entity) and not isinstance(entity, Player_Ship):
+            game.CHUNKS.remove_entity(entity)
+
+
+def teleport(position: tuple[float, float]):
+    game.CHUNKS.set_position(game.player, Vector(*position))

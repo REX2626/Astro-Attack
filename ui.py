@@ -198,22 +198,26 @@ class Console():
         self.entity_list_colour = (100, 180, 180)
         self.error_colour = (199, 46, 12)
 
-        self.commands = {"spawnentity": commands.spawn_entity,
-                         "godmode": commands.god_mode,
-                         "zoom": commands.change_max_zoom,
-                         "score": commands.add_score}
+        self.commands = {"godmode": commands.god_mode,
+                         "kill": commands.kill,
+                         "score": commands.add_score,
+                         "spawnentity": commands.spawn_entity,
+                         "tp": commands.teleport,
+                         "zoom": commands.change_max_zoom}
 
         # console_commands mean that the command is written in this class
         self.console_commands = {"log": self.log}
 
         self.commands_to_run = []
 
-        self.help_message = ["/spawnentity (entity_class) (frequency) - spawns entity at current location",
+        self.help_message = ["/entitylist - prints entities that can be spawned",
                              "/godmode (max_health) (max_boost) - boosts stats",
-                             "/zoom (zoom_level) - changes how far you can zoom out",
-                             "/score (score) - adds score to current score",
+                             "/kill - removes all entities apart from player",
                              "/log (argument) - prints argument to console",
-                             "/entitylist - prints list of entities to spawn"]
+                             "/score (score) - adds score to current score",
+                             "/spawnentity (entity_class) (frequency) - spawns entity at current location",
+                             "/tp (x) (y) - teleports player to coordinates (x, y)",
+                             "/zoom (zoom_level) - changes how far you can zoom out"]
 
         self.entity_list_message = ["EnemyStation, FriendlyStation, Neutral_Ship_Cargo, Enemy_Ship,",
                                     "Drone_Enemy, Missile_Ship,  Mother_Ship, Neutral_Ship_Fighter, Scrap"]
