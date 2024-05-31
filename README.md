@@ -19,8 +19,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ### a1.5.0 (sound, general clear up and polishing)
 
-Add back buttons
-
 Add more console commands - such as kill
 
 Outline of space stations is thin at bottom
@@ -466,3 +464,5 @@ Changed from pygame 2.4.0 to pygame-ce 2.4.1
 Switch to pygame-ce, text location has shifted
 pygame.scrap can be simplified - init can be removed
 multiline text can be simplified
+
+Add back buttons

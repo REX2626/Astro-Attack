@@ -16,6 +16,9 @@ Coord = tuple[int, int]
 Colour = tuple[int, int, int]
 Rect = tuple[float, float, float, float]
 
+EXIT = 1
+CLICKED = 2
+
 
 
 class Menu():
@@ -54,7 +57,7 @@ class Menu():
 
     def run() -> None:
         while Menu.running:
-            if Menu.check_for_inputs():  # if check_for_inputs() returns True, then break out of Menu control
+            if Menu.check_for_inputs() == EXIT:  # if check_for_inputs() returns EXIT, then break out of Menu control
                 Menu.running = False
 
     def update() -> None:
@@ -69,7 +72,7 @@ class Menu():
                 widget.resize()
         Menu.update()
 
-    def check_for_inputs() -> bool | None:
+    def check_for_inputs() -> int | None:
         """Go through pygame.event and do the corresponding functions"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -80,7 +83,8 @@ class Menu():
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 1 is left click
                 mouse = pygame.mouse.get_pos()
-                Menu.mouse_click(mouse)
+                if Menu.mouse_click(mouse) == EXIT:
+                    return EXIT
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:  # 1 is left click
                 for widget in Menu.current_page.widgets:  # Stop sliding for all sliders
@@ -96,9 +100,9 @@ class Menu():
                 Menu.mouse_scroll(event.y)
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                # runs Menu.escape_pressed, if that returns True, then follow suit and return True
+                # runs Menu.escape_pressed, if that returns EXIT, then follow suit and return EXIT
                 if Menu.escape_pressed():
-                    return True
+                    return EXIT
 
             elif event.type == pygame.KEYDOWN:
 
@@ -109,28 +113,31 @@ class Menu():
                     Menu.down_pressed()
 
                 elif event.key == pygame.K_e:
-                    # if e_pressed return True, then go back to the game
+                    # if e_pressed return EXIT, then go back to the game
                     if Menu.e_pressed():
-                        return True
+                        return EXIT
 
                 elif event.key == pygame.K_TAB:
-                    # if tab_pressed return True, then go back to the game
+                    # if tab_pressed return EXIT, then go back to the game
                     if Menu.tab_pressed():
-                        return True
+                        return EXIT
 
                 Menu.key_pressed(event)
 
                 Menu.update()
 
-    def mouse_click(mouse: Coord) -> None:
+    def mouse_click(mouse: Coord) -> int | None:
         """Go through all Page Widgets, if the Widget is a button then check if it is clicked on"""
         if Menu.current_page.click:
             Menu.current_page.click()
 
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "click"):
-                if widget.click(mouse):  # if the Button has been clicked, then stop checking the Buttons
+                result = widget.click(mouse)
+                if result == CLICKED:  # if the Button has been clicked, then stop checking the Buttons
                     break
+                elif result == EXIT:
+                    return EXIT
 
     def mouse_moved(mouse: Coord) -> None:
         """Go through all Page Widgets, if the Widget has a mouse_moved attribute, then call it"""
@@ -143,19 +150,20 @@ class Menu():
             if hasattr(widget, "scroll"):
                 widget.scroll(y)
 
-    def escape_pressed() -> None:
+    def escape_pressed() -> int | None:
         if Menu.current_page.escape:
-            if Menu.current_page.escape(): return True  # return True allows for a propagation which relieves Menu's control
+            if Menu.current_page.escape():
+                return EXIT  # return EXIT allows for a propagation which relieves Menu's control
 
-    def e_pressed() -> None:
+    def e_pressed() -> int | None:
         if Menu.current_page.e_press:
             if Menu.current_page.e_press():
-                return True  # return to playing
+                return EXIT  # return to playing
 
-    def tab_pressed() -> None:
+    def tab_pressed() -> int | None:
         if Menu.current_page.tab_press:
             if Menu.current_page.tab_press():
-                return True  # return to playing
+                return EXIT  # return to playing
 
     def up_pressed() -> None:
         if Menu.current_page.up:
@@ -506,8 +514,9 @@ class Button(Text):
 
     def click(self, mouse: Coord) -> bool:
         if self.touching_mouse(mouse):
-            self.function()
-            return True  # Tells the Menu that this Button has been clicked on
+            if self.function() == EXIT:
+                return EXIT
+            return CLICKED  # Tells the Menu that this Button has been clicked on
 
     def touching_mouse(self, mouse: Coord) -> bool:
         label = self.label
@@ -721,7 +730,7 @@ class WorldSelectionButton(Button):
     def click(self, mouse: Coord) -> bool | None:
         if self.touching_mouse(mouse) and world_list.world_selected:
             self.function()
-            return True  # Tells the Menu that this Button has been clicked on
+            return CLICKED  # Tells the Menu that this Button has been clicked on
 
     @property
     def colour(self) -> Colour:
@@ -1215,7 +1224,7 @@ class WorldList(RectWidget):
         for button in self.buttons:
             rect = (self.x - self.width/2, self.y - 1.5*self.gap, self.width, self.height + min(2, (len(self.list))-1)*(self.height + self.gap))
             if button.click(mouse, rect, self.button_scroll_height()) is True:
-                return True
+                return CLICKED
 
         # Click on scroll bar
         x, y, width, height = self.get_scroll_bar()
@@ -1327,7 +1336,7 @@ class WorldButton(Button):
         if self.touching_mouse(mouse, rect, scroll_height):
             if self.selected:
                 self.function()
-                return True  # Tells the Menu that this Button has been clicked on
+                return CLICKED  # Tells the Menu that this Button has been clicked on
             else:
                 self.selected = True
                 world_list.world_selected = self
@@ -1529,13 +1538,13 @@ class Mission():
         # Making sure button functions are run when clicked
         if not self.in_progress:
             if self.active:
-                if self.accept_button.click(mouse) is True: return True
-                if self.decline_button.click(mouse) is True: return True
+                if self.accept_button.click(mouse) is True: return CLICKED
+                if self.decline_button.click(mouse) is True: return CLICKED
         else:
             if self.current_number >= self.number:
-                if self.claim_reward_button.click(mouse) is True: return True
+                if self.claim_reward_button.click(mouse) is True: return CLICKED
             else:
-                if self.decline_button.click(mouse) is True: return True
+                if self.decline_button.click(mouse) is True: return CLICKED
 
     def update(self) -> None:
         # Drawing title and info
@@ -1613,7 +1622,8 @@ class MissionManager():
 
     def click(self, mouse: Coord) -> bool:
         for mission in self.missions:
-            if mission.click(mouse) is True: return True
+            if mission.click(mouse) is True:
+                return CLICKED
 
     def draw(self) -> None:
         for mission in self.missions:
@@ -1682,7 +1692,7 @@ pause = Page(
     Button(0.5, 0.345, "Continue", font_size=40, function=lambda: setattr(Menu, "running", False)),
     Button(0.5, 0.46, "Main Menu", font_size=40, function=lambda: exit_game()),
     background_colour=None,
-    escape=lambda: True,
+    escape=lambda: EXIT,
 )
 
 world_list = WorldList(0.5, 0.242, width=0.6, height=0.12, gap=0.04)
@@ -1743,6 +1753,7 @@ quit_confirm = Page(
 station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Upgrades"),
+    Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
     Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
@@ -1757,13 +1768,14 @@ station = Page(
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: True,
-    e_press=lambda: True
+    escape=lambda: EXIT,
+    e_press=lambda: EXIT
 )
 
 missions = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Missions"),
+    Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
     Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
@@ -1771,13 +1783,14 @@ missions = Page(
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: True,
-    e_press=lambda: True
+    escape=lambda: EXIT,
+    e_press=lambda: EXIT
 )
 
 stats = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Stats"),
+    Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
     Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
@@ -1785,8 +1798,8 @@ stats = Page(
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: True,
-    e_press=lambda: True
+    escape=lambda: EXIT,
+    e_press=lambda: EXIT
 )
 
 stats_skill_levels = (
@@ -1806,6 +1819,7 @@ stats_skill_levels = (
 armour = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Armour"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
     UpgradeBar(0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     UpgradeBar(0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
     UpgradeBar(0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
@@ -1813,12 +1827,13 @@ armour = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 weapon = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Weapon"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
     Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
@@ -1827,12 +1842,13 @@ weapon = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 engine = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Engine"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
     UpgradeBar(0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
@@ -1840,24 +1856,26 @@ engine = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 radar = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Radar"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
     UpgradeBar(0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     UpgradeBar(0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 default_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Default"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
     UpgradeBar(0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
     UpgradeBar(0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
@@ -1865,12 +1883,13 @@ default_gun = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 gatling_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Gatling"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
     UpgradeBar(0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
     UpgradeBar(0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
@@ -1878,12 +1897,13 @@ gatling_gun = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 sniper_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Sniper"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
     UpgradeBar(0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
@@ -1891,24 +1911,26 @@ sniper_gun = Page(
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 laser = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Laser"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
     UpgradeBar(0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
     UpgradeBar(0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
-    e_press=lambda: True
+    e_press=lambda: EXIT
 )
 
 systems = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Systems"),
+    Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
 
     Text(0.3, 0.3, "Health", font_size=25),
     Bar(0.39, 0.298, width=0.32, height=0.1, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
@@ -1925,15 +1947,15 @@ systems = Page(
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: True,
-    tab_press=lambda: True
+    escape=lambda: EXIT,
+    tab_press=lambda: EXIT
 )
 
 death_screen = Page(
-    Text(  0.5, 0.25 , "YOU DIED!"                 , colour=(255, 0, 0)    , font_size=40),
-    Text(  0.5, 0.4, lambda: f"SCORE: {game.SCORE}", colour=(100, 100, 255), font_size=40),
-    Button(0.5, 0.6 , "Respawn"   , font_size=40, function=lambda: main.main()),
-    Button(0.5, 0.75, "Main Menu" , font_size=40, function=lambda: exit_game())
+    Text(0.5, 0.25, "YOU DIED!", colour=(255, 0, 0), font_size=40),
+    Text(0.5, 0.4, lambda: f"SCORE: {game.SCORE}", colour=(100, 100, 255), font_size=40),
+    Button(0.5, 0.6, "Respawn", font_size=40, function=lambda: main.main()),
+    Button(0.5, 0.75, "Main Menu", font_size=40, function=lambda: exit_game())
 )
 
 
