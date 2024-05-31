@@ -4,6 +4,7 @@ import images
 import game
 import main
 import random
+from typing import Callable
 from pygame import freetype
 import pygame
 # menu v2
@@ -32,7 +33,7 @@ class Menu():
     DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
     DEFAULT_CLICK_OUTLINE_COLOUR = (190, 190, 190)
     DEFAULT_TEXT_SPACING = 0.003
-    SLIDER_WIDTH = 0.02 # percentage (0 to 1) of screen width
+    SLIDER_WIDTH = 0.02  # percentage (0 to 1) of screen width
     SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
     SLIDER_OUTLINE = (30, 30, 30, 150)
 
@@ -52,7 +53,7 @@ class Menu():
 
     def run() -> None:
         while Menu.running:
-            if Menu.check_for_inputs(): # if check_for_inputs() returns True, then break out of Menu control
+            if Menu.check_for_inputs():  # if check_for_inputs() returns True, then break out of Menu control
                 Menu.running = False
 
     def update() -> None:
@@ -76,19 +77,19 @@ class Menu():
             elif event.type == pygame.VIDEORESIZE:
                 Menu.resize()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # 1 is left click
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 1 is left click
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_click(mouse)
 
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1: # 1 is left click
-                for widget in Menu.current_page.widgets: # Stop sliding for all sliders
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:  # 1 is left click
+                for widget in Menu.current_page.widgets:  # Stop sliding for all sliders
                     if hasattr(widget, "sliding"):
                         widget.sliding = False
 
             elif event.type == pygame.MOUSEMOTION:
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_moved(mouse)
-                Menu.update() # buttons will be checked if they are hovered on or not
+                Menu.update()  # buttons will be checked if they are hovered on or not
 
             elif event.type == pygame.MOUSEWHEEL:
                 Menu.mouse_scroll(event.y)
@@ -127,14 +128,14 @@ class Menu():
 
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "click"):
-                if widget.click(mouse): # if the Button has been clicked, then stop checking the Buttons
+                if widget.click(mouse):  # if the Button has been clicked, then stop checking the Buttons
                     break
 
     def mouse_moved(mouse: Coord) -> None:
         """Go through all Page Widgets, if the Widget has a mouse_moved attribute, then call it"""
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "mouse_moved"):
-                widget.mouse_moved(mouse) # moves slider if need be
+                widget.mouse_moved(mouse)  # moves slider if need be
 
     def mouse_scroll(y: int) -> None:
         for widget in Menu.current_page.widgets:
@@ -143,17 +144,17 @@ class Menu():
 
     def escape_pressed():
         if Menu.current_page.escape:
-            if Menu.current_page.escape(): return True # return True allows for a propagation which relieves Menu's control
+            if Menu.current_page.escape(): return True  # return True allows for a propagation which relieves Menu's control
 
     def e_pressed():
         if Menu.current_page.e_press:
             if Menu.current_page.e_press():
-                return True # return to playing
+                return True  # return to playing
 
     def tab_pressed():
         if Menu.current_page.tab_press:
             if Menu.current_page.tab_press():
-                return True # return to playing
+                return True  # return to playing
 
     def up_pressed():
         if Menu.current_page.up:
@@ -282,7 +283,7 @@ class Image(Widget):
         self.image = pygame.transform.scale_by(image, scale)
 
     def draw(self) -> None:
-        ratio = min(game.WIDTH * self.image.get_width() / 1_000_000, # Ratio of image width to game width
+        ratio = min(game.WIDTH * self.image.get_width() / 1_000_000,  # Ratio of image width to game width
                     game.HEIGHT * self.image.get_width() / 625_000)
         image = pygame.transform.scale_by(self.image, ratio)
         game.WIN.blit(image, (self.x - image.get_width()/2, self.y - image.get_height()/2))
@@ -360,21 +361,28 @@ class Text(Widget):
 
     (`x`, `y`) is the centre of the first line of the Text
 
-    `font_size` is relative to screen width, if you change the screen resolution then the font size will dynamically change
-
     `text` can be a string or a function, if it's a function then that will be called, e.g. text=lambda f"SCORE: {game.SCORE}"
 
-    NOTE: if text is a function it has to return a string (can be single or multi-line)
+    `font_size` is relative to screen width, if you change the screen resolution then the font size will dynamically change
 
-    `align` is a string, can be "left", "centre" or "right", this is for the x value
+    `align` can be pygame.FONT_LEFT, pygame.FONT_RIGHT, pygame.FONT_CENTER, this is for the x value
+
+    NOTE: if text is a function it has to return a string (can be single or multi-line)
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, spacing=Menu.DEFAULT_TEXT_SPACING, align="centre") -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str | Callable[[], str],
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            spacing: float = Menu.DEFAULT_TEXT_SPACING,
+            align: int = pygame.FONT_CENTER
+        ) -> None:
         super().__init__(x, y)
 
-        if isinstance(text, str):
-            self.text = [sentence.lstrip() for sentence in text.split("\n")]
-        else: # if text is a function
-            self.text = text
+        self.text = text
 
         self.font = font
         self.font_size = font_size
@@ -382,54 +390,61 @@ class Text(Widget):
         self.spacing = lambda: spacing * game.HEIGHT
         self.align = align
 
-        self.labels_text = None
-        self.labels_size = None
+        self.height = None
+        self.label_text = None
+        self.label_size = None
 
     def get_blit_x(self, label: pygame.Surface) -> float:
-        if self.align == "centre":
+        if self.align == pygame.FONT_CENTER:
             return self.x - label.get_width()/2
-        elif self.align == "left":
+        elif self.align == pygame.FONT_LEFT:
             return self.x
-        elif self.align == "right":
+        elif self.align == pygame.FONT_RIGHT:
             return self.x - label.get_width()
 
-    def update_labels_info(self) -> list[pygame.Surface]:
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
+    def update_label_info(self) -> pygame.Surface:
+        """
+        Creates a new text label with the required info
+        """
+        if callable(self.text):
             text = self.text()
         else:
             text = self.text
-        self.labels_text = text
 
-        self.labels_size = round(game.WIDTH * self.font_size / 900)
+        text = "\n".join([sentence.lstrip() for sentence in text.split("\n")])  # Remove whitespace before each line
+
+        self.label_text = text
+        self.label_size = round(game.WIDTH * self.font_size / 900)
 
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
+        font.align = self.align
 
-        if isinstance(text, list):
-            self.labels = [font.render(sentence, True, self.colour) for sentence in text]
-        else: # if text is a function
-            self.labels = [font.render(sentence.lstrip(), True, self.colour) for sentence in text.split("\n")] # split sentence up into lines, then turn each line into a label
+        self.height = font.get_height()
+        self.label = font.render(text, True, self.colour)
 
-        return self.labels
+        return self.label
 
-    def get_labels(self) -> list[pygame.Surface]:
-        """Creates a list of label for every sentence of the text"""
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = [sentence.lstrip() for sentence in self.text().split("\n")]
+    def get_label(self) -> pygame.Surface:
+        """
+        Returns a text label, updates label if necessary
+        """
+        if callable(self.text):
+            text = self.text()
         else:
             text = self.text
 
-        if text != self.labels_text or round(game.WIDTH * self.font_size / 900) != self.labels_size:
-            self.update_labels_info()
+        if text != self.label_text or round(game.WIDTH * self.font_size / 900) != self.label_size:
+            self.update_label_info()
 
-        return self.labels
+        return self.label
 
     def draw(self) -> None:
-        labels = self.get_labels()
-        cum_height = 0 # cumulative height of all the labels above a certain label
-        for label in labels:
-            position = self.get_blit_x(label), self.y - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
-            game.WIN.blit(label, position)
-            cum_height += label.get_height() + self.spacing()
+        """
+        Draws the text label to the screen
+        """
+        label = self.get_label()
+        position = self.get_blit_x(label), self.y - self.height/2  # Adjust coordinates to be centre of Widget
+        game.WIN.blit(label, position)
 
 
 
@@ -441,7 +456,22 @@ class Button(Text):
 
     (`padx`, `pady`) is the padding, i.e. how much the button extends past the text, i.e. padx=1 means 1 pixel on the left AND 1 pixel on the right
     """
-    def __init__(self, x, y, text="Text", font=Menu.DEFAULT_FONT, font_size=Menu.DEFAULT_FONT_SIZE, colour=Menu.DEFAULT_COLOUR, padx=Menu.DEFAULT_PADX, pady=Menu.DEFAULT_PADY, function=None, box_colour=Menu.DEFAULT_BOX_COLOUR, outline_colour=Menu.DEFAULT_OUTLINE_COLOUR, hover_colour=Menu.DEFAULT_HOVER_COLOUR, uniform=False) -> None:
+    def __init__(
+            self,
+            x: float,
+            y: float,
+            text: str,
+            font: str = Menu.DEFAULT_FONT,
+            font_size: int = Menu.DEFAULT_FONT_SIZE,
+            colour: Colour = Menu.DEFAULT_COLOUR,
+            padx: int = Menu.DEFAULT_PADX,
+            pady: int = Menu.DEFAULT_PADY,
+            function: None | Callable = None,
+            box_colour: Colour = Menu.DEFAULT_BOX_COLOUR,
+            outline_colour: Colour = Menu.DEFAULT_OUTLINE_COLOUR,
+            hover_colour: Colour = Menu.DEFAULT_HOVER_COLOUR,
+            uniform: bool = False
+        ) -> None:
         super().__init__(x, y, text, font, font_size, colour)
         self.padx = padx
         self.pady = pady
@@ -453,14 +483,12 @@ class Button(Text):
         self.hover_colour = hover_colour
         self.uniform = uniform
 
-        self.label_text = None
-        self.label_size = None
         self.update_label_info()
 
     def click(self, mouse: Coord) -> bool:
         if self.touching_mouse(mouse):
             self.function()
-            return True # Tells the Menu that this Button has been clicked on
+            return True  # Tells the Menu that this Button has been clicked on
 
     def touching_mouse(self, mouse: Coord) -> bool:
         label = self.label
@@ -470,14 +498,15 @@ class Button(Text):
                 mouse[1] > y and mouse[1] < y + height)
 
     def get_width(self, label: pygame.Surface) -> float:
-        return label.get_width() + self.padx*2 # padding*2 as there is padding on both sides
+        return label.get_width() + self.padx*2  # padding*2 as there is padding on both sides
 
-    def get_height(self, label: pygame.Surface) -> float:
-        return label.get_height() + self.pady*2 # padding*2 as there is padding on both sides
+    def get_height(self) -> float:
+        return self.height + self.pady*2  # padding*2 as there is padding on both sides
 
     def get_max_width(self) -> float:
-        """Get greatest width of all Buttons on the current_page"""
-
+        """
+        Get greatest width of all Buttons on the current_page
+        """
         max_width = 0
         for widget in Menu.current_page.widgets:
             if isinstance(widget, Button) and widget.uniform:
@@ -486,51 +515,33 @@ class Button(Text):
         return max_width
 
     def get_rect(self, label: pygame.Surface) -> Rect:
-        """If self.uniform == True, set the width to the greatest width of all Buttons on the current_page"""
+        """
+        If self.uniform is True, set the width to the greatest width of all Buttons on the current_page
+        """
         if self.uniform:
-            width, height = self.get_max_width(), self.get_height(label)
+            width, height = self.get_max_width(), self.get_height()
             width_difference = width - self.get_width(label)
-            x, y = self.x - label.get_width()/2 - width_difference/2, self.y - label.get_height()/2
+            x, y = self.x - label.get_width()/2 - width_difference/2, self.y - self.height/2
             return x, y, width, height
 
-        width, height = self.get_width(label), self.get_height(label)
-        x, y = self.x - label.get_width()/2, self.y - label.get_height()/2
+        width, height = self.get_width(label), self.get_height()
+        x, y = self.x - label.get_width()/2, self.y - self.height/2
         return x, y, width, height
 
-    def update_label_info(self) -> None:
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text[0]
-        self.label_text = text
-
-        self.label_size = round(game.WIDTH * self.font_size / 900)
-
-        self.label = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
-
-    def get_label(self) -> pygame.Surface:
-        """For buttons which currently only use the first line of text to create the button"""
-        if callable(self.text): # if text is a function, e.g. lambda: f"SCORE: {game.SCORE}", then it will be called
-            text = self.text()
-        else:
-            text = self.text[0]
-
-        if text != self.label_text or round(game.WIDTH * self.font_size / 900) != self.label_size:
-            self.update_label_info()
-
-        return self.label
-
     def draw(self) -> None:
+        """
+        Draws the button to the screen
+        """
         if self.touching_mouse(pygame.mouse.get_pos()):
             self.current_box_colour = self.hover_colour
         else:
             self.current_box_colour = self.box_colour
 
-        label = self.label # This is updated in Page.draw()
+        label = self.label  # This is updated in Page.draw()
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
-        pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
-        position = self.x - label.get_width()/2, self.y - label.get_height()/2 # Adjust coordinates to be centre of Widget
+        pygame.draw.rect(game.WIN, self.outline_colour, (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
+        position = self.x - label.get_width()/2, self.y - self.height/2  # Adjust coordinates to be centre of Widget
         game.WIN.blit(label, position)
 
 
@@ -585,7 +596,7 @@ class SettingButton(Button):
 
     def get_slider(self) -> Rect:
         label = self.label
-        ratio = (self.get_value() - self.min) / (self.max - self.min) # percentage of max value
+        ratio = (self.get_value() - self.min) / (self.max - self.min)  # percentage of max value
         x, y, width, height = self.get_rect(label)
         x += ratio*(width-self.get_slider_width()) - self.padx
         width = self.get_slider_width()
@@ -595,11 +606,11 @@ class SettingButton(Button):
     def mouse_moved(self, mouse: Coord) -> None:
         if hasattr(self, "sliding") and self.sliding:
 
-            x, _, width, _ = self.get_rect(self.label) # get button rect
-            ratio = (self.max - self.min) / (width - self.get_slider_width()) # value per pixel
-            left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
-            value = int((left_slider - x + self.padx) * ratio) + self.min # get relative mouse position from left of button * ratio
-            if value < self.min: value = self.min # clip value so that it is between min and max
+            x, _, width, _ = self.get_rect(self.label)  # get button rect
+            ratio = (self.max - self.min) / (width - self.get_slider_width())  # value per pixel
+            left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio  # gets x of left side of the slider, keeping same slider ratio
+            value = int((left_slider - x + self.padx) * ratio) + self.min  # get relative mouse position from left of button * ratio
+            if value < self.min: value = self.min  # clip value so that it is between min and max
             elif value > self.max: value = self.max
 
             setattr(game, self.value, value)
@@ -612,7 +623,7 @@ class SettingButton(Button):
         if (mouse[0] > x and mouse[0] < x + width and
             mouse[1] > y and mouse[1] < y + height):
             self.sliding = True
-            self.slider_ratio = (mouse[0] - x) / width # The percentage (0 to 1) of the mouse position on the sliding segment
+            self.slider_ratio = (mouse[0] - x) / width  # The percentage (0 to 1) of the mouse position on the sliding segment
 
     def up(self) -> None:
         if type(self.get_value()) == bool:
@@ -657,7 +668,7 @@ class WorldSelectionButton(Button):
     def click(self, mouse: Coord) -> bool | None:
         if self.touching_mouse(mouse) and world_list.world_selected:
             self.function()
-            return True # Tells the Menu that this Button has been clicked on
+            return True  # Tells the Menu that this Button has been clicked on
 
     @property
     def colour(self) -> Colour:
@@ -749,7 +760,7 @@ class UpgradeBar(Widget):
         self.min_value = min_value
         self.max_value = max_value
         self.step = (max_value - min_value) / bars
-        if self.step.is_integer(): self.step = int(self.step) # if step is an integer, then remove the decimal point
+        if self.step.is_integer(): self.step = int(self.step)  # if step is an integer, then remove the decimal point
         self.level = value + "_LEVEL"
         self.padlock = images.PADLOCK
 
@@ -805,7 +816,9 @@ class UpgradeBar(Widget):
 
     def get_label(self) -> pygame.Surface:
         """Gets a text label"""
-        return pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, Menu.DEFAULT_COLOUR)
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        self.label_height = font.get_height()
+        return font.render(self.text, True, Menu.DEFAULT_COLOUR)
 
     def draw(self) -> None:
         padlock = pygame.transform.scale_by(self.padlock, game.WIDTH/1200)
@@ -816,14 +829,14 @@ class UpgradeBar(Widget):
         button_width = game.WIDTH * self.button_width
 
         # draw text bar
-        if self.get_value() == self.min_value: # if level 0, text bar has a select outline
+        if self.get_value() == self.min_value:  # if level 0, text bar has a select outline
             pygame.draw.rect(game.WIN, self.select_outline_colour, (self.x, self.y, button_width, height), border_radius=10)
         else:
             pygame.draw.rect(game.WIN, self.outline_colour, (self.x, self.y, button_width, height), border_radius=10)
 
         pygame.draw.rect(game.WIN, self.button_colour, (self.x+2, self.y+2, button_width-4, height-4), border_radius=10)
         label = self.get_label()
-        game.WIN.blit(label, (self.x + button_width/2 - label.get_width()/2, self.y + height/2 - label.get_height()/2))
+        game.WIN.blit(label, (self.x + button_width/2 - label.get_width()/2, self.y + height/2 - self.label_height/2))
 
 
         # draw bars
@@ -832,7 +845,7 @@ class UpgradeBar(Widget):
             x = self.x + bar * (width + self.gap) + button_width + self.gap
 
             # draw bar outline
-            if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different outline colour
+            if self.get_value() == (bar+1) * self.step + self.min_value:  # if selected choose a different outline colour
                 pygame.draw.rect(game.WIN, self.select_outline_colour, (x, self.y, width, height), border_radius=10)
             else:
                 pygame.draw.rect(game.WIN, self.outline_colour, (x, self.y, width, height), border_radius=10)
@@ -840,23 +853,23 @@ class UpgradeBar(Widget):
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
             if bar+1 <= self.get_level():
 
-                if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
+                if self.get_value() == (bar+1) * self.step + self.min_value:  # if selected choose a different colour
                     pygame.draw.rect(game.WIN, self.select_colour, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-                else: # fill in with regular colour
+                else:  # fill in with regular colour
                     pygame.draw.rect(game.WIN, self.bar_colour, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-            else: # fill in with background colour
+            else:  # fill in with background colour
                 pygame.draw.rect(game.WIN, Menu.DEFAULT_BACKGROUND_COLOUR, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-                if bar == self.get_level(): # the first locked bar shows a price instead of a padlock
+                if bar == self.get_level():  # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
                     number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(2**bar), True, colour)
                     game.WIN.blit(number, (x + width*0.35 - number.get_width()/2, self.y + height/2 - number.get_height()/2))
                     game.WIN.blit(scrap , (x + width*0.65 - scrap.get_width()/2 , self.y + height/2 - scrap.get_height()/2))
 
-                else: # all of the locked bars show padlocks
+                else:  # all of the locked bars show padlocks
                     game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.y + height/2 - padlock.get_height()/2))
 
 
@@ -882,7 +895,7 @@ class Bar(Widget):
     def draw(self) -> None:
         self.update(self.value() / self.max_value())
         pygame.draw.rect(game.WIN, self.colour,
-                        rect=(self.x + self.outline_width, self.y - self.height()/2 + self.outline_width, # bar position is middle left
+                        rect=(self.x + self.outline_width, self.y - self.height()/2 + self.outline_width,  # bar position is middle left
                               self.width(), self.height() - self.outline_width*2),
 
                         border_radius=self.curve-self.outline_width  # - self.outline_width to be the same curve as the inside curve of the outline
@@ -890,7 +903,7 @@ class Bar(Widget):
 
         if self.outline_width:
             pygame.draw.rect(game.WIN, self.outline_colour,
-                        rect=(self.x, self.y - self.height()/2, # bar position is middle left
+                        rect=(self.x, self.y - self.height()/2,  # bar position is middle left
                               self.original_width(), self.height()),
 
                         width=self.outline_width,
@@ -1024,7 +1037,7 @@ class WorldList(RectWidget):
         return world
 
     def delete_selected_world(self) -> None:
-        name = self.world_selected.text[0]
+        name = self.world_selected.text
 
         for world in self.list:
             if world.name == name:
@@ -1039,7 +1052,7 @@ class WorldList(RectWidget):
             button._y -= self._height + self._gap
 
         self.world_selected = None
-        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # ensure scroll is within limits
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height)  # ensure scroll is within limits
 
         game.delete_world(name)
         Menu.update()
@@ -1047,7 +1060,7 @@ class WorldList(RectWidget):
     def get_total_button_height(self) -> float:
         """Gets the total height that the buttons can scroll"""
         num = min(3, len(self.list))
-        total_button_height = num*(self.height + self.gap) - self.gap # Height of buttons that are shown on screen
+        total_button_height = num*(self.height + self.gap) - self.gap  # Height of buttons that are shown on screen
         return total_button_height
 
     def get_scroll_bar_height(self) -> float:
@@ -1055,18 +1068,18 @@ class WorldList(RectWidget):
         num = min(3, len(self.list))
 
         total_button_height = self.get_total_button_height()
-        max_button_height = len(self.list)*(self.height + self.gap) - self.gap + (num-1)*(self.height + self.gap) # length of all the buttons + 2 (i.e.num-1) buttons worth of gap at the bottom
+        max_button_height = len(self.list)*(self.height + self.gap) - self.gap + (num-1)*(self.height + self.gap)  # length of all the buttons + 2 (i.e.num-1) buttons worth of gap at the bottom
 
-        scroll_bar_height = (total_button_height / max_button_height) * total_button_height # Ratio of visible button height over total button height, multiplied by available scroll height
+        scroll_bar_height = (total_button_height / max_button_height) * total_button_height  # Ratio of visible button height over total button height, multiplied by available scroll height
         return scroll_bar_height
 
     def get_max_scroll_height(self) -> float:
         """Gets the total height the scroll bar can scroll"""
         scroll_bar_height = self.get_scroll_bar_height()
 
-        total_button_height = self.get_total_button_height() # Height of buttons that are shown on screen
+        total_button_height = self.get_total_button_height()  # Height of buttons that are shown on screen
 
-        max_scroll_height = total_button_height - scroll_bar_height # Amount of pixels the scroll bar can move
+        max_scroll_height = total_button_height - scroll_bar_height  # Amount of pixels the scroll bar can move
         return max_scroll_height
 
     def get_scroll_bar(self) -> Rect:
@@ -1120,8 +1133,8 @@ class WorldList(RectWidget):
         scroll_const = 0.021 * game.HEIGHT
         self.scroll_height += y*scroll_const/self.get_button_scroll_ratio()
 
-        self.scroll_height = max(0, self.scroll_height) # Player can't scroll up above top button
-        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # Player can't scroll down below bottom button
+        self.scroll_height = max(0, self.scroll_height)  # Player can't scroll up above top button
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height)  # Player can't scroll down below bottom button
         Menu.update()
 
     def resize(self) -> None:
@@ -1156,7 +1169,7 @@ class WorldList(RectWidget):
             button.padx = (self.width - button.label.get_width())/2
 
             # Make all buttons the same height
-            button.pady = (self.height - button.label.get_height())/2
+            button.pady = (self.height - button.height)/2
 
             # Draw button
             button.draw(surf, x_offset, y_offset, rect, self.button_scroll_height())
@@ -1194,7 +1207,7 @@ class WorldButton(Button):
         if self.touching_mouse(mouse, rect, scroll_height):
             if self.selected:
                 self.function()
-                return True # Tells the Menu that this Button has been clicked on
+                return True  # Tells the Menu that this Button has been clicked on
             else:
                 self.selected = True
                 world_list.world_selected = self
@@ -1207,7 +1220,9 @@ class WorldButton(Button):
 
     def update_label_info(self) -> None:
         super().update_label_info()
-        self.seed_label = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
+        seed_font = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900))  # seed is 60% of the size of world
+        self.seed_label = seed_font.render(f"seed: {self.seed}", True, self.colour)
+        self.seed_height = seed_font.get_height()
 
     def draw(self, surf: pygame.Surface, x_offset: float, y_offset: float, rect: Rect, scroll_height: float) -> None:
         # Draw button
@@ -1217,18 +1232,18 @@ class WorldButton(Button):
             self.current_box_colour = self.box_colour
 
         outline_colour = self.click_outline_colour if self.selected else self.outline_colour
-        label = self.label # This is updated in when screen is resized
+        label = self.label  # This is updated in when screen is resized
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(surf, self.current_box_colour, (x - self.padx + x_offset, y - self.pady + y_offset, width, height))
         pygame.draw.rect(surf, outline_colour         , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
 
         # Draw name
-        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - label.get_height()/2 + y_offset # Adjust coordinates to be left of button
+        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - self.height/2 + y_offset  # Adjust coordinates to be left of button
         surf.blit(label, position)
 
         # Draw seed
-        seed = self.seed_label # updated when screen is resized
-        position = self.x + self.get_width(label)*0.2 + x_offset, self.y - seed.get_height()/2 + y_offset
+        seed = self.seed_label  # updated when screen is resized
+        position = self.x + self.get_width(label)*0.2 + x_offset, self.y - self.seed_height/2 + y_offset
         surf.blit(seed, position)
 
 
@@ -1274,12 +1289,14 @@ class TextInput(RectWidget):
             pygame.draw.rect(game.WIN, self.outline_colour, self.get_rect(), width=round(game.WIDTH/300))
 
         # Draw header
-        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.header, True, game.WHITE)
-        game.WIN.blit(label, (self.x - self.width/2, self.y - self.height/2 - label.get_height()))
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        label = font.render(self.header, True, game.WHITE)
+        game.WIN.blit(label, (self.x - self.width/2, self.y - self.height/2 - font.get_height()))
 
         # Draw input text
-        label = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900)).render(self.text, True, game.WHITE)
-        game.WIN.blit(label, (self.x - self.width/2 + round(game.WIDTH/300), self.y - label.get_height()/2))
+        font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH * self.font_size / 900))
+        label = font.render(self.text, True, game.WHITE)
+        game.WIN.blit(label, (self.x - self.width/2 + round(game.WIDTH/300), self.y - font.get_height()/2))
 
 
 
@@ -1366,7 +1383,7 @@ class Mission():
     def claim_reward(self) -> None:
         game.SCRAP_COUNT += self.reward
         game.CURRENT_MISSION = None
-        self.decline() # Removes this mission after claiming reward
+        self.decline()  # Removes this mission after claiming reward
 
     def click(self, mouse: Coord) -> bool:
         # Making sure button functions are run when clicked
@@ -1485,12 +1502,12 @@ main_menu = Page(
 )
 
 info = Page(
-    Text(0.5, 0.125,   "CREDITS"          , font_size=40),
-    Text(0.5, 0.2  , """Rex Attwood
+    Text(0.5, 0.1,   "CREDITS"          , font_size=40),
+    Text(0.5, 0.17  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
-    Text(0.5, 0.27 ,   "Fred"             , font_size=5),
-    Text(0.5, 0.35 ,   "CONTROLS"         , font_size=40),
-    Text(0.5, 0.42 , """Change Settings: Up, Down, Drag
+    Text(0.5, 0.24 ,   "Fred"             , font_size=5),
+    Text(0.5, 0.3 ,   "CONTROLS"         , font_size=40),
+    Text(0.5, 0.37 , """Change Settings: Up, Down, Drag
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
@@ -1510,7 +1527,7 @@ settings = Page(
     SettingButton(0.75, 1/6, lambda: f"SCREEN HEIGHT: {game.HEIGHT}"       , font_size=40, value="HEIGHT"       , function_action=lambda: make_windowed(), min=108, max=game.FULLSCREEN_SIZE[1]),
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=lambda: game.save_settings(), min=4, max=26),
-    SettingButton(0.25, 3/6, lambda: f"RENDER: {"AGGRESIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
+    SettingButton(0.25, 3/6, lambda: f"RENDER: {"AGGRESSIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
     Button(0.5, 7/8, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),
@@ -1595,7 +1612,7 @@ station = Page(
     Image(0.4, 0.5, images.WEAPON_ICON, scale=6),
     Image(0.6, 0.5, images.ENGINE_ICON, scale=6),
     Image(0.8, 0.5, images.RADAR_ICON, scale=6),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1609,7 +1626,7 @@ missions = Page(
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     MissionManager(),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1623,7 +1640,7 @@ stats = Page(
     Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     Text(0.5, 0.5, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1650,7 +1667,7 @@ armour = Page(
     UpgradeBar(0.3, "Health", "MAX_PLAYER_HEALTH", min_value=game.MAX_PLAYER_HEALTH, max_value=100),
     UpgradeBar(0.4, "Shield", "MAX_PLAYER_SHIELD", min_value=game.MAX_PLAYER_SHIELD, max_value=25),
     UpgradeBar(0.5, "Recharge", "PLAYER_SHIELD_RECHARGE", min_value=game.PLAYER_SHIELD_RECHARGE, max_value=3),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1664,7 +1681,7 @@ weapon = Page(
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Button(0.7, 0.5, "Laser"  , function=lambda: Menu.change_page(laser)),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1677,7 +1694,7 @@ engine = Page(
     UpgradeBar(0.3, "Acceleration", "PLAYER_ACCELERATION", min_value=game.PLAYER_ACCELERATION, max_value=1500),
     UpgradeBar(0.4, "Max Speed", "MAX_PLAYER_SPEED", min_value=game.MIN_PLAYER_SPEED, max_value=1000),
     UpgradeBar(0.5, "Max Boost", "MAX_BOOST_AMOUNT", min_value=20, max_value=50),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1689,7 +1706,7 @@ radar = Page(
     Text(0.5, 0.12, "Radar"),
     UpgradeBar(0.3, "Item Magnet", "PICKUP_DISTANCE", min_value=game.PICKUP_DISTANCE, max_value=300),
     UpgradeBar(0.4, "Max Zoom", "CURRENT_MIN_ZOOM", min_value=game.CURRENT_MIN_ZOOM, max_value=game.MIN_ZOOM),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(station),
@@ -1702,7 +1719,7 @@ default_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
     UpgradeBar(0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1715,7 +1732,7 @@ gatling_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
     UpgradeBar(0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1728,7 +1745,7 @@ sniper_gun = Page(
     UpgradeBar(0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
     UpgradeBar(0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
     UpgradeBar(0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1740,7 +1757,7 @@ laser = Page(
     Text(0.5, 0.12, "Laser"),
     UpgradeBar(0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=700),
     UpgradeBar(0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: Menu.change_page(weapon),
@@ -1753,17 +1770,17 @@ systems = Page(
 
     Text(0.3, 0.3, "Health", font_size=25),
     Bar(0.39, 0.298, width=0.32, height=0.1, value=lambda: game.player.health, max_value=lambda: game.MAX_PLAYER_HEALTH, colour=(255, 0, 0), outline_width=5, curve=12),
-    Text(0.405, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25, align="left"),
+    Text(0.405, 0.3, lambda: f"{round(game.player.health)} | {game.MAX_PLAYER_HEALTH}", font_size=25, align=pygame.FONT_LEFT),
 
     Text(0.3, 0.45, "Armour", font_size=25),
     ArmourBar(0.39, 0.448, width=0.32, height=0.1, value=lambda: game.player.armour, max_value=lambda: game.MAX_PLAYER_ARMOUR, price=3, number=3, colour=(185, 185, 185), outline_width=5, curve=12),
-    Text(0.405, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25, align="left"),
+    Text(0.405, 0.45, lambda: f"{round(game.player.armour)} | {game.MAX_PLAYER_ARMOUR}", font_size=25, align=pygame.FONT_LEFT),
 
     Text(0.3, 0.6, "Shield", font_size=25),
     Bar(0.39, 0.598, width=0.32, height=0.1, value=lambda: game.player.shield, max_value=lambda: game.MAX_PLAYER_SHIELD, colour=(34, 130, 240), outline_width=5, curve=12),
-    Text(0.405, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25, align="left"),
+    Text(0.405, 0.6, lambda: f"{round(game.player.shield)} | {game.MAX_PLAYER_SHIELD}", font_size=25, align=pygame.FONT_LEFT),
 
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align="right"),
+    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
     escape=lambda: True,
@@ -1840,7 +1857,7 @@ def page_click():
     """If there is a selected widget that shouldn't be, un-select it"""
     mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
-        if hasattr(widget, "selected") and widget.selected and not widget.touching_mouse(mouse): # if widget should be un-selected
+        if hasattr(widget, "selected") and widget.selected and not widget.touching_mouse(mouse):  # if widget should be un-selected
             widget.selected = False
             if isinstance(widget, SettingButton): widget.outline_colour = widget.original_outline_colour
             Menu.update()

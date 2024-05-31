@@ -21,7 +21,7 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 Add back buttons
 
-Switch to pygame-ce, text location has shifted, pygame.scrap can be simplified
+Add more console commands - such as kill
 
 Outline of space stations is thin at bottom
 
@@ -78,6 +78,8 @@ Improve E menu
 
 NOTE: pygame.draw.circle uses integer for radius, e.g. diameter is always multiples of two
 Do some caching for circles for particles to improve performance
+
+Add a check to see if world is the correct version
 
 ### POTENTIAL
 
@@ -458,3 +460,9 @@ Add ctrl+v
 Add ctrl + arrows
 Add spam, if a button is hold down > 0.5 second, repeatedly paste that button
 Text moves when left key is pressed for first time
+
+Changed from pygame 2.4.0 to pygame-ce 2.4.1
+
+Switch to pygame-ce, text location has shifted
+pygame.scrap can be simplified - init can be removed
+multiline text can be simplified
