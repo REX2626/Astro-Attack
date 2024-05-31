@@ -12,8 +12,6 @@ import psutil
 from pygame import freetype
 import pygame
 
-pygame.scrap.init()
-
 
 
 class Bar():
@@ -290,16 +288,16 @@ class Console():
 
                     # ctrl + x copies text to clipboard then deletes text
                     elif event.key == pygame.K_x and event.mod & pygame.KMOD_CTRL:
-                        pygame.scrap.put(pygame.SCRAP_TEXT, self.input_text.encode())
+                        pygame.scrap.put_text(self.input_text)
                         self.input_text = ""
 
                     # ctrl + c copies text to clipboard
                     elif event.key == pygame.K_c and event.mod & pygame.KMOD_CTRL:
-                        pygame.scrap.put(pygame.SCRAP_TEXT, self.input_text.encode())
+                        pygame.scrap.put_text(self.input_text)
 
                     # ctrl + v pastes clipboard
                     elif event.key == pygame.K_v and event.mod & pygame.KMOD_CTRL:
-                        self.input_text += pygame.scrap.get(pygame.SCRAP_TEXT).decode()
+                        self.input_text += pygame.scrap.get_text()
 
                     # add pressed character to input_text
                     else:
