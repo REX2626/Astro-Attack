@@ -33,7 +33,7 @@ class Menu():
     DEFAULT_HOVER_COLOUR = game.LIGHT_GREY
     DEFAULT_CLICK_OUTLINE_COLOUR = (190, 190, 190)
     DEFAULT_TEXT_SPACING = 0.003
-    SLIDER_WIDTH = 0.02 # percentage (0 to 1) of screen width
+    SLIDER_WIDTH = 0.02  # percentage (0 to 1) of screen width
     SLIDER_COLOUR = (*game.LIGHT_GREY, 150)
     SLIDER_OUTLINE = (30, 30, 30, 150)
 
@@ -53,7 +53,7 @@ class Menu():
 
     def run() -> None:
         while Menu.running:
-            if Menu.check_for_inputs(): # if check_for_inputs() returns True, then break out of Menu control
+            if Menu.check_for_inputs():  # if check_for_inputs() returns True, then break out of Menu control
                 Menu.running = False
 
     def update() -> None:
@@ -77,19 +77,19 @@ class Menu():
             elif event.type == pygame.VIDEORESIZE:
                 Menu.resize()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # 1 is left click
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 1 is left click
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_click(mouse)
 
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1: # 1 is left click
-                for widget in Menu.current_page.widgets: # Stop sliding for all sliders
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:  # 1 is left click
+                for widget in Menu.current_page.widgets:  # Stop sliding for all sliders
                     if hasattr(widget, "sliding"):
                         widget.sliding = False
 
             elif event.type == pygame.MOUSEMOTION:
                 mouse = pygame.mouse.get_pos()
                 Menu.mouse_moved(mouse)
-                Menu.update() # buttons will be checked if they are hovered on or not
+                Menu.update()  # buttons will be checked if they are hovered on or not
 
             elif event.type == pygame.MOUSEWHEEL:
                 Menu.mouse_scroll(event.y)
@@ -128,14 +128,14 @@ class Menu():
 
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "click"):
-                if widget.click(mouse): # if the Button has been clicked, then stop checking the Buttons
+                if widget.click(mouse):  # if the Button has been clicked, then stop checking the Buttons
                     break
 
     def mouse_moved(mouse: Coord) -> None:
         """Go through all Page Widgets, if the Widget has a mouse_moved attribute, then call it"""
         for widget in Menu.current_page.widgets:
             if hasattr(widget, "mouse_moved"):
-                widget.mouse_moved(mouse) # moves slider if need be
+                widget.mouse_moved(mouse)  # moves slider if need be
 
     def mouse_scroll(y: int) -> None:
         for widget in Menu.current_page.widgets:
@@ -144,17 +144,17 @@ class Menu():
 
     def escape_pressed():
         if Menu.current_page.escape:
-            if Menu.current_page.escape(): return True # return True allows for a propagation which relieves Menu's control
+            if Menu.current_page.escape(): return True  # return True allows for a propagation which relieves Menu's control
 
     def e_pressed():
         if Menu.current_page.e_press:
             if Menu.current_page.e_press():
-                return True # return to playing
+                return True  # return to playing
 
     def tab_pressed():
         if Menu.current_page.tab_press:
             if Menu.current_page.tab_press():
-                return True # return to playing
+                return True  # return to playing
 
     def up_pressed():
         if Menu.current_page.up:
@@ -283,7 +283,7 @@ class Image(Widget):
         self.image = pygame.transform.scale_by(image, scale)
 
     def draw(self) -> None:
-        ratio = min(game.WIDTH * self.image.get_width() / 1_000_000, # Ratio of image width to game width
+        ratio = min(game.WIDTH * self.image.get_width() / 1_000_000,  # Ratio of image width to game width
                     game.HEIGHT * self.image.get_width() / 625_000)
         image = pygame.transform.scale_by(self.image, ratio)
         game.WIN.blit(image, (self.x - image.get_width()/2, self.y - image.get_height()/2))
@@ -596,7 +596,7 @@ class SettingButton(Button):
 
     def get_slider(self) -> Rect:
         label = self.label
-        ratio = (self.get_value() - self.min) / (self.max - self.min) # percentage of max value
+        ratio = (self.get_value() - self.min) / (self.max - self.min)  # percentage of max value
         x, y, width, height = self.get_rect(label)
         x += ratio*(width-self.get_slider_width()) - self.padx
         width = self.get_slider_width()
@@ -606,11 +606,11 @@ class SettingButton(Button):
     def mouse_moved(self, mouse: Coord) -> None:
         if hasattr(self, "sliding") and self.sliding:
 
-            x, _, width, _ = self.get_rect(self.label) # get button rect
-            ratio = (self.max - self.min) / (width - self.get_slider_width()) # value per pixel
-            left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio # gets x of left side of the slider, keeping same slider ratio
-            value = int((left_slider - x + self.padx) * ratio) + self.min # get relative mouse position from left of button * ratio
-            if value < self.min: value = self.min # clip value so that it is between min and max
+            x, _, width, _ = self.get_rect(self.label)  # get button rect
+            ratio = (self.max - self.min) / (width - self.get_slider_width())  # value per pixel
+            left_slider = mouse[0] - self.get_slider_width()*self.slider_ratio  # gets x of left side of the slider, keeping same slider ratio
+            value = int((left_slider - x + self.padx) * ratio) + self.min  # get relative mouse position from left of button * ratio
+            if value < self.min: value = self.min  # clip value so that it is between min and max
             elif value > self.max: value = self.max
 
             setattr(game, self.value, value)
@@ -623,7 +623,7 @@ class SettingButton(Button):
         if (mouse[0] > x and mouse[0] < x + width and
             mouse[1] > y and mouse[1] < y + height):
             self.sliding = True
-            self.slider_ratio = (mouse[0] - x) / width # The percentage (0 to 1) of the mouse position on the sliding segment
+            self.slider_ratio = (mouse[0] - x) / width  # The percentage (0 to 1) of the mouse position on the sliding segment
 
     def up(self) -> None:
         if type(self.get_value()) == bool:
@@ -668,7 +668,7 @@ class WorldSelectionButton(Button):
     def click(self, mouse: Coord) -> bool | None:
         if self.touching_mouse(mouse) and world_list.world_selected:
             self.function()
-            return True # Tells the Menu that this Button has been clicked on
+            return True  # Tells the Menu that this Button has been clicked on
 
     @property
     def colour(self) -> Colour:
@@ -760,7 +760,7 @@ class UpgradeBar(Widget):
         self.min_value = min_value
         self.max_value = max_value
         self.step = (max_value - min_value) / bars
-        if self.step.is_integer(): self.step = int(self.step) # if step is an integer, then remove the decimal point
+        if self.step.is_integer(): self.step = int(self.step)  # if step is an integer, then remove the decimal point
         self.level = value + "_LEVEL"
         self.padlock = images.PADLOCK
 
@@ -827,7 +827,7 @@ class UpgradeBar(Widget):
         button_width = game.WIDTH * self.button_width
 
         # draw text bar
-        if self.get_value() == self.min_value: # if level 0, text bar has a select outline
+        if self.get_value() == self.min_value:  # if level 0, text bar has a select outline
             pygame.draw.rect(game.WIN, self.select_outline_colour, (self.x, self.y, button_width, height), border_radius=10)
         else:
             pygame.draw.rect(game.WIN, self.outline_colour, (self.x, self.y, button_width, height), border_radius=10)
@@ -843,7 +843,7 @@ class UpgradeBar(Widget):
             x = self.x + bar * (width + self.gap) + button_width + self.gap
 
             # draw bar outline
-            if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different outline colour
+            if self.get_value() == (bar+1) * self.step + self.min_value:  # if selected choose a different outline colour
                 pygame.draw.rect(game.WIN, self.select_outline_colour, (x, self.y, width, height), border_radius=10)
             else:
                 pygame.draw.rect(game.WIN, self.outline_colour, (x, self.y, width, height), border_radius=10)
@@ -851,23 +851,23 @@ class UpgradeBar(Widget):
             # fill in bar if neseccary, bar+1 so that the first bar is level 1
             if bar+1 <= self.get_level():
 
-                if self.get_value() == (bar+1) * self.step + self.min_value: # if selected choose a different colour
+                if self.get_value() == (bar+1) * self.step + self.min_value:  # if selected choose a different colour
                     pygame.draw.rect(game.WIN, self.select_colour, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-                else: # fill in with regular colour
+                else:  # fill in with regular colour
                     pygame.draw.rect(game.WIN, self.bar_colour, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-            else: # fill in with background colour
+            else:  # fill in with background colour
                 pygame.draw.rect(game.WIN, Menu.DEFAULT_BACKGROUND_COLOUR, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
-                if bar == self.get_level(): # the first locked bar shows a price instead of a padlock
+                if bar == self.get_level():  # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
                     number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(2**bar), True, colour)
                     game.WIN.blit(number, (x + width*0.35 - number.get_width()/2, self.y + height/2 - number.get_height()/2))
                     game.WIN.blit(scrap , (x + width*0.65 - scrap.get_width()/2 , self.y + height/2 - scrap.get_height()/2))
 
-                else: # all of the locked bars show padlocks
+                else:  # all of the locked bars show padlocks
                     game.WIN.blit(padlock, (x + width/2 - padlock.get_width()/2, self.y + height/2 - padlock.get_height()/2))
 
 
@@ -893,7 +893,7 @@ class Bar(Widget):
     def draw(self) -> None:
         self.update(self.value() / self.max_value())
         pygame.draw.rect(game.WIN, self.colour,
-                        rect=(self.x + self.outline_width, self.y - self.height()/2 + self.outline_width, # bar position is middle left
+                        rect=(self.x + self.outline_width, self.y - self.height()/2 + self.outline_width,  # bar position is middle left
                               self.width(), self.height() - self.outline_width*2),
 
                         border_radius=self.curve-self.outline_width  # - self.outline_width to be the same curve as the inside curve of the outline
@@ -901,7 +901,7 @@ class Bar(Widget):
 
         if self.outline_width:
             pygame.draw.rect(game.WIN, self.outline_colour,
-                        rect=(self.x, self.y - self.height()/2, # bar position is middle left
+                        rect=(self.x, self.y - self.height()/2,  # bar position is middle left
                               self.original_width(), self.height()),
 
                         width=self.outline_width,
@@ -1050,7 +1050,7 @@ class WorldList(RectWidget):
             button._y -= self._height + self._gap
 
         self.world_selected = None
-        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # ensure scroll is within limits
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height)  # ensure scroll is within limits
 
         game.delete_world(name)
         Menu.update()
@@ -1058,7 +1058,7 @@ class WorldList(RectWidget):
     def get_total_button_height(self) -> float:
         """Gets the total height that the buttons can scroll"""
         num = min(3, len(self.list))
-        total_button_height = num*(self.height + self.gap) - self.gap # Height of buttons that are shown on screen
+        total_button_height = num*(self.height + self.gap) - self.gap  # Height of buttons that are shown on screen
         return total_button_height
 
     def get_scroll_bar_height(self) -> float:
@@ -1066,18 +1066,18 @@ class WorldList(RectWidget):
         num = min(3, len(self.list))
 
         total_button_height = self.get_total_button_height()
-        max_button_height = len(self.list)*(self.height + self.gap) - self.gap + (num-1)*(self.height + self.gap) # length of all the buttons + 2 (i.e.num-1) buttons worth of gap at the bottom
+        max_button_height = len(self.list)*(self.height + self.gap) - self.gap + (num-1)*(self.height + self.gap)  # length of all the buttons + 2 (i.e.num-1) buttons worth of gap at the bottom
 
-        scroll_bar_height = (total_button_height / max_button_height) * total_button_height # Ratio of visible button height over total button height, multiplied by available scroll height
+        scroll_bar_height = (total_button_height / max_button_height) * total_button_height  # Ratio of visible button height over total button height, multiplied by available scroll height
         return scroll_bar_height
 
     def get_max_scroll_height(self) -> float:
         """Gets the total height the scroll bar can scroll"""
         scroll_bar_height = self.get_scroll_bar_height()
 
-        total_button_height = self.get_total_button_height() # Height of buttons that are shown on screen
+        total_button_height = self.get_total_button_height()  # Height of buttons that are shown on screen
 
-        max_scroll_height = total_button_height - scroll_bar_height # Amount of pixels the scroll bar can move
+        max_scroll_height = total_button_height - scroll_bar_height  # Amount of pixels the scroll bar can move
         return max_scroll_height
 
     def get_scroll_bar(self) -> Rect:
@@ -1131,8 +1131,8 @@ class WorldList(RectWidget):
         scroll_const = 0.021 * game.HEIGHT
         self.scroll_height += y*scroll_const/self.get_button_scroll_ratio()
 
-        self.scroll_height = max(0, self.scroll_height) # Player can't scroll up above top button
-        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height) # Player can't scroll down below bottom button
+        self.scroll_height = max(0, self.scroll_height)  # Player can't scroll up above top button
+        self.scroll_height = min(self.get_max_scroll_height(), self.scroll_height)  # Player can't scroll down below bottom button
         Menu.update()
 
     def resize(self) -> None:
@@ -1205,7 +1205,7 @@ class WorldButton(Button):
         if self.touching_mouse(mouse, rect, scroll_height):
             if self.selected:
                 self.function()
-                return True # Tells the Menu that this Button has been clicked on
+                return True  # Tells the Menu that this Button has been clicked on
             else:
                 self.selected = True
                 world_list.world_selected = self
@@ -1230,17 +1230,17 @@ class WorldButton(Button):
             self.current_box_colour = self.box_colour
 
         outline_colour = self.click_outline_colour if self.selected else self.outline_colour
-        label = self.label # This is updated in when screen is resized
+        label = self.label  # This is updated in when screen is resized
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(surf, self.current_box_colour, (x - self.padx + x_offset, y - self.pady + y_offset, width, height))
         pygame.draw.rect(surf, outline_colour         , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
 
         # Draw name
-        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - self.height/2 + y_offset # Adjust coordinates to be left of button
+        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - self.height/2 + y_offset  # Adjust coordinates to be left of button
         surf.blit(label, position)
 
         # Draw seed
-        seed = self.seed_label # updated when screen is resized
+        seed = self.seed_label  # updated when screen is resized
         position = self.x + self.get_width(label)*0.2 + x_offset, self.y - self.seed_height/2 + y_offset
         surf.blit(seed, position)
 
@@ -1379,7 +1379,7 @@ class Mission():
     def claim_reward(self) -> None:
         game.SCRAP_COUNT += self.reward
         game.CURRENT_MISSION = None
-        self.decline() # Removes this mission after claiming reward
+        self.decline()  # Removes this mission after claiming reward
 
     def click(self, mouse: Coord) -> bool:
         # Making sure button functions are run when clicked
@@ -1853,7 +1853,7 @@ def page_click():
     """If there is a selected widget that shouldn't be, un-select it"""
     mouse = pygame.mouse.get_pos()
     for widget in Menu.current_page.widgets:
-        if hasattr(widget, "selected") and widget.selected and not widget.touching_mouse(mouse): # if widget should be un-selected
+        if hasattr(widget, "selected") and widget.selected and not widget.touching_mouse(mouse):  # if widget should be un-selected
             widget.selected = False
             if isinstance(widget, SettingButton): widget.outline_colour = widget.original_outline_colour
             Menu.update()
