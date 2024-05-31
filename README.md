@@ -21,7 +21,24 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 Add back buttons
 
-Switch to pygame-ce, text location has shifted, pygame.scrap can be simplified
+Add more console commands - such as kill
+
+Switch to pygame-ce, text location has shifted
+pygame.scrap can be simplified - init can be removed
+multiline text can be simplified
+Text height broken from version <2.3.1.dev2
+
+ce:
+height 39
+ascent 26
+descent -6
+get_height 32
+
+regular:
+height 32
+ascent 26
+descent -6
+get_height 32
 
 Outline of space stations is thin at bottom
 

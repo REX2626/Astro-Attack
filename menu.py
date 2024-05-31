@@ -382,6 +382,7 @@ class Text(Widget):
         self.spacing = lambda: spacing * game.HEIGHT
         self.align = align
 
+        self.height = None
         self.labels_text = None
         self.labels_size = None
 
@@ -403,6 +404,7 @@ class Text(Widget):
         self.labels_size = round(game.WIDTH * self.font_size / 900)
 
         font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
+        self.height = font.get_height()
 
         if isinstance(text, list):
             self.labels = [font.render(sentence, True, self.colour) for sentence in text]
@@ -427,7 +429,8 @@ class Text(Widget):
         labels = self.get_labels()
         cum_height = 0 # cumulative height of all the labels above a certain label
         for label in labels:
-            position = self.get_blit_x(label), self.y - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
+            # position = self.get_blit_x(label), self.y - label.get_height()/2 + cum_height # Adjust coordinates to be centre of Widget
+            position = self.get_blit_x(label), self.y - self.height/2 + cum_height # Adjust coordinates to be centre of Widget
             game.WIN.blit(label, position)
             cum_height += label.get_height() + self.spacing()
 
@@ -453,6 +456,7 @@ class Button(Text):
         self.hover_colour = hover_colour
         self.uniform = uniform
 
+        self.height = None
         self.label_text = None
         self.label_size = None
         self.update_label_info()
@@ -473,7 +477,7 @@ class Button(Text):
         return label.get_width() + self.padx*2 # padding*2 as there is padding on both sides
 
     def get_height(self, label: pygame.Surface) -> float:
-        return label.get_height() + self.pady*2 # padding*2 as there is padding on both sides
+        return self.height + self.pady*2 # padding*2 as there is padding on both sides
 
     def get_max_width(self) -> float:
         """Get greatest width of all Buttons on the current_page"""
@@ -490,11 +494,11 @@ class Button(Text):
         if self.uniform:
             width, height = self.get_max_width(), self.get_height(label)
             width_difference = width - self.get_width(label)
-            x, y = self.x - label.get_width()/2 - width_difference/2, self.y - label.get_height()/2
+            x, y = self.x - label.get_width()/2 - width_difference/2, self.y - self.height/2
             return x, y, width, height
 
         width, height = self.get_width(label), self.get_height(label)
-        x, y = self.x - label.get_width()/2, self.y - label.get_height()/2
+        x, y = self.x - label.get_width()/2, self.y - self.height/2
         return x, y, width, height
 
     def update_label_info(self) -> None:
@@ -506,7 +510,9 @@ class Button(Text):
 
         self.label_size = round(game.WIDTH * self.font_size / 900)
 
-        self.label = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900)).render(text, True, self.colour)
+        font = pygame.font.SysFont(self.font, round(game.WIDTH * self.font_size / 900))
+        self.label = font.render(text, True, self.colour)
+        self.height = font.get_height()
 
     def get_label(self) -> pygame.Surface:
         """For buttons which currently only use the first line of text to create the button"""
@@ -530,7 +536,8 @@ class Button(Text):
         x, y, width, height = self.get_rect(label)
         pygame.draw.rect(game.WIN, self.current_box_colour, (x - self.padx, y - self.pady, width, height))
         pygame.draw.rect(game.WIN, self.outline_colour    , (x - self.padx, y - self.pady, width, height), width=round(game.WIDTH/300))
-        position = self.x - label.get_width()/2, self.y - label.get_height()/2 # Adjust coordinates to be centre of Widget
+        # position = self.x - label.get_width()/2, self.y - label.get_height()/2 # Adjust coordinates to be centre of Widget
+        position = self.x - label.get_width()/2, self.y - self.height/2 # Adjust coordinates to be centre of Widget
         game.WIN.blit(label, position)
 
 
