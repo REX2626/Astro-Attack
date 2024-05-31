@@ -678,7 +678,7 @@ def update_closest_station():
 
         # Draw letter E
         label = font.render("E", True, (255, 255, 255))
-        game.WIN.blit(label, (x+size/2-label.get_width()/2, y+size/2-label.get_height()/2))
+        game.WIN.blit(label, (x+size/2-label.get_width()/2, y+size/2-font.get_height()/2))
 
     game.player.closest_station = closest_station
 
