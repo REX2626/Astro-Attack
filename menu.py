@@ -1502,12 +1502,12 @@ main_menu = Page(
 )
 
 info = Page(
-    Text(0.5, 0.125,   "CREDITS"          , font_size=40),
-    Text(0.5, 0.2  , """Rex Attwood
+    Text(0.5, 0.1,   "CREDITS"          , font_size=40),
+    Text(0.5, 0.17  , """Rex Attwood
                         Gabriel Correia""", font_size=20),
-    Text(0.5, 0.27 ,   "Fred"             , font_size=5),
-    Text(0.5, 0.35 ,   "CONTROLS"         , font_size=40),
-    Text(0.5, 0.42 , """Change Settings: Up, Down, Drag
+    Text(0.5, 0.24 ,   "Fred"             , font_size=5),
+    Text(0.5, 0.3 ,   "CONTROLS"         , font_size=40),
+    Text(0.5, 0.37 , """Change Settings: Up, Down, Drag
                         Pause: Esc
                         Movement: W, A, S, D
                         Boost: Space
