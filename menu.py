@@ -1035,7 +1035,7 @@ class WorldList(RectWidget):
         return world
 
     def delete_selected_world(self) -> None:
-        name = self.world_selected.text[0]
+        name = self.world_selected.text
 
         for world in self.list:
             if world.name == name:
@@ -1218,7 +1218,9 @@ class WorldButton(Button):
 
     def update_label_info(self) -> None:
         super().update_label_info()
-        self.seed_label = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900)).render(f"seed: {self.seed}", True, self.colour) # seed is 60% of the size of world
+        seed_font = pygame.font.SysFont(self.font, round(game.WIDTH * 0.6 * self.font_size / 900))  # seed is 60% of the size of world
+        self.seed_label = seed_font.render(f"seed: {self.seed}", True, self.colour)
+        self.seed_height = seed_font.get_height()
 
     def draw(self, surf: pygame.Surface, x_offset: float, y_offset: float, rect: Rect, scroll_height: float) -> None:
         # Draw button
@@ -1234,12 +1236,12 @@ class WorldButton(Button):
         pygame.draw.rect(surf, outline_colour         , (x - self.padx + x_offset, y - self.pady + y_offset, width, height), width=round(game.WIDTH/300))
 
         # Draw name
-        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - label.get_height()/2 + y_offset # Adjust coordinates to be left of button
+        position = self.x - self.get_width(label)*0.45 + x_offset, self.y - self.height/2 + y_offset # Adjust coordinates to be left of button
         surf.blit(label, position)
 
         # Draw seed
         seed = self.seed_label # updated when screen is resized
-        position = self.x + self.get_width(label)*0.2 + x_offset, self.y - seed.get_height()/2 + y_offset
+        position = self.x + self.get_width(label)*0.2 + x_offset, self.y - self.seed_height/2 + y_offset
         surf.blit(seed, position)
 
 
