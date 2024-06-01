@@ -1,7 +1,8 @@
 import game
 from game import *
 from entities import Bullet, Asteroid
-from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper, Laser
+from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper
+from laser import Laser
 from particles import ParticleSystem
 import ui
 import menu

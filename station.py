@@ -1,6 +1,7 @@
 from objects import Object, Vector, random_vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
 from weapons import DefaultGun
+import effects
 import images
 import game
 import random
@@ -107,7 +108,6 @@ class StationCannon(Object):
     def __init__(self, position: Vector, health: int = 20, damage: int = 2, range: int = 800, level: int = 0, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, image)
         self.health = health
-        self.damage = damage
         self.range = range
         self.level = level
 
@@ -115,6 +115,14 @@ class StationCannon(Object):
         self.velocity = Vector(0, 0)  # DefaultGun requires the "ship" to have a velocity
 
         self.cannon = DefaultGun(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
+
+    def damage(self, damage: int, entity=None) -> None:
+        self.health -= damage
+        effects.damage(self.position, damage)
+
+        if self.health <= 0:
+            game.CHUNKS.remove_entity(self)
+            effects.explosion(self.position)
 
     def update(self, delta_time: float) -> None:
         self.cannon.update(delta_time)

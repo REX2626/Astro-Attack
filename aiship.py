@@ -1,6 +1,5 @@
-from objects import Vector, random_vector
-import entities
-from entities import Ship, Asteroid
+from objects import Vector, Entity, random_vector
+from entities import Ship, Asteroid, Scrap
 from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
 import effects
@@ -278,7 +277,7 @@ class Enemy_Ship(AI_Ship):
             game.SCORE += 3
 
         for _ in range(self.scrap_count):
-            scrap = entities.Scrap(self.position, random_vector(random.randint(400, 600)), rotation=random.random() * math.pi * 2)
+            scrap = Scrap(self.position, random_vector(random.randint(400, 600)), rotation=random.random() * math.pi * 2)
             game.CHUNKS.add_entity(scrap)
 
     def group_attack_player(self):
@@ -418,7 +417,7 @@ class Mother_Ship(Enemy_Ship):
         self.time_reloading += delta_time
 
 
-    def attack_entity_state(self, delta_time, entity: entities.Entity, min_dist=300, max_dist=600, max_speed=100):
+    def attack_entity_state(self, delta_time, entity: Entity, min_dist=300, max_dist=600, max_speed=100):
         super().attack_entity_state(delta_time, entity, min_dist, max_dist, max_speed)
 
         # Fire Missiles

@@ -24,8 +24,6 @@ Add guns to friendly stations
 
 Add station cannon image
 
-Add ability to destroy station cannon
-
 Reduce frequency of stations
 
 Limit enemy spawning to only 3 times
@@ -45,6 +43,8 @@ Player can walk around player ship
 ### a1.8.0 (sound)
 
 ### Future
+Enemies flash when they are damaged
+
 Add a wide zoom out feature
 
 Sound
@@ -497,3 +497,5 @@ Add more console commands
 - tp
 
 Add twin guns to enemy stations
+
+Add ability to destroy station cannon

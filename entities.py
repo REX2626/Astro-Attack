@@ -3,8 +3,8 @@ from weapons import DefaultGun
 import effects
 import images
 import game
-import random
 import math
+import random
 import pygame
 
 
@@ -259,7 +259,9 @@ class Scrap(Pickup):
 
 
 
+# To prevent circular import error
 from aiship import Enemy_Ship
+from station import StationCannon
 
 
 
@@ -296,6 +298,14 @@ class Bullet(Entity):
                             entity.explode(entity.explode_radius)
                             game.CHUNKS.remove_entity(self)
                             break
+
+                elif isinstance(entity, StationCannon) and not isinstance(self.ship, StationCannon):
+                    if not isinstance(self.ship, Enemy_Ship):
+                        if self.distance_to(entity) < 20:
+                            entity.damage(self.damage, self.ship)
+                            game.CHUNKS.remove_entity(self)
+                            break
+
 
     def unload(self):
         game.CHUNKS.remove_entity(self)
