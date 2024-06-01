@@ -1708,7 +1708,7 @@ single_player = Page(
 )
 
 multiplayer = Page(
-    Text(0.5, 0.45, "Coming soon in a1.7!"),
+    Text(0.5, 0.45, "Coming soon in a1.9.0!"),
     Button(0.5, 0.875, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )

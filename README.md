@@ -17,25 +17,37 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.5.0 (sound, general clear up and polishing)
+### a1.5.0 (general clear up and station guns)
+Change default gun to blaster
 
-Outline of space stations is thin at bottom
+Add twin guns to stations
 
-Rendering setting is too big
+Reduce frequency of stations
+
+Limit enemy spawning to only 3 times
 
 Add more mission types
 
-When you take damage, bar is highlighted with damage before the health/armour/shield disappears
+### a1.6.0 (station docking and boarding, moving around ship, top down person view)
+Ability to dock with friendly stations and board enemy stations
+Player can walk around station
 
-Add special features to weapons (e.g. sniper can zoom in on enemy)
+Player can walk around player ship
 
-Add thruster particles to ships
+### a1.7.0 (bosses, ship customization, friendly ships)
 
-Enemy stations have weapons, can be destroyed for loot
+### a1.8.0 (sound)
+
+### Future
+Sound
 
 New mothership image, large and powerful
 
 Add missile and autoturret weapons
+
+Add thruster particles to ships
+
+Add special features to weapons (e.g. sniper can zoom in on enemy)
 
 Weapons have a certain amount of penetration, more penetration, more damage to health
 Missile have low pen, sniper has high pen
@@ -44,9 +56,12 @@ When health is damaged, it effects how ships work, e.g. start smoking, visual sc
 When bits of player ship stops working, message should come up
 Some visual to show armour, and it breaking
 
-### a1.6.0 (bosses, ship customization, friendly ships)
+### Small things
+Rendering setting is too big
 
-### a1.7.0 (multiplayer)
+When you take damage, bar is highlighted with damage before the health/armour/shield disappears
+
+Outline of space stations is thin at bottom
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice
