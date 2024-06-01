@@ -20,13 +20,19 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ### a1.5.0 (general clear up and station guns)
 Change default gun to blaster
 
-Add twin guns to stations
+Add guns to friendly stations
+
+Add station cannon image
+
+Add ability to destroy station cannon
 
 Reduce frequency of stations
 
 Limit enemy spawning to only 3 times
 
 Add more mission types
+
+Friendly ships cannot damage other friendly ships
 
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
@@ -39,6 +45,8 @@ Player can walk around player ship
 ### a1.8.0 (sound)
 
 ### Future
+Add a wide zoom out feature
+
 Sound
 
 New mothership image, large and powerful
@@ -62,6 +70,8 @@ Rendering setting is too big
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
 Outline of space stations is thin at bottom
+
+Add PlayerShip type hint to game.player
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice
@@ -474,6 +484,8 @@ Text moves when left key is pressed for first time
 
 Changed from pygame 2.4.0 to pygame-ce 2.4.1
 
+Changed from python 3.11.3 to python 3.12.3
+
 Switch to pygame-ce, text location has shifted
 pygame.scrap can be simplified - init can be removed
 multiline text can be simplified
@@ -483,3 +495,5 @@ Add back buttons
 Add more console commands
 - kill
 - tp
+
+Add twin guns to enemy stations

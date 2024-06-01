@@ -1,6 +1,6 @@
-from objects import Object
-from objects import random_vector, Vector
+from objects import Object, Vector, random_vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
+from weapons import DefaultGun
 import images
 import game
 import random
@@ -13,7 +13,7 @@ class Station(Object):
         super().__init__(position, image)
         self.max_entities = max_entities
         self.spawn_cooldown = spawn_cooldown
-        self.current_time = spawn_cooldown # Entities are spawned in straight away
+        self.current_time = spawn_cooldown  # Entities are spawned in straight away
         self.entities_to_spawn = random.randint(1, max_entities)
         self.entity_type = entity_type
 
@@ -93,3 +93,31 @@ class FriendlyStation(Station):
 class EnemyStation(Station):
     def __init__(self, position, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.ENEMY_STATION) -> None:
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
+
+        # Spawn in 2 cannons
+        pos1 = position - Vector(self.width/2, 0)
+        pos2 = position + Vector(self.width/2, 0)
+
+        game.CHUNKS.add_entity(StationCannon(pos1, level=game.CURRENT_SHIP_LEVEL))
+        game.CHUNKS.add_entity(StationCannon(pos2, level=game.CURRENT_SHIP_LEVEL))
+
+
+
+class StationCannon(Object):
+    def __init__(self, position: Vector, health: int = 20, damage: int = 2, range: int = 800, level: int = 0, image=lambda: images.DEFAULT) -> None:
+        super().__init__(position, image)
+        self.health = health
+        self.damage = damage
+        self.range = range
+        self.level = level
+
+        self.rotation = 0
+        self.velocity = Vector(0, 0)  # DefaultGun requires the "ship" to have a velocity
+
+        self.cannon = DefaultGun(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
+
+    def update(self, delta_time: float) -> None:
+        self.cannon.update(delta_time)
+        self.rotation = self.position.get_angle_to(game.player.position)
+        if self.position.dist_to(game.player.position) <= self.range:
+            self.cannon.shoot()
