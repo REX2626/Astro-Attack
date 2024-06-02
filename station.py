@@ -10,13 +10,16 @@ import pygame
 
 
 class Station(Object):
-    def __init__(self, position, max_entities=1, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
+    def __init__(self, position, max_entities=1, max_spawns=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
         super().__init__(position, image)
         self.max_entities = max_entities
+        self.max_spawns = max_spawns
         self.spawn_cooldown = spawn_cooldown
         self.current_time = spawn_cooldown  # Entities are spawned in straight away
-        self.entities_to_spawn = random.randint(1, max_entities)
         self.entity_type = entity_type
+
+        self.spawns_occurred = 0
+        self.entities_to_spawn = random.randint(1, max_entities)
 
         self.default_image = image()
         self.selected_image = selected_image()
@@ -45,15 +48,18 @@ class Station(Object):
     def update(self, delta_time):
         super().update(delta_time)
 
-        # Spawn entities after cooldown
-        if self.entities_to_spawn > 0:
-            self.current_time += delta_time
+        if self.spawns_occurred < self.max_spawns:
 
-        if self.current_time > self.spawn_cooldown:
-            for _ in range(self.entities_to_spawn):
-                self.spawn_entity(self.entity_type)
-            self.current_time = 0
-            self.entities_to_spawn = 0
+            # Spawn entities after cooldown
+            if self.entities_to_spawn > 0:
+                self.current_time += delta_time
+
+                if self.current_time >= self.spawn_cooldown:
+                    for _ in range(self.entities_to_spawn):
+                        self.spawn_entity(self.entity_type)
+                    self.current_time = 0
+                    self.entities_to_spawn = 0
+                    self.spawns_occurred += 1
 
 
     def spawn_entity(self, entity_type):
@@ -81,8 +87,8 @@ class Station(Object):
 
 
 class FriendlyStation(Station):
-    def __init__(self, position, max_entities=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
-        super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
+    def __init__(self, position, max_entities=3, max_spawns=3, spawn_cooldown=5, entity_type=Neutral_Ship_Cargo, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.FRIENDLY_STATION) -> None:
+        super().__init__(position, max_entities, max_spawns, spawn_cooldown, entity_type, selected_image, image)
 
     def update(self, delta_time):
         super().update(delta_time)
@@ -92,8 +98,8 @@ class FriendlyStation(Station):
 
 
 class EnemyStation(Station):
-    def __init__(self, position, max_entities=2, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.ENEMY_STATION) -> None:
-        super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
+    def __init__(self, position, max_entities=2, max_spawns=3, spawn_cooldown=10, entity_type=Mother_Ship, selected_image=lambda: images.SELECTED_STATION, image=lambda: images.ENEMY_STATION) -> None:
+        super().__init__(position, max_entities, max_spawns, spawn_cooldown, entity_type, selected_image, image)
 
         # Spawn in 2 cannons
         pos1 = position - Vector(self.width/2 - 20, 0)

@@ -22,7 +22,7 @@ Change default gun to blaster
 
 Add guns to friendly stations
 
-Limit enemy spawning to only 3 times
+Increase station cannons difficulty with level
 
 Add more mission types
 
@@ -499,3 +499,5 @@ Add ability to destroy station cannon
 Add station cannon image
 
 Reduce frequency of stations
+
+Limit enemy spawning to only 3 times
