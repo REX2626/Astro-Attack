@@ -68,3 +68,4 @@ FRIENDLY_STATION_ICON = outline_station_image(load_image("assets/space_station.p
 ENEMY_STATION = outline_station_image(load_image("assets/space_station.png"), (230, 0, 0), width=3, scale=10)
 ENEMY_STATION_ICON = outline_station_image(load_image("assets/space_station.png"), (230, 0, 0), width=1, scale=1)
 SELECTED_STATION = outline_station_image(load_image("assets/space_station.png"), (252, 225, 5), width=3, scale=10)
+STATION_CANNON = pygame.transform.scale_by(load_image("assets/station_cannon.png"), 3)

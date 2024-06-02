@@ -22,8 +22,6 @@ Change default gun to blaster
 
 Add guns to friendly stations
 
-Add station cannon image
-
 Reduce frequency of stations
 
 Limit enemy spawning to only 3 times
@@ -499,3 +497,5 @@ Add more console commands
 Add twin guns to enemy stations
 
 Add ability to destroy station cannon
+
+Add station cannon image

@@ -1,4 +1,4 @@
-from objects import Object, Vector, random_vector
+from objects import Entity, Object, Vector, random_vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
 from weapons import DefaultGun
 import effects
@@ -96,23 +96,20 @@ class EnemyStation(Station):
         super().__init__(position, max_entities, spawn_cooldown, entity_type, selected_image, image)
 
         # Spawn in 2 cannons
-        pos1 = position - Vector(self.width/2, 0)
-        pos2 = position + Vector(self.width/2, 0)
+        pos1 = position - Vector(self.width/2 - 20, 0)
+        pos2 = position + Vector(self.width/2 - 20, 0)
 
         game.CHUNKS.add_entity(StationCannon(pos1, level=game.CURRENT_SHIP_LEVEL))
         game.CHUNKS.add_entity(StationCannon(pos2, level=game.CURRENT_SHIP_LEVEL))
 
 
 
-class StationCannon(Object):
-    def __init__(self, position: Vector, health: int = 20, damage: int = 2, range: int = 800, level: int = 0, image=lambda: images.DEFAULT) -> None:
-        super().__init__(position, image)
+class StationCannon(Entity):
+    def __init__(self, position: Vector, health: int = 20, damage: int = 2, range: int = 800, level: int = 0, image=lambda: images.STATION_CANNON) -> None:
+        super().__init__(position, velocity=Vector(0, 0), image=image)
         self.health = health
         self.range = range
         self.level = level
-
-        self.rotation = 0
-        self.velocity = Vector(0, 0)  # DefaultGun requires the "ship" to have a velocity
 
         self.cannon = DefaultGun(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
 
