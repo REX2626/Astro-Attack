@@ -1,3 +1,4 @@
+from __future__ import annotations
 from objects import Vector, Object, Entity
 from entities import Asteroid
 from station import FriendlyStation, EnemyStation
@@ -48,7 +49,7 @@ class Chunks():
             if hasattr(entity, "unload"):
                 entity.unload()
 
-    def get_chunk(self, arg: tuple[int, int] | Object) -> "Chunk":
+    def get_chunk(self, arg: tuple[int, int] | Object) -> Chunk:
         """Returns the chunk, arg can be a chunk_coord or an object"""
 
         # Check if arg is chunk_coord or an entity
@@ -65,7 +66,7 @@ class Chunks():
 
         return self.list[position]
 
-    def get_chunk_from_coord(self, position: tuple[int, int]) -> "Chunk":
+    def get_chunk_from_coord(self, position: tuple[int, int]) -> Chunk:
         """Returns the chunk, arg is a chunk_coord"""
 
         # Create chunk, if chunk hasn't been generated
@@ -76,7 +77,7 @@ class Chunks():
 
         return self.list[position]
 
-    def get_chunk_from_entity(self, entity: Object) -> "Chunk":
+    def get_chunk_from_entity(self, entity: Object) -> Chunk:
         """Returns the chunk, arg is an object"""
 
         # Check if arg is chunk_coord or an entity
@@ -148,15 +149,15 @@ class Chunk():
                 Asteroid(self.random_position())
             )
 
-        # Enemy Station - 3.6%
-        elif self.chance(0.036):
+        # Enemy Station - 2.5%
+        elif self.chance(0.025):
             self.entities.add(
 
                 EnemyStation(self.random_position())
             )
 
-        # Friendly Station - 2.5%
-        elif self.chance(0.025):
+        # Friendly Station - 1.7%
+        elif self.chance(0.017):
             self.entities.add(
 
                 FriendlyStation(self.random_position())
