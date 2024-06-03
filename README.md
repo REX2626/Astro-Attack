@@ -20,10 +20,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ### a1.5.0 (general clear up and station guns)
 Change default gun to blaster
 
-Add guns to friendly stations
-
-Increase station cannons difficulty with level
-
 Add more mission types
 
 Friendly ships cannot damage other friendly ships
@@ -97,6 +93,7 @@ Do some caching for circles for particles to improve performance
 Add a check to see if world is the correct version
 
 ### POTENTIAL
+Add guns to friendly stations
 
 Strict Rendering (only rendering objects which will defo be on screen)
 
@@ -501,3 +498,5 @@ Add station cannon image
 Reduce frequency of stations
 
 Limit enemy spawning to only 3 times
+
+Increase station cannons difficulty with level

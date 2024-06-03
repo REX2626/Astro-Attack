@@ -113,9 +113,13 @@ class EnemyStation(Station):
 class StationCannon(Entity):
     def __init__(self, position: Vector, health: int = 20, damage: int = 2, range: int = 800, level: int = 0, image=lambda: images.STATION_CANNON) -> None:
         super().__init__(position, velocity=Vector(0, 0), image=image)
-        self.health = health
         self.range = range
-        self.level = level
+
+        # Adds 5 hp for every level
+        self.health = health + 5*level
+
+        # Adds 0.4 damage per level
+        damage += 0.4*level
 
         self.cannon = DefaultGun(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
 
