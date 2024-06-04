@@ -22,6 +22,8 @@ Friendly ships cannot damage other friendly ships
 
 Outline of space stations is thin at bottom
 
+Fix bottom of info text being covered by main menu button
+
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
 Player can walk around station
@@ -33,6 +35,8 @@ Player can walk around player ship
 ### a1.8.0 (sound)
 
 ### Future
+Add button to reset settings to default
+
 Add more mission types
 
 Enemies flash when they are damaged
@@ -62,6 +66,8 @@ Rendering setting is too big
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
 Add PlayerShip type hint to game.player
+
+Fix objects jumping in and out of mini map
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice

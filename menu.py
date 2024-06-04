@@ -1649,7 +1649,7 @@ main_menu = Page(
     Button(0.5, 5/8, "Settings"     , font_size=40, function=lambda: Menu.change_page(settings)),
     Button(0.5, 6/8, "Info"         , font_size=40, function=lambda: Menu.change_page(info)),
     Button(0.5, 7/8, "Quit"         , font_size=40, function=lambda: Menu.change_page(quit_confirm)),
-    Text(0.95, 0.95, "a1.4.1", font_size=20),
+    Text(0.95, 0.95, "a1.5.0", font_size=20),
     escape=lambda: Menu.change_page(quit_confirm)
 )
 
