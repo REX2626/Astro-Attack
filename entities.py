@@ -260,7 +260,7 @@ class Scrap(Pickup):
 
 
 # To prevent circular import error
-from aiship import Enemy_Ship
+from aiship import Enemy_Ship, Neutral_Ship
 from station import StationCannon
 
 
@@ -281,12 +281,15 @@ class Bullet(Entity):
         if self.start_time > self.lifetime:
             game.CHUNKS.remove_entity(self)
         else:
-            # Check if bullet is near to any aliens in it's chunk
-            # If it is, then destroy alien and bullet
+            # Check if bullet is near to any entities in it's chunk
+            # Make sure entity is not on same alliance as self.ship
+            # Then destroy entity and bullet
             for entity in game.CHUNKS.get_chunk(self).entities:
 
                 if isinstance(entity, Ship) and entity != self.ship:
-                    if not (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)):
+                    if not (
+                        (isinstance(entity, Enemy_Ship) and isinstance(self.ship, Enemy_Ship)) or
+                        (isinstance(entity, Neutral_Ship) and isinstance(self.ship, Neutral_Ship))):
                         if (entity.shield and self.distance_to(entity) < 35) or (not entity.shield and self.distance_to(entity) < 29):
                             entity.damage(self.damage, self.ship)
                             game.CHUNKS.remove_entity(self)

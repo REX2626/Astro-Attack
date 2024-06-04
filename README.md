@@ -10,6 +10,7 @@ Tips:
 6: For additional files choose assets (C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets)
 7: In advanced, set name to "Astro Attack [version]"
 8: In advanced, enable --clean
+9: Click convert .py to .exe
 
 If above doesn't work, try the command below
 pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/red_ship.ico" --name "Astro Attack a1.2.0" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
@@ -17,12 +18,16 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.5.1 (bug fixes)
-Friendly ships cannot damage other friendly ships
-
+### a1.5.1 (bug fixes and improvements)
 Outline of space stations is thin at bottom
 
 Fix bottom of info text being covered by main menu button
+
+Friendly stations cannot spawn next to enemy stations
+
+Render bullets on top of other things
+
+Add ability to kill all neutral or all enemy
 
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
@@ -510,3 +515,5 @@ Limit enemy spawning to only 3 times
 Increase station cannons difficulty with level
 
 Change default gun to blaster
+
+Friendly ships cannot damage other friendly ships
