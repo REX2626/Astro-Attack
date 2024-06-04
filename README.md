@@ -17,9 +17,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 
 ## TODO:
 
-### a1.5.0 (general clear up and station guns)
-Add more mission types
-
 ### a1.5.1 (bug fixes)
 Friendly ships cannot damage other friendly ships
 
@@ -36,6 +33,8 @@ Player can walk around player ship
 ### a1.8.0 (sound)
 
 ### Future
+Add more mission types
+
 Enemies flash when they are damaged
 
 Add a wide zoom out feature

@@ -1477,7 +1477,7 @@ class Mission():
 
         # Changes x position based on what slot it is in (there are three mission slots)
         self.x = 0.2 + 0.3*self.slot
-        self.y = 0.7
+        self.y = 0.62
 
         self.width = 0.2
         self.height = 0.4
@@ -1503,11 +1503,11 @@ class Mission():
         self.progress_bar = Bar(self.x-(self.width/2), self.y, width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
 
         if self.mission_type == game.KILL:
-            self.title_text = Text(self.x, self.y-0.1-self.height/2, "Kill Mission")
+            self.title_text = Text(self.x, self.y-0.05-self.height/2, "Kill Mission")
 
             self.info = f"Kill {self.number} {game.ENTITY_DICT.get(self.goal)}s REWARDS: {self.reward} Scrap"
 
-        self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, text=self.info, default_font_size=70)
+        self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, text=self.info, default_font_size=70)
 
         # True if you have clicked accept on a mission
         self.in_progress = False
