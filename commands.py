@@ -1,3 +1,4 @@
+from aiship import Neutral_Ship, Enemy_Ship
 from objects import Vector
 from entities import Entity
 from player import Player_Ship
@@ -35,10 +36,21 @@ def add_score(score=100):
     game.SCORE += score
 
 
-def kill():
-    for entity in game.CHUNKS.entities.copy():
-        if isinstance(entity, Entity) and not isinstance(entity, Player_Ship):
-            game.CHUNKS.remove_entity(entity)
+def kill(type: str = ""):
+    if type == "":
+        for entity in game.CHUNKS.entities.copy():
+            if isinstance(entity, Entity) and not isinstance(entity, Player_Ship):
+                game.CHUNKS.remove_entity(entity)
+
+    elif type == "neutral":
+        for entity in game.CHUNKS.entities.copy():
+            if isinstance(entity, Neutral_Ship):
+                game.CHUNKS.remove_entity(entity)
+
+    elif type == "enemy":
+        for entity in game.CHUNKS.entities.copy():
+            if isinstance(entity, Enemy_Ship):
+                game.CHUNKS.remove_entity(entity)
 
 
 def teleport(position: tuple[float, float]):

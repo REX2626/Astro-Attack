@@ -212,7 +212,7 @@ class Console():
 
         self.help_message = ["/entitylist - prints entities that can be spawned",
                              "/godmode (max_health) (max_boost) - boosts stats",
-                             "/kill - removes all entities apart from player",
+                             "/kill (type) - type can be 'neutral', 'enemy' or blank for all entities",
                              "/log (argument) - prints argument to console",
                              "/score (score) - adds score to current score",
                              "/spawnentity (entity_class) (frequency) - spawns entity at current location",
