@@ -273,6 +273,8 @@ class Bullet(Entity):
         self.lifetime = lifetime
         self.start_time = 0
 
+        self.z = 1  # Ensure bullets are seen above ships
+
     def update(self, delta_time):
         super().update(delta_time)
 

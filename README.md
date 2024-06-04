@@ -25,8 +25,6 @@ Fix bottom of info text being covered by main menu button
 
 Friendly stations cannot spawn next to enemy stations
 
-Render bullets on top of other things
-
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
 Player can walk around station
@@ -517,3 +515,5 @@ Change default gun to blaster
 Friendly ships cannot damage other friendly ships
 
 Add ability to kill all neutral or all enemy
+
+Render bullets on top of other things
