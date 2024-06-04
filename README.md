@@ -18,11 +18,12 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.5.0 (general clear up and station guns)
-Change default gun to blaster
-
 Add more mission types
 
+### a1.5.1 (bug fixes)
 Friendly ships cannot damage other friendly ships
+
+Outline of space stations is thin at bottom
 
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
@@ -60,8 +61,6 @@ Some visual to show armour, and it breaking
 Rendering setting is too big
 
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
-
-Outline of space stations is thin at bottom
 
 Add PlayerShip type hint to game.player
 
@@ -475,9 +474,13 @@ Add ctrl + arrows
 Add spam, if a button is hold down > 0.5 second, repeatedly paste that button
 Text moves when left key is pressed for first time
 
-Changed from pygame 2.4.0 to pygame-ce 2.4.1
+Ported from pygame 2.4.0 to pygame-ce 2.4.1
 
-Changed from python 3.11.3 to python 3.12.3
+Updated python 3.11.3 to python 3.12.3
+
+Updated dill 0.3.6 to dill 0.3.8
+
+Updated psutil 5.9.5 to psutil 5.9.8
 
 Switch to pygame-ce, text location has shifted
 pygame.scrap can be simplified - init can be removed
@@ -500,3 +503,5 @@ Reduce frequency of stations
 Limit enemy spawning to only 3 times
 
 Increase station cannons difficulty with level
+
+Change default gun to blaster

@@ -1,6 +1,6 @@
 from objects import Entity, Object, Vector, random_vector
 from aiship import Mother_Ship, Neutral_Ship_Cargo
-from weapons import DefaultGun
+from weapons import Blaster
 import effects
 import images
 import game
@@ -121,7 +121,7 @@ class StationCannon(Entity):
         # Adds 0.4 damage per level
         damage += 0.4*level
 
-        self.cannon = DefaultGun(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
+        self.cannon = Blaster(self, damage, fire_rate=0.5, speed=400, image=lambda: images.STATION_CANNON_BULLET)
 
     def damage(self, damage: int, entity=None) -> None:
         self.health -= damage

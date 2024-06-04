@@ -1,7 +1,7 @@
 import game
 from game import *
 from entities import Bullet, Asteroid
-from weapons import PlayerGun, PlayerGatlingGun, PlayerSniper
+from weapons import PlayerBlaster, PlayerGatlingGun, PlayerSniper
 from laser import Laser
 from particles import ParticleSystem
 import ui
@@ -103,7 +103,7 @@ def handle_player_input(keys_pressed, delta_time):
         scroll(-5*delta_time)
 
     if keys_pressed[pygame.K_1]:
-        game.player.weapon = PlayerGun(game.player)
+        game.player.weapon = PlayerBlaster(game.player)
         game.WEAPON_SELECTED = 0
 
     if keys_pressed[pygame.K_2]:

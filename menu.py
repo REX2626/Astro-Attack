@@ -1834,7 +1834,7 @@ weapon = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Weapon"),
     Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
-    Button(0.3, 0.3, "Default", function=lambda: Menu.change_page(default_gun)),
+    Button(0.3, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun)),
     Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
     Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
     Button(0.7, 0.5, "Laser"  , function=lambda: Menu.change_page(laser)),
@@ -1872,13 +1872,13 @@ radar = Page(
     e_press=lambda: EXIT
 )
 
-default_gun = Page(
+blaster_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Default"),
+    Text(0.5, 0.12, "Blaster"),
     Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
-    UpgradeBar(0.3, "Fire Rate", "PLAYER_DEFAULT_FIRE_RATE", min_value=game.PLAYER_DEFAULT_FIRE_RATE, max_value=20),
-    UpgradeBar(0.4, "Damage", "PLAYER_DEFAULT_DAMAGE", min_value=game.PLAYER_DEFAULT_DAMAGE, max_value=2),
-    UpgradeBar(0.5, "Bullet Speed", "PLAYER_DEFAULT_BULLET_SPEED", min_value=game.PLAYER_DEFAULT_BULLET_SPEED, max_value=1000),
+    UpgradeBar(0.3, "Fire Rate", "PLAYER_BLASTER_FIRE_RATE", min_value=game.PLAYER_BLASTER_FIRE_RATE, max_value=20),
+    UpgradeBar(0.4, "Damage", "PLAYER_BLASTER_DAMAGE", min_value=game.PLAYER_BLASTER_DAMAGE, max_value=2),
+    UpgradeBar(0.5, "Bullet Speed", "PLAYER_BLASTER_BULLET_SPEED", min_value=game.PLAYER_BLASTER_BULLET_SPEED, max_value=1000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,

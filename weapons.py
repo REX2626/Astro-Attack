@@ -7,7 +7,7 @@ import random
 
 
 
-class DefaultGun():
+class Blaster():
     def __init__(self, ship: entities.Ship, damage=1, fire_rate=1, speed=game.BULLET_SPEED, spread=0, image=lambda: images.BULLET) -> None:
         self.ship = ship
         self.damage = damage
@@ -57,25 +57,25 @@ class DefaultGun():
 
 
 
-class PlayerGun(DefaultGun):
+class PlayerBlaster(Blaster):
     def __init__(self, ship) -> None:
-        super().__init__(ship, damage=game.PLAYER_DEFAULT_DAMAGE, fire_rate=game.PLAYER_DEFAULT_FIRE_RATE, speed=game.PLAYER_DEFAULT_BULLET_SPEED, spread=0.05)
+        super().__init__(ship, damage=game.PLAYER_BLASTER_DAMAGE, fire_rate=game.PLAYER_BLASTER_FIRE_RATE, speed=game.PLAYER_BLASTER_BULLET_SPEED, spread=0.05)
 
     def shoot(self):
-        self.reload_time = 1 / game.PLAYER_DEFAULT_FIRE_RATE
-        self.damage = game.PLAYER_DEFAULT_DAMAGE
-        self.speed = game.PLAYER_DEFAULT_BULLET_SPEED
+        self.reload_time = 1 / game.PLAYER_BLASTER_FIRE_RATE
+        self.damage = game.PLAYER_BLASTER_DAMAGE
+        self.speed = game.PLAYER_BLASTER_BULLET_SPEED
         super().shoot()
 
 
 
-class EnemyGun(DefaultGun):
+class EnemyBlaster(Blaster):
     def __init__(self, ship) -> None:
         super().__init__(ship, damage=1, fire_rate=1, image=lambda: images.RED_BULLET)
 
 
 
-class GatlingGun(DefaultGun):
+class GatlingGun(Blaster):
     def __init__(self, ship, damage=0.5, fire_rate=20, speed=800, spread=0.2, image=lambda: images.GATLING_BULLET) -> None:
         super().__init__(ship, damage, fire_rate, speed, spread, image)
 
@@ -99,7 +99,7 @@ class EnemyGatlingGun(GatlingGun):
 
 
 
-class Sniper(DefaultGun):
+class Sniper(Blaster):
     def __init__(self, ship, damage=2, fire_rate=3, speed=1500, spread=0, image=lambda: images.SNIPER_BULLET) -> None:
         super().__init__(ship, damage, fire_rate, speed, spread, image)
 

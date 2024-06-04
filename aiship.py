@@ -1,6 +1,6 @@
 from objects import Vector, Entity, random_vector
 from entities import Ship, Asteroid, Scrap
-from weapons import EnemyGun, EnemyGatlingGun, EnemySniper
+from weapons import EnemyBlaster, EnemyGatlingGun, EnemySniper
 from player import Player_Ship
 import effects
 import images
@@ -20,7 +20,7 @@ level_text_cache = dict()
 
 
 class AI_Ship(Ship):
-    def __init__(self, position: Vector, velocity: Vector=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyBlaster, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, max_speed, rotation, weapon, health, shield, armour, shield_delay, shield_recharge, image)
 
         self.state = state
@@ -206,7 +206,7 @@ class AI_Ship(Ship):
 
 
 class Enemy_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, scrap_count=1, health=2, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=lambda: images.ENEMY_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyBlaster, scrap_count=1, health=2, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, mother_ship=None, image=lambda: images.ENEMY_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
         self.scrap_count = scrap_count
         self.mother_ship = mother_ship
@@ -292,7 +292,7 @@ class Enemy_Ship(AI_Ship):
 
 
 class Missile_Ship(Enemy_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyGun, scrap_count=2, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=lambda: images.MISSILE_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=250, level=0, rotation=0, max_rotation_speed=5, explode_countdown=0.1, weapon=EnemyBlaster, scrap_count=2, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=0, mother_ship=None, image=lambda: images.MISSILE_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, scrap_count, health, armour, shield, shield_delay, shield_recharge, state, mother_ship, image)
         self.attack_max_speed = 750
         self.explode_radius = 100
@@ -466,7 +466,7 @@ class Mother_Ship(Enemy_Ship):
 
 
 class Neutral_Ship(AI_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyBlaster, health=1, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, image)
 
         self.mother_ship = None
@@ -558,7 +558,7 @@ class Neutral_Ship(AI_Ship):
 
 
 class Neutral_Ship_Cargo(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyGun, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, neutral_list=None, current_station=None, image=lambda: images.NEUTRAL_SHIP_CARGO) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=1, weapon=EnemyBlaster, health=10, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, neutral_list=None, current_station=None, image=lambda: images.NEUTRAL_SHIP_CARGO) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, image)
         if neutral_list is None:
             neutral_list = []
@@ -606,7 +606,7 @@ class Neutral_Ship_Cargo(Neutral_Ship):
 
 
 class Neutral_Ship_Fighter(Neutral_Ship):
-    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyGun, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, mother_ship=None, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
+    def __init__(self, position: Vector, velocity=Vector(0, 0), max_speed=100, level=0, rotation=0, max_rotation_speed=5, weapon=EnemyBlaster, health=3, armour=0, shield=0, shield_delay=1, shield_recharge=1, state=PATROL_TO_STATION, mother_ship=None, current_station=None, image=lambda: images.NEUTRAL_SHIP) -> None:
         super().__init__(position, velocity, max_speed, level, rotation, max_rotation_speed, weapon, health, armour, shield, shield_delay, shield_recharge, state, current_station, image)
 
         self.mother_ship: Neutral_Ship_Cargo = mother_ship

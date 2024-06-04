@@ -1,6 +1,6 @@
 from objects import Vector, random_vector
 from entities import Ship, Scrap
-from weapons import PlayerGun
+from weapons import PlayerBlaster
 import particles
 import images
 import game
@@ -16,7 +16,7 @@ class Player_Ship(Ship):
         position: Vector, velocity: Vector,
         max_speed=game.MAX_PLAYER_SPEED,
         rotation=0,
-        weapon=PlayerGun,
+        weapon=PlayerBlaster,
         health=game.MAX_PLAYER_HEALTH,
         armour=game.MAX_PLAYER_ARMOUR,
         shield=game.MAX_PLAYER_SHIELD, shield_delay=3, shield_recharge=game.PLAYER_SHIELD_RECHARGE,

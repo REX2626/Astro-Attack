@@ -1,5 +1,5 @@
 from objects import Vector, Object, Entity
-from weapons import DefaultGun
+from weapons import Blaster
 import effects
 import images
 import game
@@ -10,7 +10,7 @@ import pygame
 
 
 class Ship(Entity):
-    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, weapon=DefaultGun, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
+    def __init__(self, position: Vector, velocity: Vector, max_speed, rotation=0, weapon=Blaster, health=1, shield=0, armour=0, shield_delay=1, shield_recharge=1, image=lambda: images.DEFAULT) -> None:
         super().__init__(position, velocity, rotation, image)
 
         self.weapon = weapon(self)
