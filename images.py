@@ -11,7 +11,13 @@ import pygame
 
 
 def outline_station_image(image, colour, width, scale):
+    # Scale image and blit on to surface, so there is a bit more room for the outline
     image = pygame.transform.scale_by(image, scale)
+    surf = pygame.Surface((image.get_width()+2*int(width/2), image.get_height()+2*int(width/2)), flags=pygame.SRCALPHA)
+    surf.blit(image, (int(width/2), int(width/2)))
+    image = surf
+
+    # Take a mask to make an outline of the station
     mask = pygame.mask.from_surface(image)
     outline = mask.outline()
 

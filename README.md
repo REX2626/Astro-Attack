@@ -19,8 +19,6 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ## TODO:
 
 ### a1.5.1 (bug fixes and improvements)
-Outline of space stations is thin at bottom
-
 Fix bottom of info text being covered by main menu button
 
 Friendly stations cannot spawn next to enemy stations
@@ -69,6 +67,8 @@ When you take damage, bar is highlighted with damage before the health/armour/sh
 Add PlayerShip type hint to game.player
 
 Fix objects jumping in and out of mini map
+
+Test if using Surface.fblits is faster (for drawing stars)
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice
@@ -517,3 +517,5 @@ Friendly ships cannot damage other friendly ships
 Add ability to kill all neutral or all enemy
 
 Render bullets on top of other things
+
+Outline of space stations is thin at bottom
