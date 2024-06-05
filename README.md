@@ -27,9 +27,9 @@ Look at colour keys for images with alpha 0 or 255
 ## TODO:
 
 ### a1.5.1 (bug fixes and improvements)
-Fix bottom of info text being covered by main menu button
+Improve laser raycasting so it uses the correct, rotated hit box
 
-Fix laser projection near asteroids (and possibly other objects)
+Add hitboxes to debug mode
 
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
@@ -80,8 +80,6 @@ Improve performance of laser
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice
-
-Add hitboxes
 
 Make bullets do less damage the further away they go (mainly for gatling gun)
 
@@ -531,3 +529,5 @@ Outline of space stations is thin at bottom
 
 Test if using Surface.fblits is faster (for drawing stars)
 draw_stars() is now twice as fast as in a1.5.0
+
+Fix laser projection near asteroids (and possibly other objects)

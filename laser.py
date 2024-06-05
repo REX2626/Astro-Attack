@@ -1,4 +1,4 @@
-from objects import Vector
+from objects import Object, Vector
 import entities
 import station
 import game
@@ -8,7 +8,7 @@ import pygame
 
 
 class Laser():
-    def __init__(self, ship: entities.Ship, damage=game.PLAYER_LASER_DAMAGE, charge=10, recharge=1, range=game.PLAYER_LASER_RANGE) -> None:
+    def __init__(self, ship: entities.Ship, damage: float = game.PLAYER_LASER_DAMAGE, charge: float = 10, recharge: float = 1, range: float = game.PLAYER_LASER_RANGE) -> None:
         self.ship = ship
         self.damage = damage
         self.charge = charge
@@ -19,11 +19,11 @@ class Laser():
         self.shooting = False
         self.delta_time = 0  # used for shoot
 
-    def update(self, delta_time):
+    def update(self, delta_time: float) -> None:
         self.charge += self.recharge * delta_time
         self.delta_time = delta_time
 
-    def shoot(self):
+    def shoot(self) -> None:
         self.shooting = True
         self.range, entity = self.raycast()
         self.damage = game.PLAYER_LASER_DAMAGE  # assuming only player has a laser
@@ -31,19 +31,23 @@ class Laser():
         if hasattr(entity, "damage") and callable(entity.damage):
             entity.damage(self.damage*self.delta_time, self.ship)
 
-    def raycast(self):
-
+    def raycast(self) -> tuple[int, Object]:
         entity_hit = None
         self.max_range = game.PLAYER_LASER_RANGE  # assuming only player has a laser
         sin_rotation = math.sin(self.ship.rotation)
         cos_rotation = math.cos(self.ship.rotation)
         x = self.ship.position.x - self.ship.image.get_height() * sin_rotation
         y = self.ship.position.y - self.ship.image.get_height() * cos_rotation
+
         for step in range(self.max_range):
             x, y = x - sin_rotation, y - cos_rotation
-            chunk = game.CHUNKS.get_chunk((int(x//game.CHUNK_SIZE), int(y//game.CHUNK_SIZE)))
+            nearby_entities = set()
 
-            for entity in chunk.entities:
+            for chunk_y in range(int(y//game.CHUNK_SIZE)-1, int(y//game.CHUNK_SIZE)+2):
+                for chunk_x in range(int(x//game.CHUNK_SIZE)-1, int(x//game.CHUNK_SIZE)+2):
+                    nearby_entities.update(game.CHUNKS.get_chunk_from_coord((chunk_x, chunk_y)).entities)
+
+            for entity in nearby_entities:
                 if (isinstance(entity, entities.Ship) or
                     isinstance(entity, entities.Asteroid) or
                     isinstance(entity, entities.Missile) or
@@ -62,8 +66,7 @@ class Laser():
 
         return step, entity_hit
 
-    def draw_beam(self):
-
+    def draw_beam(self) -> pygame.Surface:
         beam_width = 10*game.ZOOM
         glow_radius = 100*game.ZOOM
         width, height = beam_width+glow_radius, self.range*game.ZOOM+glow_radius
@@ -80,7 +83,7 @@ class Laser():
         surf = pygame.transform.rotozoom(surf, self.ship.rotation / math.pi * 180, 1)
         return surf
 
-    def draw(self, win: pygame.Surface, focus_point):
+    def draw(self, win: pygame.Surface, focus_point: Vector) -> None:
         if not self.shooting:
             return
         self.shooting = False
