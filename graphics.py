@@ -146,7 +146,7 @@ for layer in range(layers):
     surf = pygame.transform.smoothscale(surf, (diameter, diameter))
     circles.append(surf)
 
-draw_circle = WIN.blit
+draw_circles = WIN.fblits
 
 
 # This function has been OPTIMIZED
@@ -188,5 +188,5 @@ def draw_stars() -> None:
                 star[0] = randint(-layer, WIDTH+layer)
                 star[1] = -layer
 
-            # Draw star
-            draw_circle(circles[layer], star)
+        # Draw stars
+        draw_circles([(circles[layer], pos) for pos in stars[layer]])

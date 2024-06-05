@@ -68,8 +68,6 @@ Add PlayerShip type hint to game.player
 
 Fix objects jumping in and out of mini map
 
-Test if using Surface.fblits is faster (for drawing stars)
-
 ### Other
 Enemy stations can only respawn reinforcements once or twice
 
@@ -512,6 +510,7 @@ Increase station cannons difficulty with level
 
 Change default gun to blaster
 
+### a1.5.1 (bug fixes and improvements)
 Friendly ships cannot damage other friendly ships
 
 Add ability to kill all neutral or all enemy
@@ -519,3 +518,5 @@ Add ability to kill all neutral or all enemy
 Render bullets on top of other things
 
 Outline of space stations is thin at bottom
+
+Test if using Surface.fblits is faster (for drawing stars)
