@@ -139,7 +139,7 @@ class Chunk():
         # the ships make sure they don't spawn inside a chunk by
         # checking if this chunk is adjoining a chunk with an asteroid in
 
-        if self.adjoining_asteroid_chunk() or not self.adjoining_empty_chunks():
+        if not self.adjoining_empty_chunks():
             return
 
         # Asteroid - 10%

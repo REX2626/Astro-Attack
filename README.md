@@ -21,7 +21,7 @@ pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/re
 ### a1.5.1 (bug fixes and improvements)
 Fix bottom of info text being covered by main menu button
 
-Friendly stations cannot spawn next to enemy stations
+Fix laser projection near asteroids (and possibly other objects)
 
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
@@ -67,6 +67,8 @@ When you take damage, bar is highlighted with damage before the health/armour/sh
 Add PlayerShip type hint to game.player
 
 Fix objects jumping in and out of mini map
+
+Improve performance of laser
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice

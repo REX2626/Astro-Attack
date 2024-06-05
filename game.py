@@ -8,6 +8,7 @@ Settings are loaded from save at the start of the program
 Game constants are loaded from save at the start of a game
 """
 
+from __future__ import annotations
 import os
 import json
 import pygame
@@ -26,7 +27,7 @@ display_info = pygame.display.Info()
 FULLSCREEN = True
 WIDTH = display_info.current_w
 HEIGHT = display_info.current_h
-LOAD_DISTANCE = 5 # Chunks loaded from player
+LOAD_DISTANCE = 5  # Chunks loaded from player
 ENTITY_CULLING = False
 
 settings = [
@@ -86,7 +87,7 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
-CHUNK_SIZE = 600 # How big each chunk is
+CHUNK_SIZE = 600  # How big each chunk is
 
 SPAWN_SIZE = 4
 
@@ -96,6 +97,11 @@ ENTITY_DICT = {"Enemy_Ship": "Enemy Ship", "Mother_Ship": "Mother Ship", "Drone_
 # WORLD CONSTANTS
 # ==================
 
+# This allows type hinting for game.player, done this way to avoid circular import errors
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from player import Player_Ship
+
 import dill
 
 global_variables = globals().copy()
@@ -103,7 +109,7 @@ global_variables = globals().copy()
 NAME = None
 SEED = None
 CHUNKS = None
-player = None
+player: Player_Ship = None
 
 SCREEN_SHAKE = 0
 
