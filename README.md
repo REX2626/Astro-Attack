@@ -15,6 +15,14 @@ Tips:
 If above doesn't work, try the command below
 pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/red_ship.ico" --name "Astro Attack a1.2.0" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
 
+### Performance tips:
+Use fblits
+
+Look at pre-multiplying alpha
+
+Look at blend flags when blitting
+
+Look at colour keys for images with alpha 0 or 255
 
 ## TODO:
 
@@ -522,3 +530,4 @@ Render bullets on top of other things
 Outline of space stations is thin at bottom
 
 Test if using Surface.fblits is faster (for drawing stars)
+draw_stars() is now twice as fast as in a1.5.0

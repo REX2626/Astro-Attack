@@ -90,10 +90,10 @@ def handle_player_input(keys_pressed, delta_time):
     else:
         player.no_boost(delta_time)
 
-    if pygame.mouse.get_pressed()[0]: # left click
+    if pygame.mouse.get_pressed()[0]:  # left click
         player.shoot()
 
-    if player.cursor_highlighted and pygame.mouse.get_pressed()[2]: # right click
+    if player.cursor_highlighted and pygame.mouse.get_pressed()[2]:  # right click
         player.tracked_enemy = player.aiming_enemy
 
     if keys_pressed[pygame.K_UP]:
