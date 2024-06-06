@@ -141,9 +141,10 @@ def update_graphics_screen_size() -> None:
 circles = []
 for layer in range(layers):
     diameter = layer + 1
-    surf = pygame.Surface((200, 200))
+    surf = pygame.Surface((200, 200), flags=pygame.SRCALPHA)  # Using alpha for scaling makes stars more diamond than circle
     pygame.draw.circle(surf, (200, 200, 200), (100, 100), 100)
     surf = pygame.transform.smoothscale(surf, (diameter, diameter))
+    surf.convert()  # Remove alpha as we use colorkey for transparency
     surf.set_colorkey((0, 0, 0))
     circles.append(surf)
 
