@@ -144,6 +144,7 @@ for layer in range(layers):
     surf = pygame.Surface((200, 200))
     pygame.draw.circle(surf, (200, 200, 200), (100, 100), 100)
     surf = pygame.transform.smoothscale(surf, (diameter, diameter))
+    surf.set_colorkey((0, 0, 0))
     circles.append(surf)
 
 draw_circles = WIN.fblits

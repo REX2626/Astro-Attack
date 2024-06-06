@@ -26,11 +26,6 @@ Look at colour keys for images with alpha 0 or 255
 
 ## TODO:
 
-### a1.5.1 (bug fixes and improvements)
-Improve laser raycasting so it uses the correct, rotated hit box
-
-Add hitboxes to debug mode
-
 ### a1.6.0 (station docking and boarding, moving around ship, top down person view)
 Ability to dock with friendly stations and board enemy stations
 Player can walk around station
@@ -77,6 +72,10 @@ Add PlayerShip type hint to game.player
 Fix objects jumping in and out of mini map
 
 Improve performance of laser
+
+Improve laser raycasting so it uses the correct, rotated hit box
+
+Add hitboxes to debug mode
 
 ### Other
 Enemy stations can only respawn reinforcements once or twice
