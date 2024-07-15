@@ -102,11 +102,13 @@ class Vector():
         return (self.x**2 + self.y**2) ** 0.5
 
     def set_magnitude(self, magnitude: float) -> None:
-        # cringe way of updating self
-        # can't do "self = new_vector" as self is just a variable
-        new_vector = self * magnitude / self.magnitude()
-        self.x = new_vector.x
-        self.y = new_vector.y
+        factor = magnitude / self.magnitude()
+        self.x *= factor
+        self.y *= factor
+
+    def with_magnitude(self, magnitude: float) -> None:
+        if self.magnitude() == 0: return Vector(0, 0)
+        return self * magnitude / self.magnitude()
 
     def get_angle_to(self, position: Vector) -> float:
         angle = math.atan((-position.y + self.y) / (position.x - self.x))

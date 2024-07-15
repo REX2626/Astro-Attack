@@ -10,7 +10,8 @@ Tips:
 6: For additional files choose assets (C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets)
 7: In advanced, set name to "Astro Attack [version]"
 8: In advanced, enable --clean
-9: Click convert .py to .exe
+9: In advanced, set --optimize to 2
+10: Click convert .py to .exe
 
 If above doesn't work, try the command below
 pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/red_ship.ico" --name "Astro Attack a1.2.0" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
