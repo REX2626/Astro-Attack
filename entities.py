@@ -111,17 +111,18 @@ class Asteroid(Object):
             number = random.randint(0, len(images.ASTEROIDS)-1)
         super().__init__(position, lambda: images.ASTEROIDS[number])
 
-        # Set Asteroid to random rotation
-        self.rotation = random.random() * 360
-        self.image = pygame.transform.rotate(self.image, self.rotation)
+        # Set Asteroid to random rotation (in radians)
+        # Asteroid image is already rotated
+        self.rotation = random.random() * 2 * math.pi
+        self.image = pygame.transform.rotate(self.image, math.degrees(self.rotation))
         self.mask = pygame.mask.from_surface(self.image)
 
         self.previous_delta_time = 1
 
     def __setstate__(self, state):
         super().__setstate__(state)
-        self.image = pygame.transform.rotate(self.image, self.rotation)
-        self.scaled_image = pygame.transform.rotate(self.scaled_image, self.rotation)
+        self.image = pygame.transform.rotate(self.image, math.degrees(self.rotation))
+        self.scaled_image = pygame.transform.rotate(self.scaled_image, math.degrees(self.rotation))
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, delta_time):
@@ -195,7 +196,7 @@ def asteroid_collision(asteroid: Asteroid, entity: Entity):
             entity.velocity = original_velocity
 
         vector_to_asteroid = asteroid.position - entity.position
-        tangent_to_asteroid = vector_to_asteroid.get_rotate(math.pi/2)  # Rotate 90 degrees
+        tangent_to_asteroid = vector_to_asteroid.get_rotated(math.pi/2)  # Rotate 90 degrees
         tangent_angle = tangent_to_asteroid.get_angle()
         entity_angle = entity.velocity.get_angle()
         angle_difference = entity_angle - tangent_angle

@@ -42,10 +42,10 @@ class Player_Ship(Ship):
         def ship_offset(ship, distance): return Vector(distance * math.sin(ship.rotation), distance * math.cos(ship.rotation))
 
         def boost_offset(player): return ship_offset(player, boost_distance)
-        self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=150, initial_velocity=lambda player: Vector(0, 600).get_rotate(player.rotation)+player.velocity)
+        self.boost_particles1 = particles.ParticleSystem(self, entity_offset=boost_offset, z=2, start_size=4, end_size=0, colour=(207, 77, 17), bloom=2, duration=None, lifetime=0.5, frequency=150, initial_velocity=lambda player: Vector(0, 600).get_rotated(player.rotation)+player.velocity)
 
         def boost_offset(player): return ship_offset(player, boost_distance) + random_vector(1)
-        self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=3, end_size=0, colour=(227, 97, 37), bloom=0, duration=None, lifetime=0.5, frequency=250, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotate(player.rotation)+player.velocity)
+        self.boost_particles2 = particles.ParticleSystem(self, entity_offset=boost_offset, z=3, start_size=3, end_size=0, colour=(227, 97, 37), bloom=0, duration=None, lifetime=0.5, frequency=250, speed_variance=50, initial_velocity=lambda player: Vector(0, 700).get_rotated(player.rotation)+player.velocity)
 
         def smoke_offset(player): return ship_offset(player, 4) + random_vector(7)
         self.smoke_particles = particles.ParticleSystem(self, entity_offset=smoke_offset, z=0, start_size=4, colour=game.LIGHT_GREY, duration=None, lifetime=1.5, frequency=80, speed_variance=10, initial_velocity=lambda player: Vector(0, 0))

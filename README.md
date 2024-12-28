@@ -64,6 +64,8 @@ When bits of player ship stops working, message should come up
 Some visual to show armour, and it breaking
 
 ### Small things
+Add a pause command
+
 Rendering setting is too big
 
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears

@@ -140,7 +140,7 @@ class MiniMap():
         ), width=self.border_width, border_radius=5)
 
         # Draws player image
-        image = pygame.transform.rotate(self.player_image, game.player.rotation / math.pi * 180)
+        image = pygame.transform.rotate(self.player_image, math.degrees(game.player.rotation))
         game.WIN.blit(image, ((self.width / 2) - (image.get_width() / 2), (self.height / 2) - (image.get_height() / 2)))
 
 
@@ -792,7 +792,7 @@ def draw(delta_time):
         label = font3.render(f"Chunk Position: {game.LAST_PLAYER_POS // game.CHUNK_SIZE}", True, (255, 255, 255))
         WIN.blit(label, (8, 38))
 
-        label = font3.render(f"Angle: {round(game.player.rotation / math.pi * 180 - 180) % 360 - 180}", True, (255, 255, 255))
+        label = font3.render(f"Angle: {round(math.degrees(game.player.rotation) - 180) % 360 - 180}", True, (255, 255, 255))
         WIN.blit(label, (8, 68))
 
         label = font3.render(f"Zoom: {round(game.ZOOM, 3)}", True, (255, 255, 255))

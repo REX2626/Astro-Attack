@@ -125,7 +125,7 @@ class Vector():
         self.x = y1*math.sin(angle) + x1*math.cos(angle)
         self.y = y1*math.cos(angle) - x1*math.sin(angle)
 
-    def get_rotate(self, angle: float) -> Vector:
+    def get_rotated(self, angle: float) -> Vector:
         x1, y1 = self.x, self.y
         # The positive and negative signs are different
         # Because y increases downwards (for our coord system)
@@ -231,7 +231,7 @@ class Entity(MoveableObject):
 
     def __setstate__(self, state: dict) -> None:
         super().__setstate__(state)
-        self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
+        self.rotated_image = pygame.transform.rotate(self.scaled_image, math.degrees(self.rotation))
 
     def rotate_to(self, delta_time: float, rotation: float, speed: float) -> None:
         # Simplify rotation (-pi < self.rotation < pi)
@@ -284,13 +284,13 @@ class Entity(MoveableObject):
 
             # if image has been rescaled, then it will also need to be rotated again
             self.image_rotation = self.rotation
-            self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
+            self.rotated_image = pygame.transform.rotate(self.scaled_image, math.degrees(self.rotation))
 
             return self.rotated_image
 
         if self.image_rotation != self.rotation:
             self.image_rotation = self.rotation
-            self.rotated_image = pygame.transform.rotate(self.scaled_image, self.rotation / math.pi * 180)
+            self.rotated_image = pygame.transform.rotate(self.scaled_image, math.degrees(self.rotation))
 
         return self.rotated_image
 

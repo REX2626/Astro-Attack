@@ -171,7 +171,7 @@ class AI_Ship(Ship):
 
         # Get vector 90 degrees from player
         direction_vector = entity.position - self.position
-        rotated_vector = direction_vector.get_rotate(math.pi / 2)
+        rotated_vector = direction_vector.get_rotated(math.pi / 2)
         final_vector = Vector(rotated_vector.x + self.position.x, rotated_vector.y + self.position.y)
 
         # Alternate directions to strafe
