@@ -70,13 +70,9 @@ Rendering setting is too big
 
 When you take damage, bar is highlighted with damage before the health/armour/shield disappears
 
-Add PlayerShip type hint to game.player
-
 Fix objects jumping in and out of mini map
 
 Improve performance of laser
-
-Improve laser raycasting so it uses the correct, rotated hit box
 
 Add hitboxes to debug mode
 
@@ -533,3 +529,6 @@ Test if using Surface.fblits is faster (for drawing stars)
 draw_stars() is now twice as fast as in a1.5.0
 
 Fix laser projection near asteroids (and possibly other objects)
+
+### a1.5.2 (more bugs fixes and improvements)
+Improve laser raycasting so it uses the correct, rotated hit box

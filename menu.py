@@ -953,8 +953,9 @@ class UpgradeBar(Widget):
                 if bar == self.get_level():  # the first locked bar shows a price instead of a padlock
                     if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
-                    number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50)).render(str(2**bar), True, colour)
-                    game.WIN.blit(number, (x + width*0.35 - number.get_width()/2, self.y + height/2 - number.get_height()/2))
+                    number_font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50))
+                    number = number_font.render(str(2**bar), True, colour)
+                    game.WIN.blit(number, (x + width*0.35 - number.get_width()/2, self.y + height/2 - number_font.get_height()/2))
                     game.WIN.blit(scrap , (x + width*0.65 - scrap.get_width()/2 , self.y + height/2 - scrap.get_height()/2))
 
                 else:  # all of the locked bars show padlocks
@@ -1076,7 +1077,7 @@ class ArmourBar(Bar):
         if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
         else: colour = (255, 0, 0)
         number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30)).render(str(self.price), True, colour)
-        game.WIN.blit(number, (rect[0] + 0.225*rect[2] - number.get_width()/2, self.y - number.get_height()/2))
+        game.WIN.blit(number, (rect[0] + 0.225*rect[2] - number.get_width()/2, self.y + 0.006*game.HEIGHT - number.get_height()/2))
 
         # Draw price scrap image
         scrap_image = pygame.transform.scale_by(images.SCRAP, game.HEIGHT/images.SCRAP.get_height()*0.07)

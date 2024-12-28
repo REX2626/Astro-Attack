@@ -31,7 +31,7 @@ class Laser():
         if hasattr(entity, "damage") and callable(entity.damage):
             entity.damage(self.damage*self.delta_time, self.ship)
 
-    def raycast(self) -> tuple[int, Object]:
+    def raycast(self) -> tuple[int, Object | None]:
         self.max_range = game.PLAYER_LASER_RANGE  # assuming only player has a laser
         sin_rotation = math.sin(self.ship.rotation)
         cos_rotation = math.cos(self.ship.rotation)
