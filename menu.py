@@ -1076,8 +1076,9 @@ class ArmourBar(Bar):
         # Draw price number
         if game.SCRAP_COUNT >= self.price: colour = Menu.DEFAULT_COLOUR
         else: colour = (255, 0, 0)
-        number = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30)).render(str(self.price), True, colour)
-        game.WIN.blit(number, (rect[0] + 0.225*rect[2] - number.get_width()/2, self.y + 0.006*game.HEIGHT - number.get_height()/2))
+        number_font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/30))
+        number = number_font.render(str(self.price), True, colour)
+        game.WIN.blit(number, (rect[0] + 0.225*rect[2] - number.get_width()/2, self.y + 0.002*game.HEIGHT - number_font.get_height()/2))
 
         # Draw price scrap image
         scrap_image = pygame.transform.scale_by(images.SCRAP, game.HEIGHT/images.SCRAP.get_height()*0.07)
