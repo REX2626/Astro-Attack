@@ -69,13 +69,10 @@ class Vector():
         # arg can't be a Vector
         return Vector(self.x * arg, self.y * arg)
 
-    def __mod__(self, arg: Vector) -> Vector:
-        return Vector(int(self.x) % arg, int(self.y) % arg)
-
     def __neg__(self) -> Vector:
         return Vector(-self.x, -self.y)
 
-    def __bool__(self) -> Vector:
+    def __bool__(self) -> bool:
         return bool(self.x) or bool(self.y)
 
     def __repr__(self) -> str:
@@ -106,7 +103,7 @@ class Vector():
         self.x *= factor
         self.y *= factor
 
-    def with_magnitude(self, magnitude: float) -> None:
+    def with_magnitude(self, magnitude: float) -> Vector:
         if self.magnitude() == 0: return Vector(0, 0)
         return self * magnitude / self.magnitude()
 
@@ -210,11 +207,9 @@ class MoveableObject(Object):
         self.velocity = velocity
 
     def update(self, delta_time: float) -> None:
-
         game.CHUNKS.move_entity(self, delta_time)
 
     def move_towards(self, target_position: Vector, speed: float) -> None:
-
         self.velocity = target_position - self.position
         self.velocity.set_magnitude(speed)
 

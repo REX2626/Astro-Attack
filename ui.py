@@ -9,6 +9,7 @@ import commands
 import math
 import time
 import psutil
+from typing import Callable
 from pygame import freetype
 import pygame
 
@@ -558,7 +559,7 @@ class AdjustableText():
 
 
 class MissionOverview():
-    def __init__(self, x, y, width, height) -> None:
+    def __init__(self, x: Callable[[], int], y: Callable[[], int], width: int, height: int) -> None:
         # Coordinates are from right side of MissionOverview ui to make it easier
         self.x = x
         self.y = y
@@ -584,7 +585,7 @@ class MissionOverview():
     def draw(self):
         pygame.draw.rect(game.WIN, game.DARK_GREY, (self.x() - self.width, self.y() - (self.height/2), self.width, self.height), border_radius=7)
 
-        if game.CURRENT_MISSION_SLOT:
+        if game.CURRENT_MISSION_SLOT != None:
             data = game.MISSIONS[game.CURRENT_MISSION_SLOT]
             if data["current_number"] >= data["number"]:  # If reward completed: draw "Claim Reward"
                 game.WIN.blit(self.claim_reward_label, (self.x()-self.claim_reward_label_width/2-self.width/2, self.y()+self.height/4-self.claim_reward_label_height/2))
@@ -597,6 +598,10 @@ class MissionOverview():
 
                 self.progress_bar.update(data["current_number"]/data["number"])
                 self.progress_bar.draw()
+
+                # Draw the image for the goal
+                image = game.ENTITY_IMAGE_DICT[data["goal"]]
+                game.WIN.blit(image, (self.x() - image.get_width()/2 - self.width/2, self.y() - image.get_height()/2))
 
             if data["mission_type"] == game.KILL:
                 self.title_label = self.kill_mission_label

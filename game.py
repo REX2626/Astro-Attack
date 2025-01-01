@@ -97,6 +97,9 @@ CHUNK_SIZE = 600  # How big each chunk is
 SPAWN_SIZE = 4
 
 ENTITY_DICT = {"Enemy_Ship": "Enemy Ship", "Mother_Ship": "Mother Ship", "Drone_Enemy": "Drone Ship", "Missile_Ship": "Missile Ship"}
+ENTITY_IMAGE_DICT = {"Enemy_Ship": images.ENEMY_SHIP, "Mother_Ship": images.MOTHER_SHIP, "Drone_Enemy": images.DRONE_SHIP, "Missile_Ship": images.MISSILE_SHIP}
+for ship in ENTITY_IMAGE_DICT:
+    ENTITY_IMAGE_DICT[ship] = pygame.transform.scale2x(ENTITY_IMAGE_DICT[ship])
 
 # ==================
 # WORLD CONSTANTS

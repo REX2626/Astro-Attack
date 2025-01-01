@@ -1,5 +1,4 @@
 import game
-from game import *
 from entities import Bullet, Asteroid
 from weapons import PlayerBlaster, PlayerGatlingGun, PlayerSniper
 from laser import Laser
@@ -48,7 +47,7 @@ def screen_shake(delta_time):
 
 def draw_window(delta_time):
     """Draw window"""
-    WIN.fill(BLACK)
+    game.WIN.fill(game.BLACK)
 
     screen_shake(delta_time)
 
@@ -56,7 +55,7 @@ def draw_window(delta_time):
 
 
     for object in graphics.get_entities_to_draw():
-        object.draw(WIN, player.position)
+        object.draw(game.WIN, player.position)
 
     if game.DEBUG_SCREEN:
         graphics.draw_chunks()
