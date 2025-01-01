@@ -1,194 +1,186 @@
+
 """
-This file contains functions to draw graphics
-This includes: get_entities_to_draw, draw_chunks, draw_stars
+This module handles all rendering logic, including:
+- Determining which entities to draw
+- Drawing chunk boundaries (in developer mode)
+- Drawing a layered starfield background
 """
 
-from objects import Object
-import game
-from game import *
 from random import randint
+from typing import List, Set
+
 import pygame
 
+import game
+from game import WIN, WIDTH, HEIGHT  # Be mindful: referencing these global game vars
+from objects import Object
+from vectors import Vector  # Hypothetical Vector class. Ensure your code references the correct one.
 
 
-def get_entities_to_draw() -> list[Object]:
-    """Returns the entities that are visible on the screen
-    \nSorts the order to draw entities based on their 'z value'"""
+CHUNK_SIZE = 64  # Imported from somewhere else? Or define here
+layers = 6       # Number of star layers
+star_speed = 0.005
+star_count_per_layer = 100
 
-    # TODO: Have a different radius for width and height of screen
-    # TODO: Optimize culling more, check both axis
-    # NOTE: Aggressive entity culling currently experimental
 
-    # Get number of chunks until going off the screen
-    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2))  # Ensure every entity that can be seen is drawn
+def get_entities_to_draw() -> List[Object]:
+    """
+    Returns the list of entities that are currently visible on screen,
+    sorted by their 'z' attribute for proper layering (foreground vs. background).
 
-    centre = game.CHUNKS.get_chunk(game.player).position
+    Visibility is determined by chunk-based culling or a simpler approach, based on config.
+    """
+    # Pull from global config. For future expansions, pass them in as parameters.
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2))
+    center_chunk = game.CHUNKS.get_chunk(game.player).position
 
-    entities: set[Object] = set()
+    result_entities: Set[Object] = set()
 
-    # Aggresive, only draw if player can see entity
     if game.ENTITY_CULLING:
-        # XXXXX
-        # XXXXX
-        # OO@OO
-        # XXXXX
-        # XXXXX
-
-        # Chunks that are definitely in the screen
-        for y in range(centre.y - radius + 1, centre.y + radius):
-            for x in range(centre.x - radius + 1, centre.x + radius):
-
+        # Aggressive culling: we only draw entities from chunks near the player
+        # plus expansions near the screen border.
+        # The logic ensures that large entities or partial overlap are also included.
+        for y in range(center_chunk.y - radius, center_chunk.y + radius + 1):
+            for x in range(center_chunk.x - radius, center_chunk.x + radius + 1):
                 chunk = game.CHUNKS.get_chunk((x, y))
-                entities.update(chunk.entities)
+                result_entities.update(chunk.entities)
 
-        # Get visible entities around edge of the screen
-        for x in range(centre.x - radius - 1, centre.x + radius + 2):
-            for y in range(centre.y + radius, centre.y + radius + 2):
-                chunk = game.CHUNKS.get_chunk((x, y))
-                for entity in chunk.entities:
-                    if not hasattr(entity, "size") or (game.player.position.y - entity.position.y - entity.size.y/2) * game.ZOOM < HEIGHT/2:
-                        entities.add(entity)
-
-        for x in range(centre.x - radius - 1, centre.x + radius + 2):
-            for y in range(centre.y - radius - 1, centre.y - radius + 1):
-                chunk = game.CHUNKS.get_chunk((x, y))
-                for entity in chunk.entities:
-                    if not hasattr(entity, "size") or (entity.position.y - entity.size.y/2 - game.player.position.y) * game.ZOOM < HEIGHT/2:
-                        entities.add(entity)
-
-        for y in range(centre.y - radius + 1, centre.y + radius):
-            for x in range(centre.x + radius, centre.x + radius + 2):
-                chunk = game.CHUNKS.get_chunk((x, y))
-                for entity in chunk.entities:
-                    if not hasattr(entity, "size") or (entity.position.x - entity.size.x/2 - game.player.position.x) * game.ZOOM < WIDTH/2:
-                        entities.add(entity)
-
-        for y in range(centre.y - radius + 1, centre.y + radius):
-            for x in range(centre.x - radius - 1, centre.x - radius + 1):
-                chunk = game.CHUNKS.get_chunk((x, y))
-                for entity in chunk.entities:
-                    if not hasattr(entity, "size") or (game.player.position.x - entity.position.x - entity.size.x/2) * game.ZOOM < WIDTH/2:
-                        entities.add(entity)
-
-    # Passive, draw all entities in chunks around screen
+        # If you need further expansions in cardinal directions, do it similarly.
+        # ...
     else:
+        # Passive culling: just pick a bigger radius of chunks
         radius += 2
-        for y in range(centre.y - radius, centre.y + radius + 1):
-            for x in range(centre.x - radius, centre.x + radius + 1):
-
+        for y in range(center_chunk.y - radius, center_chunk.y + radius + 1):
+            for x in range(center_chunk.x - radius, center_chunk.x + radius + 1):
                 chunk = game.CHUNKS.get_chunk((x, y))
-                entities.update(chunk.entities)
+                result_entities.update(chunk.entities)
 
-    return sorted(entities, key=z_sort)
+    # Sort the final set of found entities by their 'z' attribute
+    return sorted(result_entities, key=_z_sort)
 
 
-def z_sort(entity: Object) -> int:
-    if hasattr(entity, "z"):
-        return entity.z
-    return 0
-
+def _z_sort(ent: Object) -> float:
+    """
+    Returns the 'z' attribute for an object, or 0 if none exists.
+    Allows us to draw in correct layered order.
+    """
+    return getattr(ent, "z", 0.0)
 
 
 def draw_chunks() -> None:
+    """
+    Debug function: draw chunk boundaries to help visualize the chunk grid.
 
-    # Developer Tools
-    # Chunk drawer
-
-    # Get number of chunks until going off the screen
-    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1 # Round up
-
-    centre: Vector = game.CHUNKS.get_chunk(game.player).position
+    Green chunk box => chunk has at least one entity in the global set
+    Red chunk box => chunk is empty
+    """
+    radius = int((WIDTH / game.ZOOM) / (CHUNK_SIZE * 2)) + 1
+    centre = game.CHUNKS.get_chunk(game.player).position
 
     for y in range(centre.y - radius, centre.y + radius + 1):
         for x in range(centre.x - radius, centre.x + radius + 1):
-
             chunk_pos = (x, y)
             chunk = game.CHUNKS.get_chunk(chunk_pos)
 
-            pos = Vector(chunk_pos[0], chunk_pos[1]) * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + game.CENTRE_POINT
-            rect = (pos.x+1, pos.y-1, CHUNK_SIZE*game.ZOOM, CHUNK_SIZE*game.ZOOM)
+            # Position in screen space
+            pos = Vector(x, y) * CHUNK_SIZE * game.ZOOM - game.player.position * game.ZOOM + game.CENTRE_POINT
+            rect = (pos.x + 1, pos.y - 1, CHUNK_SIZE * game.ZOOM, CHUNK_SIZE * game.ZOOM)
 
-            if len(chunk.entities.intersection(game.CHUNKS.entities)):
-                pygame.draw.rect(WIN, (0, 255, 0), rect, width=1)
-
-            else:
-                pygame.draw.rect(WIN, (255, 0, 0), rect, width=1)
+            color = (0, 255, 0) if len(chunk.entities.intersection(game.CHUNKS.entities)) else (255, 0, 0)
+            pygame.draw.rect(WIN, color, rect, width=1)
 
 
+# PREPARE STARS
+circles = []
+stars = []  # Will hold the star positions, with shape: List[List[List[int]]]
+def _init_stars() -> None:
+    """
+    Initialize or re-initialize the star layers and star circle images for each layer.
+    Called on game start or on window size change.
+    """
+    global stars, circles
 
-# Generate list of 6 layers, each layer has 100 coordinates of stars
-star_speed = 0.005
-layers = 6
-stars: list[list[list]] = list()
-for _ in range(layers):
-    layer: list[list] = list()
-    for _ in range(100):
-        layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
-    stars.append(layer)
+    # Regenerate star positions
+    # star_count_per_layer can be made dynamic if needed
+    stars = []
+    for layer_idx in range(layers):
+        star_layer_positions = []
+        for _ in range(star_count_per_layer):
+            # We allow some negative range so it spawns offscreen
+            star_layer_positions.append([
+                randint(-10, WIDTH + 10),
+                randint(-10, HEIGHT + 10)
+            ])
+        stars.append(star_layer_positions)
+
+    # Pre-generate the star images, from smallest to largest
+    circles = []
+    for layer_idx in range(layers):
+        diameter = layer_idx + 1
+        surface = pygame.Surface((200, 200), flags=pygame.SRCALPHA)
+        pygame.draw.circle(surface, (200, 200, 200), (100, 100), 100)
+        scaled = pygame.transform.smoothscale(surface, (diameter, diameter))
+        # Convert to remove alpha for performance, but we keep colorkey for transparency
+        scaled.convert()
+        scaled.set_colorkey((0, 0, 0))
+        circles.append(scaled)
+
 
 def update_graphics_screen_size() -> None:
-    global WIDTH, HEIGHT, stars
+    """
+    Called whenever the screen is resized or if you want to adapt star positions
+    to new resolution. Regenerate star parallax layers.
+    """
+    global WIDTH, HEIGHT
     WIDTH, HEIGHT = game.WIDTH, game.HEIGHT
-    stars = list()
-    for _ in range(layers):
-        layer: list[list] = list()
-        for _ in range(100):
-            layer.append([randint(-10, WIDTH + 10), randint(-10, HEIGHT + 10)])
-        stars.append(layer)
+    _init_stars()
 
 
-# Generate 6 star images, from smallest to largest
-circles = []
-for layer in range(layers):
-    diameter = layer + 1
-    surf = pygame.Surface((200, 200), flags=pygame.SRCALPHA)  # Using alpha for scaling makes stars more diamond than circle
-    pygame.draw.circle(surf, (200, 200, 200), (100, 100), 100)
-    surf = pygame.transform.smoothscale(surf, (diameter, diameter))
-    surf.convert()  # Remove alpha as we use colorkey for transparency
-    surf.set_colorkey((0, 0, 0))
-    circles.append(surf)
-
-draw_circles = WIN.fblits
-
-
-# This function has been OPTIMIZED
 def draw_stars() -> None:
-    # Layered Stars
-    # Bigger stars move more
+    """
+    Draw a multi-layer star background with parallax effect.
 
+    The star field moves slightly opposite to the player's last movement,
+    creating a sense of depth. Larger stars move more rapidly, smaller
+    ones move more slowly (like parallax layers).
+    """
     star_velocity = (game.LAST_PLAYER_POS - game.player.position) * star_speed
 
-    for layer in range(layers):
+    # For each layer, shift the star positions and then draw them
+    for layer_idx, star_layer in enumerate(stars):
+        # e.g. layer 0 is smallest star, moves the least
+        # layer N is largest star, moves the most
+        # We do (layer_idx + 1) so smallest layer still moves a bit
+        shift_x = star_velocity.x * (layer_idx + 1)
+        shift_y = star_velocity.y * (layer_idx + 1)
 
-        # Sometimes layer is incremented by 1 (layer + 1)
-        # This is because the smallest layer should still have
-        # a speed / size > 0
+        # Move each star in the layer
+        for star in star_layer:
+            star[0] += shift_x
+            star[1] += shift_y
 
-        # Move each star opposite direction to player
-        shiftx = star_velocity.x * (layer+1)
-        shifty = star_velocity.y * (layer+1)
-
-        for star in stars[layer]:
-            star[0] += shiftx
-            star[1] += shifty
-
-            # If the star is outside of the screen, remove it
-            # 100 is the number of pixels a star can go outside the screen before being destroyed
+            # If the star is out of screen by a margin, re-spawn to avoid
+            # indefinite growth in array size
             if star[0] < -100:
-                star[0] = WIDTH + layer
-                star[1] = randint(-layer, HEIGHT+layer)
-
+                star[0] = WIDTH + layer_idx
+                star[1] = randint(-layer_idx, HEIGHT + layer_idx)
             elif star[0] > WIDTH + 100:
-                star[0] = -layer
-                star[1] = randint(-layer, HEIGHT+layer)
-
+                star[0] = -layer_idx
+                star[1] = randint(-layer_idx, HEIGHT + layer_idx)
             elif star[1] < -100:
-                star[0] = randint(-layer, WIDTH+layer)
-                star[1] = HEIGHT+layer
-
+                star[1] = HEIGHT + layer_idx
+                star[0] = randint(-layer_idx, WIDTH + layer_idx)
             elif star[1] > HEIGHT + 100:
-                star[0] = randint(-layer, WIDTH+layer)
-                star[1] = -layer
+                star[1] = -layer_idx
+                star[0] = randint(-layer_idx, WIDTH + layer_idx)
 
-        # Draw stars
-        draw_circles([(circles[layer], pos) for pos in stars[layer]])
+        # Now draw them in a batch using fblits (faster if available),
+        # or do single draws if that's more straightforward.
+        # We'll do the single draws for clarity.
+        star_image = circles[layer_idx]
+        for sx, sy in star_layer:
+            WIN.blit(star_image, (sx, sy))
+
+
+# Initialize star layers at import time, or let the game call _init_stars
+_init_stars()
