@@ -892,8 +892,8 @@ class UpgradeBar(Widget):
                     Menu.update()
 
                 # if bar is the next level, upgrade to that level
-                elif bar == self.get_level() and game.SCRAP_COUNT >= bar+1:
-                    game.SCRAP_COUNT -= bar+1
+                elif bar == self.get_level() and game.SCRAP_COUNT >= 2**bar:
+                    game.SCRAP_COUNT -= 2**bar
                     self.upgrade_level()
                     self.set_value(self.min_value + self.get_level() * self.step)
                     Menu.update()

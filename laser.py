@@ -54,7 +54,8 @@ class Laser():
                     for cx in range(chunk_x - 1, chunk_x + 2):
                         total_entities.extend(game.CHUNKS.get_chunk_from_coord((cx, cy)).entities)
 
-                total_entities.remove(self.ship)
+                if self.ship in total_entities:
+                    total_entities.remove(self.ship)
 
                 for entity in total_entities:
                     if (isinstance(entity, entities.Ship) or
