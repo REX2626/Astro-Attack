@@ -308,13 +308,13 @@ class Image(Widget):
 
 
 
-class AdjustableText(Widget):
+class AdjustableText():
     def __init__(self,
             top_x: int,
             top_y: int,
             bottom_x: int,
             bottom_y: int,
-            text: str,
+            text: str = "",
             font: str = Menu.DEFAULT_FONT,
             default_font_size: int = Menu.DEFAULT_FONT_SIZE,
             colour: Colour = Menu.DEFAULT_COLOUR
@@ -324,8 +324,7 @@ class AdjustableText(Widget):
         self.bottom_x = bottom_x
         self.bottom_y = bottom_y
 
-        self.text = text
-        self.words = self.text.split(" ")
+        self.words = text.split(" ")
         self.font_type = font
         self.default_font_size = default_font_size
         self.colour = colour
@@ -335,6 +334,9 @@ class AdjustableText(Widget):
         self.line_spacing = self.font.get_sized_height()
 
         self.low_letters = ["g", "j", "q", "p", "y"]
+
+    def change_text(self, text: str) -> None:
+        self.words = text.split(" ")
 
     def render_words(self) -> list:
         low_letter_difference = self.font.get_rect("y").height - self.font.get_rect("u").height
@@ -359,8 +361,7 @@ class AdjustableText(Widget):
                 self.default_font_size -= 1
                 self.font = freetype.SysFont(self.font_type, self.default_font_size)
                 self.line_spacing = self.font.get_sized_height()
-                self.render_words()
-                break
+                return self.render_words()
 
             if low_letter:
                 render_list.append((x, y + (self.line_spacing - bounds.height), word))
@@ -372,13 +373,10 @@ class AdjustableText(Widget):
         return render_list
 
     def draw(self) -> None:
-        # pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
-
         render_list = self.render_words()
 
-        if len(render_list) == len(self.words):
-            for element in render_list:
-                self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
+        for element in render_list:
+            self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
 
 
 
@@ -1474,89 +1472,101 @@ class SeedTextInput(TextInput):
 
 
 class Mission():
-    def __init__(self, slot: int, number: int, goal: str, mission_type: int, reward: int) -> None:
+    def __init__(self, slot: int, class_list: dict[str, int]) -> None:
         self.slot = slot
+        self.class_list = class_list
 
         # Changes x position based on what slot it is in (there are three mission slots)
         self.x = 0.2 + 0.3*self.slot
         self.y = 0.62
-
         self.width = 0.2
         self.height = 0.4
 
-        self.accept_button = Button(self.x, self.y, "Accept", function=lambda: self.accept())
-        self.decline_button = Button(self.x, self.y+0.1, "Decline", function=lambda: self.decline())
-        self.claim_reward_button = Button(self.x, self.y-0.1+(self.height/2), "Claim Reward", function=lambda: self.claim_reward())
+        self.accept_button = Button(self.x, self.y, "Accept", function=self.accept)
+        self.decline_button = Button(self.x, self.y+0.1, "Decline", function=self.decline)
+        self.claim_reward_button = Button(self.x, self.y-0.1+(self.height/2), "Claim Reward", function=self.claim_reward)
 
-        self.mission_manager: MissionManager = None
+        self.progress_text = Text(self.x, self.y-0.05, text=lambda: f"{game.MISSIONS[self.slot]["current_number"]}/{game.MISSIONS[self.slot]["number"]}", font_size=25)
+        self.progress_bar = Bar(self.x-(self.width/2), self.y, width=self.width, height=self.height/8, value=lambda: game.MISSIONS[self.slot]["current_number"], max_value=lambda: game.MISSIONS[self.slot]["number"], colour=(0, 0, 190), outline_width=3, curve=7)
 
-        # number = number of things for the mission
-        # goal = Target for the mission (e.g. Mother_Ship)
-        # mission_type = what type of mission it is (e.g. kill mission)
-        # reward = number of scrap claimed after completion
-        self.number = number
-        self.current_number = 0
-        self.goal = goal
-        self.mission_type = mission_type
-        self.reward = reward
-
-        self.progress_text = Text(self.x, self.y-0.05, text=lambda: f"{self.current_number}/{self.number}", font_size=25)
-
-        self.progress_bar = Bar(self.x-(self.width/2), self.y, width=self.width, height=self.height/8, value=lambda: self.current_number, max_value=lambda: self.number, colour=(0, 0, 190), outline_width=3, curve=7)
-
-        if self.mission_type == game.KILL:
-            self.title_text = Text(self.x, self.y-0.05-self.height/2, "Kill Mission")
-
-            self.info = f"Kill {self.number} {game.ENTITY_DICT.get(self.goal)}s REWARDS: {self.reward} Scrap"
-
-        self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, text=self.info, default_font_size=70)
-
-        # True if you have clicked accept on a mission
-        self.in_progress = False
+        self.title_text = Text(self.x, self.y-0.05-self.height/2, "Kill Mission")
+        self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, default_font_size=70)
 
         # False if one of the three missions is in progress - when false, you will not be able to accept the mission
         self.active = True
 
-        # Draw the info_text immediately since we dont want to wait for the menu to draw it
-        self.info_text.draw()
+    @property
+    def in_progress(self) -> bool:
+        # True if you have clicked accept on a mission
+        return game.CURRENT_MISSION_SLOT == self.slot
 
     def accept(self) -> None:
-        self.in_progress = True
-        game.CURRENT_MISSION = [self.current_number, self.number, self.goal, self.mission_type, self.reward]
+        game.CURRENT_MISSION_SLOT = self.slot
         Menu.update()
 
     def decline(self) -> None:
         if self.in_progress:
-            game.CURRENT_MISSION = None
-        self.mission_manager.remove_mission(self)
+            game.CURRENT_MISSION_SLOT = None
+        self.refresh()
         Menu.update()
 
     def claim_reward(self) -> None:
-        game.SCRAP_COUNT += self.reward
-        game.CURRENT_MISSION = None
+        game.SCRAP_COUNT += game.MISSIONS[self.slot]["reward"]
         self.decline()  # Removes this mission after claiming reward
 
     def click(self, mouse: Coord) -> bool:
         # Making sure button functions are run when clicked
-        if not self.in_progress:
-            if self.active:
-                if self.accept_button.click(mouse) is True: return CLICKED
-                if self.decline_button.click(mouse) is True: return CLICKED
-        else:
-            if self.current_number >= self.number:
+        if self.in_progress:
+            data = game.MISSIONS[self.slot]
+            if data["current_number"] >= data["number"]:
                 if self.claim_reward_button.click(mouse) is True: return CLICKED
             else:
                 if self.decline_button.click(mouse) is True: return CLICKED
+        else:
+            if self.active:
+                if self.accept_button.click(mouse) is True: return CLICKED
+                if self.decline_button.click(mouse) is True: return CLICKED
 
-    def update(self) -> None:
+    def get_enemy(self) -> str:
+        class_list = list(self.class_list)
+        if game.CURRENT_SHIP_LEVEL < 10:
+            class_list.remove("Missile_Ship")
+
+        return random.choice(class_list)
+
+    def refresh(self) -> None:
+        # number = number of things for the mission
+        # goal = Target for the mission (e.g. Mother_Ship)
+        # mission_type = what type of mission it is (e.g. kill mission)
+        # reward = number of scrap claimed after completion
+
+        number = random.randint(5, 15)
+        goal = self.get_enemy()
+        mission_type = game.KILL
+        reward = number * (1+game.CURRENT_SHIP_LEVEL)**0.5 * self.class_list[goal]  # reward depends on number, difficulty and type of enemy
+        reward *= 0.9 + random.random()*0.2  # reward +- 10% to make it look a bit random
+
+        game.MISSIONS[self.slot] = {
+            "current_number": 0,
+            "number": number,
+            "goal": goal,
+            "mission_type": mission_type,
+            "reward": round(reward)
+        }
+
+    def draw(self) -> None:
         # Drawing title and info
         self.title_text.draw()
+
+        data = game.MISSIONS[self.slot]
+        self.info_text.change_text(f"Kill {data["number"]} {game.ENTITY_DICT.get(data["goal"])}s REWARDS: {data["reward"]} Scrap")
+
         self.info_text.draw()
 
         # If the mission is in progress - draw the progress bar and stop drawing the accept and decline button. Once the mission is done, it draws the claim reward button
         if self.in_progress:
-            self.current_number = game.CURRENT_MISSION[0]
-            if self.current_number >= self.number:
+            data = game.MISSIONS[self.slot]
+            if data["current_number"] >= data["number"]:
                 self.claim_reward_button.draw()
             else:
                 self.decline_button.draw()
@@ -1572,55 +1582,14 @@ class Mission():
 
 class MissionManager():
     def __init__(self) -> None:
+        class_list = {
+            "Drone_Enemy": 1,
+            "Enemy_Ship": 1,
+            "Mother_Ship": 2,
+            "Missile_Ship": 2
+        }
 
-        self.missions: list[Mission] = []
-
-        # Set this value to a slot number so that the next mission will be added to this slot
-        self.slot_missing = 0
-
-        self.class_list = {"Drone_Enemy": 1,
-                           "Enemy_Ship": 1,
-                           "Mother_Ship": 2,
-                           "Missile_Ship": 2}
-
-        self.update_current_mission()
-
-        # Spawns in three missions (or 2 if there was previously 1 mission in progress)
-        while self.slot_missing < 3:
-            self.add_mission()
-            self.slot_missing += 1
-
-    def update_current_mission(self) -> None:
-        """Upon game restart, if game.CURRENT_MISSION then add that Mission to MissionManager"""
-        if game.CURRENT_MISSION:
-            self.slot_missing = 1
-            mission = Mission(self.slot_missing, game.CURRENT_MISSION[1], game.CURRENT_MISSION[2], game.CURRENT_MISSION[3], game.CURRENT_MISSION[4])
-            mission.current_number = game.CURRENT_MISSION[0]
-            mission.in_progress = True
-            mission.mission_manager = self
-            self.missions.append(mission)
-
-    def get_enemy(self) -> str:
-        class_list = list(self.class_list)
-        if game.CURRENT_SHIP_LEVEL < 10:
-            class_list.remove("Missile_Ship")
-
-        return random.choice(class_list)
-
-    def add_mission(self) -> None:
-        goal = self.get_enemy()
-        number = random.randint(5, 15)
-        reward = number * (1+game.CURRENT_SHIP_LEVEL)**0.5 * self.class_list[goal]  # reward depends on number, difficulty and type of enemy
-        reward *= 0.9 + random.random()*0.2  # reward +- 10% to make it look a bit random
-        mission = Mission(self.slot_missing, number, goal, game.KILL, round(reward))
-        mission.mission_manager = self
-        self.missions.append(mission)
-
-    def remove_mission(self, mission: Mission) -> None:
-        if mission in self.missions:
-            self.slot_missing = mission.slot
-            self.add_mission()
-            self.missions.remove(mission)
+        self.missions = [Mission(i, class_list) for i in range(3)]
 
     def click(self, mouse: Coord) -> bool:
         for mission in self.missions:
@@ -1628,12 +1597,17 @@ class MissionManager():
                 return CLICKED
 
     def draw(self) -> None:
+        if game.MISSIONS == [None, None, None]:  # First time world is created
+            game.MISSIONS = [None for _ in range(3)]
+            for mission in self.missions:
+                mission.refresh()
+
         for mission in self.missions:
-            if game.CURRENT_MISSION:
-                mission.active = False
-            else:
+            if game.CURRENT_MISSION_SLOT is None:
                 mission.active = True
-            mission.update()
+            else:
+                mission.active = False
+            mission.draw()
 
 
 

@@ -87,6 +87,11 @@ MEDIUM_GREY = (60, 60, 60)
 DARK_GREY = (30, 30, 30)
 BLACK = (0, 0, 0)
 
+# Mission Types
+KILL = 0
+COLLECT = 1
+UPGRADE = 2
+
 CHUNK_SIZE = 600  # How big each chunk is
 
 SPAWN_SIZE = 4
@@ -168,11 +173,8 @@ PLAYER_LASER_DAMAGE_LEVEL = 0
 
 SCORE = 0
 
-CURRENT_MISSION = None
-# Mission Types
-KILL = 0
-COLLECT = 1
-UPGRADE = 2
+CURRENT_MISSION_SLOT: int = None
+MISSIONS: list[dict] = [None, None, None]
 
 CURRENT_SHIP_LEVEL = 0
 

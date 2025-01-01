@@ -486,13 +486,22 @@ class Console():
 
 
 class AdjustableText():
-    def __init__(self, top_x, top_y, bottom_x, bottom_y, font, default_font_size, colour, text="Text") -> None:
+    def __init__(self,
+            top_x: int,
+            top_y: int,
+            bottom_x: int,
+            bottom_y: int,
+            font,
+            default_font_size,
+            colour,
+            text: str = ""
+        ) -> None:
         self.top_x = top_x
         self.top_y = top_y
         self.bottom_x = bottom_x
         self.bottom_y = bottom_y
 
-        self.words = text.split()
+        self.words = text.split(" ")
         self.font_type = font
         self.default_font_size = default_font_size
         self.colour = colour
@@ -503,7 +512,10 @@ class AdjustableText():
 
         self.low_letters = ["g", "j", "q", "p", "y"]
 
-    def render_words(self):
+    def change_text(self, text: str) -> None:
+        self.words = text.split(" ")
+
+    def render_words(self) -> list:
         low_letter_difference = self.font.get_rect("y").height - self.font.get_rect("u").height
         low_letter = False
         x, y = self.top_x, self.top_y
@@ -523,7 +535,10 @@ class AdjustableText():
                 x, y = self.top_x, y + self.line_spacing
 
             if x + bounds.width >= self.bottom_x or y + self.line_spacing >= self.bottom_y:
-                break
+                self.default_font_size -= 1
+                self.font = freetype.SysFont(self.font_type, self.default_font_size)
+                self.line_spacing = self.font.get_sized_height()
+                return self.render_words()
 
             if low_letter:
                 render_list.append((x, y + (self.line_spacing - bounds.height), word))
@@ -534,16 +549,8 @@ class AdjustableText():
 
         return render_list
 
-    def draw(self):
-        # pygame.draw.rect(game.WIN, (0, 0, 0), (self.top_x, self.top_y, self.bottom_x - self.top_x, self.bottom_y-self.top_y), width=2)
-
+    def draw(self) -> None:
         render_list = self.render_words()
-
-        while len(render_list) < len(self.words):
-            self.default_font_size -= 1
-            self.font = freetype.SysFont(self.font_type, self.default_font_size)
-            self.line_spacing = self.font.get_sized_height()
-            render_list = self.render_words()
 
         for element in render_list:
             self.font.render_to(game.WIN, (element[0], element[1]), text=element[2], fgcolor=self.colour)
@@ -567,8 +574,8 @@ class MissionOverview():
 
         self.title_label = self.mission_label
 
-        self.info = "You do not have a mission currently"
-        self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), self.info)
+        info = "You do not have a mission currently"
+        self.info_text = AdjustableText(self.x() - self.width + 10, self.y() - self.height/4 - 50, self.x() - 10, self.y() + self.height/4 - 40, "bahnschrift", 30, (255, 255, 255), info)
 
         self.progress_text = "0/0"
         self.progress_label = self.font.render(self.progress_text, (255, 255, 255))[0]
@@ -577,30 +584,31 @@ class MissionOverview():
     def draw(self):
         pygame.draw.rect(game.WIN, game.DARK_GREY, (self.x() - self.width, self.y() - (self.height/2), self.width, self.height), border_radius=7)
 
-        if game.CURRENT_MISSION:
-            if game.CURRENT_MISSION[0] >= game.CURRENT_MISSION[1]:  # If reward completed: draw "Claim Reward"
+        if game.CURRENT_MISSION_SLOT:
+            data = game.MISSIONS[game.CURRENT_MISSION_SLOT]
+            if data["current_number"] >= data["number"]:  # If reward completed: draw "Claim Reward"
                 game.WIN.blit(self.claim_reward_label, (self.x()-self.claim_reward_label_width/2-self.width/2, self.y()+self.height/4-self.claim_reward_label_height/2))
             else:
-                progress_text = f"{game.CURRENT_MISSION[0]}/{game.CURRENT_MISSION[1]}"
+                progress_text = f"{data["current_number"]}/{data["number"]}"
                 if progress_text != self.progress_text:
                     self.progress_text = progress_text
                     self.progress_label = self.font.render(self.progress_text, (255, 255, 255))[0]
                 game.WIN.blit(self.progress_label, (self.x()-self.progress_label.get_width()/2-self.width/2, self.y()+self.height/4-self.progress_label.get_height()/2))
 
-                self.progress_bar.update(game.CURRENT_MISSION[0]/game.CURRENT_MISSION[1])
+                self.progress_bar.update(data["current_number"]/data["number"])
                 self.progress_bar.draw()
 
-            if game.CURRENT_MISSION[3] == game.KILL:
+            if data["mission_type"] == game.KILL:
                 self.title_label = self.kill_mission_label
-                self.info = f"Kill {game.CURRENT_MISSION[1]} {game.ENTITY_DICT.get(game.CURRENT_MISSION[2])}s"
+                info = f"Kill {data["number"]} {game.ENTITY_DICT.get(data["goal"])}s"
 
         else:
             self.title_label = self.mission_label
-            self.info = "You do not have a mission currently"
+            info = "You do not have a mission currently"
 
         game.WIN.blit(self.title_label, (self.x()-self.title_label.get_width()/2-self.width/2, self.y()-self.height/2+self.title_label.get_height()/2))
 
-        self.info_text.words = self.info.split()
+        self.info_text.change_text(info)
         self.info_text.top_x = self.x() - self.width + 10
         self.info_text.top_y = self.y() - self.height/4 - 50
         self.info_text.bottom_x = self.x() - 10
