@@ -1,17 +1,17 @@
 # Astro-Attack
 
 ### Package command:
-Tips:
-1: Delete all pyinstaller folders (ouput, spec, dist, build)
-2: Run auto-py-to-exe
-3: Set script location to main.py (C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py)
-4: Choose "One File" and "Window Based"
-5: Choose icon "C:/Users/rexat/Downloads/red_ship.ico"
-6: For additional files choose assets (C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets)
-7: In advanced, set name to "Astro Attack [version]"
-8: In advanced, enable --clean
-9: In advanced, set --optimize to 2
-10: Click convert .py to .exe
+Steps:
+1. Delete all pyinstaller folders (output, spec, dist, build)
+2. Run auto-py-to-exe
+3. Set script location to `main.py` (`C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py`)
+4. Choose "One File" and "Window Based"
+5. Choose icon `C:/Users/rexat/Downloads/red_ship.ico`
+6. For additional files choose assets (`C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets`)
+7. In advanced, set name to "Astro Attack [version]"
+8. In advanced, enable `--clean`
+9. In advanced, set `--optimize` to 2
+10. Click convert .py to .exe
 
 If above doesn't work, try the command below
 pyinstaller --noconfirm --onefile --windowed --icon "C:/Users/rexat/Downloads/red_ship.ico" --name "Astro Attack a1.2.0" --clean --add-data "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/assets;assets/"  "C:/Users/rexat/Documents/Astro Attack/Astro-Attack/main.py"
