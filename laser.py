@@ -103,6 +103,9 @@ class Laser():
             return
         self.shooting = False
 
+        # If laser extends outside of view, then don't draw it
+        self.range = min(self.range, math.hypot(game.WIDTH/2, game.HEIGHT/2)/game.ZOOM)
+
         ship = self.ship
         centre = ship.position + Vector(0, -ship.image.get_height()/2 - self.range/2)  # centre of laser
         centre.rotate_about(ship.rotation, ship.position)
