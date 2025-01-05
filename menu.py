@@ -817,9 +817,9 @@ class UpgradeBar(Widget):
             x: float = 0.23,
             font_size: int = 15,
             button_colour: Colour = (10, 20, 138),
-            bar_colour: Colour = (255, 130, 0),
+            bar_colour: Colour = (255, 125, 0),
             outline_colour: Colour = (255, 255, 255),
-            select_colour: Colour = (230, 110, 0),
+            select_colour: Colour = (255, 100, 0),
             select_outline_colour: Colour = (20, 235, 25),
             button_width: float = 0.1,
             bar_width: float = 0.08,
@@ -1728,13 +1728,13 @@ quit_confirm = Page(
 
 station = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Upgrades"),
+    Text(0.5, 0.12, "Station"),
     Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
-    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.27, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.5, 0.23, "Upgrades", function=lambda: Menu.change_page(station), outline_colour=(255, 125, 0), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     Button(0.2, 0.7, "Armour", function=lambda: Menu.change_page(armour)),
-    Button(0.4, 0.7, "Weapon", function=lambda: Menu.change_page(weapon)),
+    Button(0.4, 0.7, "Weapon", function=lambda: Menu.change_page(blaster_gun)),
     Button(0.6, 0.7, "Engine", function=lambda: Menu.change_page(engine)),
     Button(0.8, 0.7, "Radar" , function=lambda: Menu.change_page(radar)),
     Image(0.2, 0.5, images.ARMOUR_ICON, scale=6),
@@ -1750,10 +1750,10 @@ station = Page(
 
 missions = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Missions"),
+    Text(0.5, 0.12, "Station"),
     Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
-    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.27, 0.23, "Missions", function=lambda: Menu.change_page(missions), outline_colour=(255, 125, 0), uniform=True),
+    Button(0.5, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
     MissionManager(),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
@@ -1765,11 +1765,11 @@ missions = Page(
 
 stats = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Stats"),
+    Text(0.5, 0.12, "Station"),
     Button(0.12, 0.86, "Exit", function=lambda: EXIT, font_size=30),
-    Button(0.27, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
-    Button(0.5, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
-    Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), uniform=True),
+    Button(0.27, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
+    Button(0.5, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
+    Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), outline_colour=(255, 125, 0), uniform=True),
     Text(0.5, 0.5, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
@@ -1806,21 +1806,6 @@ armour = Page(
     e_press=lambda: EXIT
 )
 
-weapon = Page(
-    Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Weapon"),
-    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
-    Button(0.3, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun)),
-    Button(0.3, 0.5, "Gatling", function=lambda: Menu.change_page(gatling_gun)),
-    Button(0.7, 0.3, "Sniper" , function=lambda: Menu.change_page(sniper_gun)),
-    Button(0.7, 0.5, "Laser"  , function=lambda: Menu.change_page(laser)),
-    Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
-    Image(0.9, 0.12, images.SCRAP, scale=6),
-    background_colour=None,
-    escape=lambda: Menu.change_page(station),
-    e_press=lambda: EXIT
-)
-
 engine = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
     Text(0.5, 0.12, "Engine"),
@@ -1850,56 +1835,72 @@ radar = Page(
 
 blaster_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Blaster"),
-    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
-    UpgradeBar(0.3, "Fire Rate", "PLAYER_BLASTER_FIRE_RATE", min_value=game.PLAYER_BLASTER_FIRE_RATE, max_value=20),
-    UpgradeBar(0.4, "Damage", "PLAYER_BLASTER_DAMAGE", min_value=game.PLAYER_BLASTER_DAMAGE, max_value=2),
-    UpgradeBar(0.5, "Bullet Speed", "PLAYER_BLASTER_BULLET_SPEED", min_value=game.PLAYER_BLASTER_BULLET_SPEED, max_value=1000),
+    Text(0.5, 0.12, "Weapon"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
+    Button(0.2, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun), outline_colour=(255, 125, 0), uniform=True),
+    Button(0.2, 0.42, "Gatling", function=lambda: Menu.change_page(gatling_gun), uniform=True),
+    Button(0.2, 0.54, "Sniper" , function=lambda: Menu.change_page(sniper_gun), uniform=True),
+    Button(0.2, 0.66, "Laser"  , function=lambda: Menu.change_page(laser), uniform=True),
+    UpgradeBar(0.35, "Fire Rate", "PLAYER_BLASTER_FIRE_RATE", x=0.32, min_value=game.PLAYER_BLASTER_FIRE_RATE, max_value=20),
+    UpgradeBar(0.45, "Damage", "PLAYER_BLASTER_DAMAGE", x=0.32, min_value=game.PLAYER_BLASTER_DAMAGE, max_value=2),
+    UpgradeBar(0.55, "Bullet Speed", "PLAYER_BLASTER_BULLET_SPEED", x=0.32, min_value=game.PLAYER_BLASTER_BULLET_SPEED, max_value=1000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(weapon),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: EXIT
 )
 
 gatling_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Gatling"),
-    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
-    UpgradeBar(0.3, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
-    UpgradeBar(0.4, "Damage", "PLAYER_GATLING_DAMAGE", min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
-    UpgradeBar(0.5, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
+    Text(0.5, 0.12, "Weapon"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
+    Button(0.2, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun), uniform=True),
+    Button(0.2, 0.42, "Gatling", function=lambda: Menu.change_page(gatling_gun), outline_colour=(255, 125, 0), uniform=True),
+    Button(0.2, 0.54, "Sniper" , function=lambda: Menu.change_page(sniper_gun), uniform=True),
+    Button(0.2, 0.66, "Laser"  , function=lambda: Menu.change_page(laser), uniform=True),
+    UpgradeBar(0.35, "Fire Rate", "PLAYER_GATLING_FIRE_RATE", x=0.32, min_value=game.PLAYER_GATLING_FIRE_RATE, max_value=40),
+    UpgradeBar(0.45, "Damage", "PLAYER_GATLING_DAMAGE", x=0.32, min_value=game.PLAYER_GATLING_DAMAGE, max_value=1),
+    UpgradeBar(0.55, "Bullet Speed", "PLAYER_GATLING_BULLET_SPEED", x=0.32, min_value=game.PLAYER_GATLING_BULLET_SPEED, max_value=1000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(weapon),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: EXIT
 )
 
 sniper_gun = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Sniper"),
-    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
-    UpgradeBar(0.3, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
-    UpgradeBar(0.4, "Damage", "PLAYER_SNIPER_DAMAGE", min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
-    UpgradeBar(0.5, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
+    Text(0.5, 0.12, "Weapon"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
+    Button(0.2, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun), uniform=True),
+    Button(0.2, 0.42, "Gatling", function=lambda: Menu.change_page(gatling_gun), uniform=True),
+    Button(0.2, 0.54, "Sniper" , function=lambda: Menu.change_page(sniper_gun), outline_colour=(255, 125, 0), uniform=True),
+    Button(0.2, 0.66, "Laser"  , function=lambda: Menu.change_page(laser), uniform=True),
+    UpgradeBar(0.35, "Fire Rate", "PLAYER_SNIPER_FIRE_RATE", x=0.32, min_value=game.PLAYER_SNIPER_FIRE_RATE, max_value=5),
+    UpgradeBar(0.45, "Damage", "PLAYER_SNIPER_DAMAGE", x=0.32, min_value=game.PLAYER_SNIPER_DAMAGE, max_value=5),
+    UpgradeBar(0.55, "Bullet Speed", "PLAYER_SNIPER_BULLET_SPEED", x=0.32, min_value=game.PLAYER_SNIPER_BULLET_SPEED, max_value=2000),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(weapon),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: EXIT
 )
 
 laser = Page(
     Rectangle(0.05, 0.05, 0.9, 0.9, Menu.DEFAULT_BACKGROUND_COLOUR, curve=10),
-    Text(0.5, 0.12, "Laser"),
-    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(weapon), font_size=30),
-    UpgradeBar(0.3, "Range" , "PLAYER_LASER_RANGE" , min_value=game.PLAYER_LASER_RANGE, max_value=600),
-    UpgradeBar(0.4, "Damage", "PLAYER_LASER_DAMAGE", min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
+    Text(0.5, 0.12, "Weapon"),
+    Button(0.12, 0.86, "Back", function=lambda: Menu.change_page(station), font_size=30),
+    Button(0.2, 0.3, "Blaster", function=lambda: Menu.change_page(blaster_gun), uniform=True),
+    Button(0.2, 0.42, "Gatling", function=lambda: Menu.change_page(gatling_gun), uniform=True),
+    Button(0.2, 0.54, "Sniper" , function=lambda: Menu.change_page(sniper_gun), uniform=True),
+    Button(0.2, 0.66, "Laser"  , function=lambda: Menu.change_page(laser), outline_colour=(255, 125, 0), uniform=True),
+    UpgradeBar(0.4, "Range" , "PLAYER_LASER_RANGE", x=0.32, min_value=game.PLAYER_LASER_RANGE, max_value=600),
+    UpgradeBar(0.5, "Damage", "PLAYER_LASER_DAMAGE", x=0.32, min_value=game.PLAYER_LASER_DAMAGE, max_value=20),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
-    escape=lambda: Menu.change_page(weapon),
+    escape=lambda: Menu.change_page(station),
     e_press=lambda: EXIT
 )
 
