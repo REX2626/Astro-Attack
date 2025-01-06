@@ -189,6 +189,19 @@ class AI_Ship(Ship):
         self.rotate_to(delta_time, self.position.get_angle_to(game.player.position) + math.pi, self.max_rotation_speed)
         self.accelerate_in_direction(self.rotation, 400 * delta_time)
 
+    def destroy(self):
+        super().destroy()
+
+        # If ship dies and it is a target of a kill mission, then the progress of that mission increases
+        if game.CURRENT_MISSION_SLOT != None:
+            data = game.MISSIONS[game.CURRENT_MISSION_SLOT]
+            if data["mission_type"] == game.KILL and data["goal"] == self.__class__.__name__:
+                data["current_number"] += 1
+
+        if len(game.KILLED_SHIP_IMAGES) == 90:
+            del game.KILLED_SHIP_IMAGES[0]
+        game.KILLED_SHIP_IMAGES.append(self.load_image)
+
     def draw(self, win: pygame.Surface, focus_point):
         super().draw(win, focus_point)
 

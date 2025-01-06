@@ -82,12 +82,6 @@ class Ship(Entity):
                 self.destroy()
 
     def destroy(self):
-        # If ship dies and it is a target of a kill mission, then the progress of that mission increases
-        if game.CURRENT_MISSION_SLOT != None:
-            data = game.MISSIONS[game.CURRENT_MISSION_SLOT]
-            if data["mission_type"] == game.KILL and data["goal"] == self.__class__.__name__:
-                data["current_number"] += 1
-
         game.CHUNKS.remove_entity(self)
         effects.explosion(self.position)
 

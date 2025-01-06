@@ -1621,6 +1621,25 @@ class MissionManager():
 
 
 
+class Graveyard(Widget):
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__(x, y)
+        self.text = Text(0.5, y-0.02, "Graveyard", font_size=30, colour=(120, 120, 120))
+
+    def draw(self) -> None:
+        self.text.draw()
+
+        # Draw a small image of each of the ships killed
+        for num, load_image in enumerate(game.KILLED_SHIP_IMAGES):
+            image = load_image()
+            game.WIN.blit(pygame.transform.rotate(image, num * 200), (self.x + (num % 30) * 20, self.y + (num % 3) * 30 - num//30 * 68))
+
+        # Draw a container for ships
+        pygame.draw.rect(game.WIN, game.BLACK, (game.WIDTH/2 - 325, self.y-150, 650, 280), width=10)
+
+
+
+
 # FRAMEWORK
 ########################################################################################################################################################
 # PAGES
@@ -1780,7 +1799,8 @@ stats = Page(
     Button(0.27, 0.23, "Missions", function=lambda: Menu.change_page(missions), uniform=True),
     Button(0.5, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), outline_colour=(255, 125, 0), uniform=True),
-    Text(0.5, 0.5, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
+    Text(0.5, 0.45, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
+    Graveyard(0.275, 0.7),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
