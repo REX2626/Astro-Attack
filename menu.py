@@ -308,24 +308,22 @@ class Image(Widget):
 
 
 
-class AdjustableText():
+class AdjustableText(RectWidget):
     def __init__(self,
-            top_x: int,
-            top_y: int,
-            bottom_x: int,
-            bottom_y: int,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
             text: str = "",
             font: str = Menu.DEFAULT_FONT,
             default_font_size: int = Menu.DEFAULT_FONT_SIZE,
             colour: Colour = Menu.DEFAULT_COLOUR
         ) -> None:
-        self.top_x = top_x
-        self.top_y = top_y
-        self.bottom_x = bottom_x
-        self.bottom_y = bottom_y
+        super().__init__(x, y, width, height)
 
         self.words = text.split(" ")
         self.font_type = font
+        self.font_size = default_font_size
         self.default_font_size = default_font_size
         self.colour = colour
 
@@ -339,9 +337,12 @@ class AdjustableText():
         self.words = text.split(" ")
 
     def render_words(self) -> list:
+        self.font = freetype.SysFont(self.font_type, self.font_size)
+        self.line_spacing = self.font.get_sized_height()
+
         low_letter_difference = self.font.get_rect("y").height - self.font.get_rect("u").height
         low_letter = False
-        x, y = self.top_x, self.top_y
+        x, y = self.x, self.y
         space = self.font.get_rect(' ')
 
         render_list = []
@@ -354,13 +355,11 @@ class AdjustableText():
                     low_letter = True
                     break
 
-            if x + bounds.width >= self.bottom_x:
-                x, y = self.top_x, y + self.line_spacing
+            if x + bounds.width >= self.x + self.width:
+                x, y = self.x, y + self.line_spacing
 
-            if x + bounds.width >= self.bottom_x or y + self.line_spacing >= self.bottom_y:
-                self.default_font_size -= 1
-                self.font = freetype.SysFont(self.font_type, self.default_font_size)
-                self.line_spacing = self.font.get_sized_height()
+            if x + bounds.width >= self.x + self.width or y + self.line_spacing >= self.y + self.height:
+                self.font_size -= 1
                 return self.render_words()
 
             if low_letter:
@@ -373,6 +372,7 @@ class AdjustableText():
         return render_list
 
     def draw(self) -> None:
+        self.font_size = self.default_font_size
         render_list = self.render_words()
 
         for element in render_list:
@@ -1483,7 +1483,7 @@ class Mission():
         self.width = 0.2
         self.height = 0.4
 
-        self.complete_mission_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, "Complete the accepted mission to get another one", default_font_size=70)
+        self.complete_mission_text = AdjustableText(self.x - self.width/2, self.y + 0.02 - self.height/2, self.width, self.height - 0.32, "Complete the accepted mission to get another one", default_font_size=27)
 
         self.accept_button = Button(self.x-0.05, self.y+0.13, "Accept", font_size=20, function=self.accept)
         self.decline_button = Button(self.x+0.05, self.y+0.13, "Decline", font_size=20, function=self.decline)
@@ -1493,7 +1493,7 @@ class Mission():
         self.progress_bar = Bar(self.x-(self.width/2), self.y+0.15, width=self.width, height=self.height/8, value=lambda: game.MISSIONS[self.slot]["current_number"], max_value=lambda: game.MISSIONS[self.slot]["number"], colour=(0, 0, 190), outline_width=3, curve=7)
 
         self.title_text = Text(self.x, self.y-0.05-self.height/2, "Kill Mission")
-        self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, default_font_size=70)
+        self.info_text = AdjustableText(self.x - self.width/2, self.y + 0.02 - self.height/2, self.width, self.height - 0.32, default_font_size=32)
 
     @property
     def in_progress(self) -> bool:
@@ -1573,7 +1573,7 @@ class Mission():
         self.title_text.draw()
 
         data = game.MISSIONS[self.slot]
-        self.info_text.change_text(f"Kill {data["number"]} {game.ENTITY_DICT.get(data["goal"])}s REWARDS: {data["reward"]} Scrap")
+        self.info_text.change_text(f"Kill {data["number"]} {game.ENTITY_DICT.get(data["goal"])}s REWARD: {data["reward"]} Scrap")
         self.info_text.draw()
 
         # Draw the image for the goal
