@@ -1482,18 +1482,17 @@ class Mission():
         self.width = 0.2
         self.height = 0.4
 
-        self.accept_button = Button(self.x, self.y, "Accept", function=self.accept)
-        self.decline_button = Button(self.x, self.y+0.1, "Decline", function=self.decline)
-        self.claim_reward_button = Button(self.x, self.y-0.1+(self.height/2), "Claim Reward", function=self.claim_reward)
+        self.complete_mission_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, "Complete the accepted mission to get another one", default_font_size=70)
 
-        self.progress_text = Text(self.x, self.y-0.05, text=lambda: f"{game.MISSIONS[self.slot]["current_number"]}/{game.MISSIONS[self.slot]["number"]}", font_size=25)
-        self.progress_bar = Bar(self.x-(self.width/2), self.y, width=self.width, height=self.height/8, value=lambda: game.MISSIONS[self.slot]["current_number"], max_value=lambda: game.MISSIONS[self.slot]["number"], colour=(0, 0, 190), outline_width=3, curve=7)
+        self.accept_button = Button(self.x-0.05, self.y+0.13, "Accept", font_size=20, function=self.accept)
+        self.decline_button = Button(self.x+0.05, self.y+0.13, "Decline", font_size=20, function=self.decline)
+        self.claim_reward_button = Button(self.x, self.y+0.13, "Claim Reward", font_size=25, colour=(255, 182, 36), function=self.claim_reward)
+
+        self.progress_text = Text(self.x, self.y+0.095, text=lambda: f"{game.MISSIONS[self.slot]["current_number"]}/{game.MISSIONS[self.slot]["number"]}", font_size=20)
+        self.progress_bar = Bar(self.x-(self.width/2), self.y+0.15, width=self.width, height=self.height/8, value=lambda: game.MISSIONS[self.slot]["current_number"], max_value=lambda: game.MISSIONS[self.slot]["number"], colour=(0, 0, 190), outline_width=3, curve=7)
 
         self.title_text = Text(self.x, self.y-0.05-self.height/2, "Kill Mission")
         self.info_text = AdjustableText((self.x-(self.width/2))*game.WIDTH, (self.y+0.02-(self.height/2)) * game.HEIGHT, (self.x+(self.width/2))* game.WIDTH, (self.y-0.3+self.height/2)*game.HEIGHT, default_font_size=70)
-
-        # False if one of the three missions is in progress - when false, you will not be able to accept the mission
-        self.active = True
 
     @property
     def in_progress(self) -> bool:
@@ -1501,18 +1500,31 @@ class Mission():
         return game.CURRENT_MISSION_SLOT == self.slot
 
     def accept(self) -> None:
+        if game.CURRENT_MISSION_SLOT != None:
+            game.MISSIONS[game.CURRENT_MISSION_SLOT] = None
         game.CURRENT_MISSION_SLOT = self.slot
         Menu.update()
 
     def decline(self) -> None:
-        if self.in_progress:
-            game.CURRENT_MISSION_SLOT = None
-        self.refresh()
+        game.MISSIONS[self.slot] = None
+
+        # If 1 mission left then accept it automatically
+        if game.MISSIONS.count(None) == 2:
+            for slot, mission in enumerate(game.MISSIONS):
+                if mission is not None:
+                    game.CURRENT_MISSION_SLOT = slot
+                    break
+
         Menu.update()
 
     def claim_reward(self) -> None:
+        game.CURRENT_MISSION_SLOT = None
         game.SCRAP_COUNT += game.MISSIONS[self.slot]["reward"]
-        self.decline()  # Removes this mission after claiming reward
+        self.refresh(self.slot)
+        for slot, mission in enumerate(game.MISSIONS):
+            if mission is None:
+                self.refresh(slot)
+        Menu.update()
 
     def click(self, mouse: Coord) -> bool:
         # Making sure button functions are run when clicked
@@ -1520,12 +1532,9 @@ class Mission():
             data = game.MISSIONS[self.slot]
             if data["current_number"] >= data["number"]:
                 if self.claim_reward_button.click(mouse) is True: return CLICKED
-            else:
-                if self.decline_button.click(mouse) is True: return CLICKED
         else:
-            if self.active:
-                if self.accept_button.click(mouse) is True: return CLICKED
-                if self.decline_button.click(mouse) is True: return CLICKED
+            if self.accept_button.click(mouse) is True: return CLICKED
+            if self.decline_button.click(mouse) is True: return CLICKED
 
     def get_enemy(self) -> str:
         class_list = list(self.class_list)
@@ -1534,7 +1543,7 @@ class Mission():
 
         return random.choice(class_list)
 
-    def refresh(self) -> None:
+    def refresh(self, slot: int) -> None:
         # number = number of things for the mission
         # goal = Target for the mission (e.g. Mother_Ship)
         # mission_type = what type of mission it is (e.g. kill mission)
@@ -1546,7 +1555,7 @@ class Mission():
         reward = number * (1+game.CURRENT_SHIP_LEVEL)**0.5 * self.class_list[goal]  # reward depends on number, difficulty and type of enemy
         reward *= 0.9 + random.random()*0.2  # reward +- 10% to make it look a bit random
 
-        game.MISSIONS[self.slot] = {
+        game.MISSIONS[slot] = {
             "current_number": 0,
             "number": number,
             "goal": goal,
@@ -1555,13 +1564,20 @@ class Mission():
         }
 
     def draw(self) -> None:
+        if game.MISSIONS[self.slot] is None:
+            self.complete_mission_text.draw()
+            return
+
         # Drawing title and info
         self.title_text.draw()
 
         data = game.MISSIONS[self.slot]
         self.info_text.change_text(f"Kill {data["number"]} {game.ENTITY_DICT.get(data["goal"])}s REWARDS: {data["reward"]} Scrap")
-
         self.info_text.draw()
+
+        # Draw the image for the goal
+        image = game.ENTITY_IMAGE_DICT[data["goal"]]
+        game.WIN.blit(image, (self.x * game.WIDTH - image.get_width()/2 - self.width/2, self.y * game.HEIGHT - image.get_height()/2))
 
         # If the mission is in progress - draw the progress bar and stop drawing the accept and decline button. Once the mission is done, it draws the claim reward button
         if self.in_progress:
@@ -1569,14 +1585,12 @@ class Mission():
             if data["current_number"] >= data["number"]:
                 self.claim_reward_button.draw()
             else:
-                self.decline_button.draw()
-            self.progress_bar.draw()
-            self.progress_text.draw()
+                self.progress_bar.draw()
+                self.progress_text.draw()
 
         else:
-            if self.active:
-                self.accept_button.draw()
-                self.decline_button.draw()
+            self.accept_button.draw()
+            self.decline_button.draw()
 
 
 
@@ -1600,13 +1614,9 @@ class MissionManager():
         if game.MISSIONS == [None, None, None]:  # First time world is created
             game.MISSIONS = [None for _ in range(3)]
             for mission in self.missions:
-                mission.refresh()
+                mission.refresh(mission.slot)
 
         for mission in self.missions:
-            if game.CURRENT_MISSION_SLOT is None:
-                mission.active = True
-            else:
-                mission.active = False
             mission.draw()
 
 
@@ -1684,7 +1694,7 @@ single_player = Page(
 )
 
 multiplayer = Page(
-    Text(0.5, 0.45, "Coming soon in a1.9.0!"),
+    Text(0.5, 0.45, "Coming soon in version b1.0!"),
     Button(0.5, 0.875, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )

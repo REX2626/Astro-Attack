@@ -587,6 +587,11 @@ class MissionOverview():
 
         if game.CURRENT_MISSION_SLOT != None:
             data = game.MISSIONS[game.CURRENT_MISSION_SLOT]
+
+            # Draw the image for the goal
+            image = game.ENTITY_IMAGE_DICT[data["goal"]]
+            game.WIN.blit(image, (self.x() - image.get_width()/2 - self.width/2, self.y() - image.get_height()/2))
+
             if data["current_number"] >= data["number"]:  # If reward completed: draw "Claim Reward"
                 game.WIN.blit(self.claim_reward_label, (self.x()-self.claim_reward_label_width/2-self.width/2, self.y()+self.height/4-self.claim_reward_label_height/2))
             else:
@@ -598,10 +603,6 @@ class MissionOverview():
 
                 self.progress_bar.update(data["current_number"]/data["number"])
                 self.progress_bar.draw()
-
-                # Draw the image for the goal
-                image = game.ENTITY_IMAGE_DICT[data["goal"]]
-                game.WIN.blit(image, (self.x() - image.get_width()/2 - self.width/2, self.y() - image.get_height()/2))
 
             if data["mission_type"] == game.KILL:
                 self.title_label = self.kill_mission_label
