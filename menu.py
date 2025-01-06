@@ -949,7 +949,7 @@ class UpgradeBar(Widget):
                 pygame.draw.rect(game.WIN, Menu.DEFAULT_BACKGROUND_COLOUR, (x+2, self.y+2, width-4, height-4), border_radius=10)
 
                 if bar == self.get_level():  # the first locked bar shows a price instead of a padlock
-                    if game.SCRAP_COUNT >= bar+1: colour = Menu.DEFAULT_COLOUR
+                    if game.SCRAP_COUNT >= 2**bar: colour = Menu.DEFAULT_COLOUR
                     else: colour = (255, 0, 0)
                     number_font = pygame.font.SysFont(Menu.DEFAULT_FONT, round(game.WIDTH/50))
                     number = number_font.render(str(2**bar), True, colour)
