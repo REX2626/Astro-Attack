@@ -873,6 +873,7 @@ class UpgradeBar(Widget):
         if mx > x and mx < x + width and my > y and my < y + height:
             self.set_value(self.min_value)
             Menu.update()
+            return
 
         # go through every bar to see if it is clicked on
         for bar in range(self.bars):
@@ -898,7 +899,7 @@ class UpgradeBar(Widget):
                     self.set_value(self.min_value + self.get_level() * self.step)
                     Menu.update()
 
-                break
+                return
 
     def get_label(self) -> pygame.Surface:
         """Gets a text label"""
@@ -1621,9 +1622,9 @@ class MissionManager():
 
 
 
-class Graveyard(Widget):
-    def __init__(self, x: int, y: int) -> None:
-        super().__init__(x, y)
+class Graveyard():
+    def __init__(self, y: int) -> None:
+        self.y = y
         self.text = Text(0.5, y-0.02, "Graveyard", font_size=30, colour=(120, 120, 120))
 
     def draw(self) -> None:
@@ -1632,10 +1633,10 @@ class Graveyard(Widget):
         # Draw a small image of each of the ships killed
         for num, load_image in enumerate(game.KILLED_SHIP_IMAGES):
             image = load_image()
-            game.WIN.blit(pygame.transform.rotate(image, num * 200), (self.x + (num % 30) * 20, self.y + (num % 3) * 30 - num//30 * 68))
+            game.WIN.blit(pygame.transform.rotate(image, num * 200), (game.WIDTH/2 - 320 + (num % 30) * 20, self.y * game.HEIGHT + 60 - (num % 3) * 30 - num//30 * 68))
 
         # Draw a container for ships
-        pygame.draw.rect(game.WIN, game.BLACK, (game.WIDTH/2 - 325, self.y-150, 650, 280), width=10)
+        pygame.draw.rect(game.WIN, game.BLACK, (game.WIDTH/2 - 325, self.y * game.HEIGHT - 150, 650, 280), width=10)
 
 
 
@@ -1685,7 +1686,7 @@ settings = Page(
     SettingButton(0.25, 2/6, lambda: f"FULL SCREEN: {game.FULLSCREEN}"     , font_size=40, value="FULLSCREEN"   , function_action=lambda: change_fullscreen()),
     SettingButton(0.75, 2/6, lambda: f"LOAD DISTANCE: {game.LOAD_DISTANCE}", font_size=40, value="LOAD_DISTANCE", function_action=lambda: game.save_settings(), min=4, max=26),
     SettingButton(0.25, 3/6, lambda: f"RENDER: {"AGGRESSIVE" if game.ENTITY_CULLING else "PASSIVE"}", font_size=40, value="ENTITY_CULLING", function_action=lambda: game.save_settings()),
-    Button(0.5, 7/8, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 7/8, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(main_menu),
     up=lambda: settings_up(),
@@ -1714,7 +1715,7 @@ single_player = Page(
 
 multiplayer = Page(
     Text(0.5, 0.45, "Coming soon in version b1.0!"),
-    Button(0.5, 0.875, "Main Menu" , font_size=40, function=lambda: Menu.change_page(main_menu)),
+    Button(0.5, 0.875, "Main Menu", font_size=40, function=lambda: Menu.change_page(main_menu)),
     escape=lambda: Menu.change_page(main_menu)
 )
 
@@ -1722,7 +1723,7 @@ new_world = Page(
     NameTextInput(0.5, 0.3, 0.5, 0.1, "Name", limit=20),
     SeedTextInput(0.5, 0.53, 0.5, 0.1, "Seed", limit=6),
     Button(0.5, 0.752, "Create World", function=lambda: create_world()),
-    Button(0.5, 0.875, "Back" , font_size=40, function=lambda: Menu.change_page(single_player)),
+    Button(0.5, 0.875, "Back", font_size=40, function=lambda: Menu.change_page(single_player)),
     click=lambda: page_click(),
     escape=lambda: Menu.change_page(single_player)
 )
@@ -1800,7 +1801,7 @@ stats = Page(
     Button(0.5, 0.23, "Upgrades", function=lambda: Menu.change_page(station), uniform=True),
     Button(0.73, 0.23, "Stats", function=lambda: Menu.change_page(stats), outline_colour=(255, 125, 0), uniform=True),
     Text(0.5, 0.45, lambda: f"Skill level: {stats_skill_levels[min(10, int(game.SCORE/50))].upper()}"),
-    Graveyard(0.275, 0.7),
+    Graveyard(0.7),
     Text(0.875, 0.12, lambda: f"{game.SCRAP_COUNT}", align=pygame.FONT_RIGHT),
     Image(0.9, 0.12, images.SCRAP, scale=6),
     background_colour=None,
